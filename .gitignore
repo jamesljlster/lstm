@@ -1,0 +1,5 @@
+# Build folder
+build
+
+# Temp file
+*.swp
