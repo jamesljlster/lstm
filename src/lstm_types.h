@@ -1,6 +1,12 @@
 #ifndef __LSTM_TYPES_H__
 #define __LSTM_TYPES_H__
 
+struct LSTM_BUF
+{
+	double* list;
+	int listLen;
+};
+
 struct LSTM_BASE
 {
 	double* weight;		// Weight connection
