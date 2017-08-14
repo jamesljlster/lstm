@@ -7,6 +7,9 @@
 extern "C" {
 #endif
 
+void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfgPtr);
+int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr);
+
 #ifdef __cplusplus
 }
 #endif

@@ -31,6 +31,22 @@ enum LSTM_RETUEN_VALUE
 	LSTM_MEM_FAILED		= -1,	/*!< Memory allocation failed. @since 0.1.0 */
 };
 
+/** Transfer (activation) function index definitions. */
+enum ANN_TRANSFER_FUNC
+{
+	ANN_SIGMOID				= 0,	/*!< Sigmoid function. @since 0.1.0 */
+	ANN_MODIFIED_SIGMOID	= 1,	/*!< Modified sigmoid function. @since 0.1.0 */
+	ANN_HYPERBOLIC_TANGENT	= 2,	/*!< Hyperbolic tangent function. @since 0.1.0 */
+	ANN_GAUSSIAN			= 3,	/*!< Gaussian function. @since 0.1.0 */
+	ANN_BENT_IDENTITY		= 4,	/*!< Bent identity function. @since 0.1.0 */
+	ANN_SOFTPLUS			= 5,	/*!< SoftPlus function. @since 0.1.0 */
+	ANN_SOFTSIGN			= 6,	/*!< SoftSign function. @since 0.1.0 */
+	ANN_SINC				= 7,	/*!< Sinc function. @since 0.1.0 */
+	ANN_SINUSOID			= 8,	/*!< Sinusoid (sine) function. @since 0.1.0 */
+	ANN_IDENTITY			= 9,	/*!< Identity function. @since 0.1.0 */
+	ANN_RELU				= 10,	/*!< Rectifier linear unit function. @since 0.1.0 */
+};
+
 /**
  *@}
  */
@@ -47,10 +63,10 @@ enum LSTM_RETUEN_VALUE
  *@{
  */
 
-/** Type definition of lstm. @since 0.2.0 */
+/** Type definition of lstm. @since 0.1.0 */
 typedef struct LSTM_STRUCT* lstm_t;
 
-/** Type definition of lstm configuration. @since 0.2.0 */
+/** Type definition of lstm configuration. @since 0.1.0 */
 typedef struct LSTM_CONFIG_STRUCT* lstm_config_t;
 
 /**
@@ -63,15 +79,18 @@ extern "C" {
 
 /**
  *	\~English @defgroup Config Configuration
- *	@brief Configuration of neural netwrok.
+ *	@brief Configuration of LSTM networks.
  *
  *@{
  *
  *	\~Chinese-Traditional @defgroup Config 配置
- *	@brief 類神經網路配置
+ *	@brief LSTM 網路配置
  *
  *@{
  */
+
+int lstm_config_create(lstm_config_t* lstmCfgPtr);
+void lstm_config_delete(lstm_config_t lstmCfg);
 
 /**
  *@}
