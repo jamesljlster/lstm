@@ -32,19 +32,19 @@ enum LSTM_RETUEN_VALUE
 };
 
 /** Transfer (activation) function index definitions. */
-enum ANN_TRANSFER_FUNC
+enum LSTM_TRANSFER_FUNC
 {
-	ANN_SIGMOID				= 0,	/*!< Sigmoid function. @since 0.1.0 */
-	ANN_MODIFIED_SIGMOID	= 1,	/*!< Modified sigmoid function. @since 0.1.0 */
-	ANN_HYPERBOLIC_TANGENT	= 2,	/*!< Hyperbolic tangent function. @since 0.1.0 */
-	ANN_GAUSSIAN			= 3,	/*!< Gaussian function. @since 0.1.0 */
-	ANN_BENT_IDENTITY		= 4,	/*!< Bent identity function. @since 0.1.0 */
-	ANN_SOFTPLUS			= 5,	/*!< SoftPlus function. @since 0.1.0 */
-	ANN_SOFTSIGN			= 6,	/*!< SoftSign function. @since 0.1.0 */
-	ANN_SINC				= 7,	/*!< Sinc function. @since 0.1.0 */
-	ANN_SINUSOID			= 8,	/*!< Sinusoid (sine) function. @since 0.1.0 */
-	ANN_IDENTITY			= 9,	/*!< Identity function. @since 0.1.0 */
-	ANN_RELU				= 10,	/*!< Rectifier linear unit function. @since 0.1.0 */
+	LSTM_SIGMOID				= 0,	/*!< Sigmoid function. @since 0.1.0 */
+	LSTM_MODIFIED_SIGMOID	= 1,	/*!< Modified sigmoid function. @since 0.1.0 */
+	LSTM_HYPERBOLIC_TANGENT	= 2,	/*!< Hyperbolic tangent function. @since 0.1.0 */
+	LSTM_GAUSSIAN			= 3,	/*!< Gaussian function. @since 0.1.0 */
+	LSTM_BENT_IDENTITY		= 4,	/*!< Bent identity function. @since 0.1.0 */
+	LSTM_SOFTPLUS			= 5,	/*!< SoftPlus function. @since 0.1.0 */
+	LSTM_SOFTSIGN			= 6,	/*!< SoftSign function. @since 0.1.0 */
+	LSTM_SINC				= 7,	/*!< Sinc function. @since 0.1.0 */
+	LSTM_SINUSOID			= 8,	/*!< Sinusoid (sine) function. @since 0.1.0 */
+	LSTM_IDENTITY			= 9,	/*!< Identity function. @since 0.1.0 */
+	LSTM_RELU				= 10,	/*!< Rectifier linear unit function. @since 0.1.0 */
 };
 
 /**
