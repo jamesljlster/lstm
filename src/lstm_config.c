@@ -3,6 +3,7 @@
 
 #include "lstm.h"
 #include "lstm_private.h"
+#include "lstm_builtin_math.h"
 
 #include "debug.h"
 
@@ -133,6 +134,78 @@ int lstm_config_get_hidden_layers(lstm_config_t lstmCfg)
 	{
 		return 0;
 	}
+}
+
+int lstm_config_set_input_transfer_func(lstm_config_t lstmCfg, int tFuncID)
+{
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+	// Checking
+	if(tFuncID >= LSTM_TFUNC_AMOUNT)
+	{
+		ret = LSTM_INVALID_ARG;
+	}
+	else
+	{
+		lstmCfg->inputTFunc = tFuncID;
+	}
+
+	LOG("exit");
+
+	return ret;
+}
+
+int lstm_config_get_input_transfer_func(lstm_config_t lstmCfg)
+{
+	return lstmCfg->inputTFunc;
+}
+
+int lstm_config_set_output_transfer_func(lstm_config_t lstmCfg, int tFuncID)
+{
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+	// Checking
+	if(tFuncID >= LSTM_TFUNC_AMOUNT)
+	{
+		ret = LSTM_INVALID_ARG;
+	}
+	else
+	{
+		lstmCfg->outputTFunc = tFuncID;
+	}
+
+	LOG("exit");
+
+	return ret;
+}
+
+int lstm_config_get_output_transfer_func(lstm_config_t lstmCfg)
+{
+	return lstmCfg->outputTFunc;
+}
+
+void lstm_config_set_learning_rate(lstm_config_t lstmCfg, double lRate)
+{
+	lstmCfg->lRate = lRate;
+}
+
+double lstm_config_get_learning_rate(lstm_config_t lstmCfg)
+{
+	return lstmCfg->lRate;
+}
+
+void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef)
+{
+	lstmCfg->mCoef = mCoef;
+}
+
+double lstm_config_get_momentum_coef(lstm_config_t lstmCfg)
+{
+	return lstmCfg->mCoef;
 }
 
 void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
