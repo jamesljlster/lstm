@@ -35,7 +35,7 @@ enum LSTM_RETUEN_VALUE
 /** Transfer (activation) function index definitions. */
 enum LSTM_TRANSFER_FUNC
 {
-	LSTM_SIGMOID				= 0,	/*!< Sigmoid function. @since 0.1.0 */
+	LSTM_SIGMOID			= 0,	/*!< Sigmoid function. @since 0.1.0 */
 	LSTM_MODIFIED_SIGMOID	= 1,	/*!< Modified sigmoid function. @since 0.1.0 */
 	LSTM_HYPERBOLIC_TANGENT	= 2,	/*!< Hyperbolic tangent function. @since 0.1.0 */
 	LSTM_GAUSSIAN			= 3,	/*!< Gaussian function. @since 0.1.0 */
@@ -98,6 +98,16 @@ int lstm_config_set_outputs(lstm_config_t lstmCfg, int outputs);
 int lstm_config_get_outputs(lstm_config_t lstmCfg);
 int lstm_config_set_hidden_layers(lstm_config_t lstmCfg, int hiddenLayers);
 int lstm_config_get_hidden_layers(lstm_config_t lstmCfg);
+int lstm_config_set_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex, int hiddenNodes);
+int lstm_config_get_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex);
+int lstm_config_set_input_transfer_func(lstm_config_t lstmCfg, int tFuncID);
+int lstm_config_get_input_transfer_func(lstm_config_t lstmCfg);
+int lstm_config_set_output_transfer_func(lstm_config_t lstmCfg, int tFuncID);
+int lstm_config_get_output_transfer_func(lstm_config_t lstmCfg);
+void lstm_config_set_learning_rate(lstm_config_t lstmCfg, double lRate);
+double lstm_config_get_learning_rate(lstm_config_t lstmCfg);
+void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef);
+double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
 
 /**
  *@}
