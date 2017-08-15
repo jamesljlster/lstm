@@ -15,13 +15,19 @@
 
 void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 {
+	LOG("enter");
+
 	memset(lstmCfgPtr, 0, sizeof(struct LSTM_CONFIG_STRUCT));
+
+	LOG("exit");
 }
 
 int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 {
 	int i;
 	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
 
 	// Zero memory
 	lstm_config_zeromem(lstmCfgPtr);
@@ -60,6 +66,7 @@ int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 	lstmCfgPtr->mCoef = LSTM_DEFAULT_MCOEF;
 
 RET:
+	LOG("exit");
 	return ret;
 }
 
@@ -69,6 +76,8 @@ int lstm_config_create(lstm_config_t* lstmCfgPtr)
 	int ret = LSTM_NO_ERROR;
 
 	struct LSTM_CONFIG_STRUCT* cfgPtr;
+
+	LOG("enter");
 
 	// Memory allocation
 	cfgPtr = malloc(sizeof(struct LSTM_CONFIG_STRUCT));
@@ -95,20 +104,29 @@ ERR:
 	free(cfgPtr);
 
 RET:
+	LOG("exit");
 	return ret;
 }
 
 void lstm_config_delete(lstm_config_t lstmCfg)
 {
+	LOG("enter");
+
 	lstm_config_delete_struct(lstmCfg);
 	free(lstmCfg);
+
+	LOG("exit");
 }
 
 void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 {
+	LOG("enter");
+
 	if(lstmCfgPtr->nodeList != NULL)
 	{
 		free(lstmCfgPtr->nodeList);
 	}
+
+	LOG("exit");
 }
 
