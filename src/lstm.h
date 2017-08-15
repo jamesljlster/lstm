@@ -94,6 +94,10 @@ int lstm_config_create(lstm_config_t* lstmCfgPtr);
 void lstm_config_delete(lstm_config_t lstmCfg);
 int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs);
 int lstm_config_get_inputs(lstm_config_t lstmCfg);
+int lstm_config_set_outputs(lstm_config_t lstmCfg, int outputs);
+int lstm_config_get_outputs(lstm_config_t lstmCfg);
+int lstm_config_set_hidden_layers(lstm_config_t lstmCfg, int hiddenLayers);
+int lstm_config_get_hidden_layers(lstm_config_t lstmCfg);
 
 /**
  *@}
