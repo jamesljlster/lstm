@@ -29,6 +29,7 @@ enum LSTM_RETUEN_VALUE
 {
 	LSTM_NO_ERROR		= 0,	/*!< No error occured while running called function. @since 0.1.0 */
 	LSTM_MEM_FAILED		= -1,	/*!< Memory allocation failed. @since 0.1.0 */
+	LSTM_INVALID_ARG	= -2,	/*!< Invalid argument(s) or setting(s). @since 0.1.0 */
 };
 
 /** Transfer (activation) function index definitions. */
@@ -91,6 +92,8 @@ extern "C" {
 
 int lstm_config_create(lstm_config_t* lstmCfgPtr);
 void lstm_config_delete(lstm_config_t lstmCfg);
+int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs);
+int lstm_config_get_inputs(lstm_config_t lstmCfg);
 
 /**
  *@}

@@ -13,6 +13,128 @@
 #define LSTM_DEFAULT_LRATE		0.01
 #define LSTM_DEFAULT_MCOEF		0.1
 
+int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs)
+{
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+	// Checking
+	if(inputs <= 0)
+	{
+		ret = LSTM_INVALID_ARG;
+	}
+	else
+	{
+		// Set value
+		lstmCfg->inputs = inputs;
+		if(lstmCfg->nodeList != NULL)
+		{
+			lstmCfg->nodeList[0] = inputs;
+		}
+	}
+
+	LOG("exit");
+	return ret;
+}
+
+int lstm_config_get_inputs(lstm_config_t lstmCfg)
+{
+	return lstmCfg->inputs;
+}
+
+int lstm_config_set_outputs(lstm_config_t lstmCfg, int outputs)
+{
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+	// Checking
+	if(outputs <= 0)
+	{
+		ret = LSTM_INVALID_ARG;
+	}
+	else
+	{
+		// Set value
+		lstmCfg->outputs = outputs;
+		if(lstmCfg->nodeList != NULL)
+		{
+			lstmCfg->nodeList[lstmCfg->layers - 1] = outputs;
+		}
+	}
+
+	LOG("exit");
+	return ret;
+}
+
+int lstm_config_get_outputs(lstm_config_t lstmCfg)
+{
+	return lstmCfg->outputs;
+}
+
+int lstm_config_set_hidden_layers(lstm_config_t lstmCfg, int hiddenLayers)
+{
+	int i;
+	int ret = LSTM_NO_ERROR;
+	int preLayers, layers;
+
+	int* tmpNodeList = NULL;
+
+	LOG("enter");
+
+	// Checking
+	if(hiddenLayers <= 0)
+	{
+		ret = LSTM_INVALID_ARG;
+		goto RET;
+	}
+
+	// Find layers
+	preLayers = lstmCfg->layers;
+	layers = hiddenLayers + 2;
+	if(preLayers == layers)
+	{
+		// Nothing need to do
+		goto RET;
+	}
+
+	// Reallocate node list
+	tmpNodeList = realloc(lstmCfg->nodeList, sizeof(int) * layers);
+	if(tmpNodeList == NULL)
+	{
+		goto RET;
+	}
+
+	// Set nodes
+	for(i = preLayers - 1; i < layers - 1; i++)
+	{
+		tmpNodeList[i] = LSTM_DEFAULT_NODES;
+	}
+	tmpNodeList[0] = lstmCfg->inputs;
+	tmpNodeList[layers - 1] = lstmCfg->outputs;
+
+	// Assign values
+	lstmCfg->nodeList = tmpNodeList;
+	lstmCfg->layers = layers;
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_config_get_hidden_layers(lstm_config_t lstmCfg)
+{
+	if(lstmCfg->layers > 2)
+	{
+		return lstmCfg->layers - 2;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 {
 	LOG("enter");
