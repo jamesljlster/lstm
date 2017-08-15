@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -134,6 +135,56 @@ int lstm_config_get_hidden_layers(lstm_config_t lstmCfg)
 	{
 		return 0;
 	}
+}
+
+int lstm_config_set_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex, int hiddenNodes)
+{
+	int ret = LSTM_NO_ERROR;
+	int layerIndex;
+
+	LOG("enter");
+
+	// Checking
+	layerIndex = hiddenLayerIndex + 1;
+	if(layerIndex >= lstmCfg->layers || hiddenNodes <= 0)
+	{
+		ret = LSTM_INVALID_ARG;
+	}
+	else
+	{
+		// Set value
+		assert(lstmCfg->nodeList != NULL);
+		lstmCfg->nodeList[layerIndex] = hiddenNodes;
+	}
+
+	LOG("exit");
+
+	return ret;
+}
+
+int lstm_config_get_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex)
+{
+	int ret;
+	int layerIndex;
+
+	LOG("enter");
+
+	// Checking
+	layerIndex = hiddenLayerIndex + 1;
+	if(layerIndex >= lstmCfg->layers)
+	{
+		ret = LSTM_INVALID_ARG;
+	}
+	else
+	{
+		// Get value
+		assert(lstmCfg->nodeList != NULL);
+		ret = lstmCfg->nodeList[layerIndex];
+	}
+
+	LOG("exit");
+
+	return ret;
 }
 
 int lstm_config_set_input_transfer_func(lstm_config_t lstmCfg, int tFuncID)
