@@ -10,7 +10,7 @@
 
 #define LSTM_DEFAULT_INPUTS		1
 #define LSTM_DEFAULT_OUTPUTS	1
-#define LSTM_DEFAULT_LAYERS		3
+#define LSTM_DEFAULT_HLAYERS	3
 #define LSTM_DEFAULT_NODES		16
 #define LSTM_DEFAULT_LRATE		0.01
 #define LSTM_DEFAULT_MCOEF		0.1
@@ -270,7 +270,6 @@ void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 
 int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 {
-	int i;
 	int ret = LSTM_NO_ERROR;
 
 	LOG("enter");
@@ -278,6 +277,34 @@ int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 	// Zero memory
 	lstm_config_zeromem(lstmCfgPtr);
 
+	// Set inputs, outputs
+	lstm_config_set_inputs(lstmCfgPtr, LSTM_DEFAULT_INPUTS);
+	lstm_config_set_outputs(lstmCfgPtr, LSTM_DEFAULT_OUTPUTS);
+
+	// Set layers
+	ret = lstm_config_set_hidden_layers(lstmCfgPtr, LSTM_DEFAULT_HLAYERS);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Set nodes
+	ret = lstm_config_set_hidden_nodes(lstmCfgPtr, LSTM_DEFAULT_HLAYERS - 1, LSTM_DEFAULT_NODES);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Set transfer function
+	lstmCfgPtr->gateTFunc = LSTM_SIGMOID;
+	lstm_config_set_input_transfer_func(lstmCfgPtr, LSTM_HYPERBOLIC_TANGENT);
+	lstm_config_set_output_transfer_func(lstmCfgPtr, LSTM_HYPERBOLIC_TANGENT);
+
+	// Set learning and momentum coef
+	lstm_config_set_learning_rate(lstmCfgPtr, LSTM_DEFAULT_LRATE);
+	lstm_config_set_momentum_coef(lstmCfgPtr, LSTM_DEFAULT_MCOEF);
+
+	/*
 	// Allocate node list
 	lstmCfgPtr->nodeList = calloc(LSTM_DEFAULT_LAYERS, sizeof(int));
 	if(lstmCfgPtr->nodeList == NULL)
@@ -310,6 +337,7 @@ int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
 	// Set learning rate and momentum coef
 	lstmCfgPtr->lRate = LSTM_DEFAULT_LRATE;
 	lstmCfgPtr->mCoef = LSTM_DEFAULT_MCOEF;
+	*/
 
 RET:
 	LOG("exit");
