@@ -421,10 +421,11 @@ void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	LOG("enter");
 
-	if(lstmCfg->nodeList != NULL)
-	{
-		free(lstmCfg->nodeList);
-	}
+	// Free memory
+	lstm_free(lstmCfg->nodeList);
+
+	// Zero memory
+	lstm_config_zeromem(lstmCfg);
 
 	LOG("exit");
 }
