@@ -261,43 +261,43 @@ double lstm_config_get_momentum_coef(lstm_config_t lstmCfg)
 	return lstmCfg->mCoef;
 }
 
-void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
+void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	LOG("enter");
 
-	memset(lstmCfgPtr, 0, sizeof(struct LSTM_CONFIG_STRUCT));
+	memset(lstmCfg, 0, sizeof(struct LSTM_CONFIG_STRUCT));
 
 	LOG("exit");
 }
 
-int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
+int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	int ret = LSTM_NO_ERROR;
 
 	LOG("enter");
 
 	// Zero memory
-	lstm_config_zeromem(lstmCfgPtr);
+	lstm_config_zeromem(lstmCfg);
 
 	// Set inputs, outputs
-	lstm_config_set_inputs(lstmCfgPtr, LSTM_DEFAULT_INPUTS);
-	lstm_config_set_outputs(lstmCfgPtr, LSTM_DEFAULT_OUTPUTS);
+	lstm_config_set_inputs(lstmCfg, LSTM_DEFAULT_INPUTS);
+	lstm_config_set_outputs(lstmCfg, LSTM_DEFAULT_OUTPUTS);
 
 	// Set layers
-	ret = lstm_config_set_hidden_layers(lstmCfgPtr, LSTM_DEFAULT_HLAYERS);
+	ret = lstm_config_set_hidden_layers(lstmCfg, LSTM_DEFAULT_HLAYERS);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto RET;
 	}
 
 	// Set transfer function
-	lstmCfgPtr->gateTFunc = LSTM_SIGMOID;
-	lstm_config_set_input_transfer_func(lstmCfgPtr, LSTM_HYPERBOLIC_TANGENT);
-	lstm_config_set_output_transfer_func(lstmCfgPtr, LSTM_HYPERBOLIC_TANGENT);
+	lstmCfg->gateTFunc = LSTM_SIGMOID;
+	lstm_config_set_input_transfer_func(lstmCfg, LSTM_HYPERBOLIC_TANGENT);
+	lstm_config_set_output_transfer_func(lstmCfg, LSTM_HYPERBOLIC_TANGENT);
 
 	// Set learning and momentum coef
-	lstm_config_set_learning_rate(lstmCfgPtr, LSTM_DEFAULT_LRATE);
-	lstm_config_set_momentum_coef(lstmCfgPtr, LSTM_DEFAULT_MCOEF);
+	lstm_config_set_learning_rate(lstmCfg, LSTM_DEFAULT_LRATE);
+	lstm_config_set_momentum_coef(lstmCfg, LSTM_DEFAULT_MCOEF);
 
 RET:
 	LOG("exit");
@@ -352,13 +352,13 @@ void lstm_config_delete(lstm_config_t lstmCfg)
 	LOG("exit");
 }
 
-void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfgPtr)
+void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	LOG("enter");
 
-	if(lstmCfgPtr->nodeList != NULL)
+	if(lstmCfg->nodeList != NULL)
 	{
-		free(lstmCfgPtr->nodeList);
+		free(lstmCfg->nodeList);
 	}
 
 	LOG("exit");
