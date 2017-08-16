@@ -91,6 +91,7 @@ extern "C" {
  */
 
 int lstm_config_create(lstm_config_t* lstmCfgPtr);
+int lstm_config_clone(lstm_config_t* lstmCfgPtr, lstm_config_t lstmCfgSrc);
 void lstm_config_delete(lstm_config_t lstmCfg);
 int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs);
 int lstm_config_get_inputs(lstm_config_t lstmCfg);

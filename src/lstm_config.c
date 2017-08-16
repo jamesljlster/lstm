@@ -15,6 +15,71 @@
 #define LSTM_DEFAULT_LRATE		0.01
 #define LSTM_DEFAULT_MCOEF		0.1
 
+int lstm_config_clone(lstm_config_t* lstmCfgPtr, lstm_config_t lstmCfgSrc)
+{
+	int ret = LSTM_NO_ERROR;
+	struct LSTM_CONFIG_STRUCT* tmpLstmCfg;
+
+	LOG("enter");
+
+	// Memory allocation: lstm config struct
+	tmpLstmCfg = malloc(sizeof(struct LSTM_CONFIG_STRUCT));
+	if(tmpLstmCfg == NULL)
+	{
+		ret = LSTM_MEM_FAILED;
+		goto RET;
+	}
+
+	// Zero memory
+	lstm_config_zeromem(tmpLstmCfg);
+
+	// Clone config struct
+	ret = lstm_config_clone_struct(tmpLstmCfg, lstmCfgSrc);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
+
+	// Assign value
+	*lstmCfgPtr = tmpLstmCfg;
+
+	goto RET;
+
+ERR:
+	free(tmpLstmCfg);
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_config_clone_struct(struct LSTM_CONFIG_STRUCT* dst, struct LSTM_CONFIG_STRUCT* src)
+{
+	int ret = LSTM_NO_ERROR;
+	int* tmpNodeList;
+
+	LOG("enter");
+
+	// Memory allocation: tmp node list
+	tmpNodeList = calloc(src->layers, sizeof(int));
+	if(tmpNodeList == NULL)
+	{
+		ret = LSTM_MEM_FAILED;
+		goto RET;
+	}
+
+	// Copy memory
+	memcpy(tmpNodeList, src->nodeList, src->layers * sizeof(int));
+
+	// Assign values
+	*dst = *src;
+	dst->nodeList = tmpNodeList;
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
 int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs)
 {
 	int ret = LSTM_NO_ERROR;

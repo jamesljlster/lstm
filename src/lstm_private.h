@@ -10,6 +10,7 @@ extern "C" {
 void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfg);
 int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfg);
 void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfg);
+int lstm_config_clone_struct(struct LSTM_CONFIG_STRUCT* dst, struct LSTM_CONFIG_STRUCT* src);
 
 #ifdef __cplusplus
 }
