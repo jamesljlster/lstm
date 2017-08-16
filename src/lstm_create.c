@@ -31,6 +31,21 @@ int lstm_create(lstm_t lstmPtr, lstm_config_t lstmCfg)
 	// Zero memory
 	lstm_zeromem(tmpLstmPtr);
 
+	// Clone config
+	ret = lstm_config_clone_struct(&tmpLstmPtr->config, lstmCfg);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
+
+	goto RET;
+
+ERR:
+	if(tmpLstmPtr != NULL)
+	{
+		free(tmpLstmPtr);
+	}
+
 RET:
 	LOG("exit");
 	return ret;
