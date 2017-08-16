@@ -113,6 +113,8 @@ double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
  *@}
  */
 
+int lstm_create(lstm_t lstmPtr, lstm_config_t lstmCfg);
+
 #ifdef __cplusplus
 }
 #endif
