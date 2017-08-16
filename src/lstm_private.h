@@ -3,7 +3,7 @@
 
 #include "lstm_types.h"
 
-#define CHK_FREE(ptr)	if(ptr != NULL) {free(ptr); ptr = NULL;}
+#define lstm_free(ptr)	if(ptr != NULL) {free(ptr); ptr = NULL;}
 
 #ifdef __cplusplus
 extern "C" {
