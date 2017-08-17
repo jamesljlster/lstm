@@ -83,6 +83,8 @@ int lstm_node_alloc(struct LSTM_NODE* nodePtr, int nodeType, int netSize, int re
 			{
 				goto ERR;
 			}
+
+		case LSTM_INPUT_NODE:
 			break;
 
 		default:
@@ -96,6 +98,43 @@ int lstm_node_alloc(struct LSTM_NODE* nodePtr, int nodeType, int netSize, int re
 
 ERR:
 	lstm_node_delete(&tmpNode);
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_layer_alloc(struct LSTM_LAYER* layerPtr, int nodeCount, int nodeType, int netSize, int reNetSize)
+{
+	int i;
+	int ret = LSTM_NO_ERROR;
+	struct LSTM_LAYER tmpLayer;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&tmpLayer, 0, sizeof(struct LSTM_LAYER));
+
+	// Allocate node list
+	lstm_alloc(tmpLayer.nodeList, nodeCount, struct LSTM_NODE, ret, ERR);
+
+	// Allocate nodes
+	for(i = 0; i < nodeCount; i++)
+	{
+		ret = lstm_node_alloc(&tmpLayer.nodeList[i], nodeType, netSize, reNetSize);
+		if(ret != LSTM_NO_ERROR)
+		{
+			goto ERR;
+		}
+	}
+
+	// Assign value
+	tmpLayer.nodeCount = nodeCount;
+	*layerPtr = tmpLayer;
+	goto RET;
+
+ERR:
+	lstm_layer_delete(&tmpLayer);
 
 RET:
 	LOG("exit");
