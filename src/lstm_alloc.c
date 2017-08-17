@@ -104,6 +104,10 @@ int lstm_alloc_network(struct LSTM_STRUCT* lstm)
 		}
 	}
 
+	// Assign value
+	lstm->layerList = layerRef;
+	goto RET;
+
 ERR:
 	for(i = 0; i < cfgRef->layers; i++)
 	{
