@@ -55,6 +55,8 @@ int lstm_layer_alloc(struct LSTM_LAYER* layerPtr, int nodeCount, int nodeType, i
 int lstm_node_alloc(struct LSTM_NODE* nodePtr, int nodeType, int netSize, int reNetSize);
 int lstm_base_alloc(struct LSTM_BASE* basePtr, int netSize, int reNetSize);
 
+int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFIG_STRUCT* lstmCfg);
+
 #ifdef __cplusplus
 }
 #endif

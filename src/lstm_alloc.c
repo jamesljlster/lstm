@@ -7,7 +7,7 @@
 
 #include "debug.h"
 
-int lstm_alloc_network(struct LSTM_STRUCT* lstm)
+int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	int i;
 	int ret = LSTM_NO_ERROR;
@@ -17,14 +17,12 @@ int lstm_alloc_network(struct LSTM_STRUCT* lstm)
 	int* nodeList;
 
 	struct LSTM_LAYER* layerRef = NULL;
-	struct LSTM_CONFIG_STRUCT* cfgRef;
 
 	LOG("enter");
 
 	// Set reference
-	cfgRef = &lstm->config;
-	layers = cfgRef->layers;
-	nodeList = cfgRef->nodeList;
+	layers = lstmCfg->layers;
+	nodeList = lstmCfg->nodeList;
 
 	// Checking
 	if(layers < 3 || nodeList == NULL)
@@ -35,7 +33,7 @@ int lstm_alloc_network(struct LSTM_STRUCT* lstm)
 
 	// Allocate layer list
 	lstm_alloc(layerRef, layers, struct LSTM_LAYER, ret, RET);
-	for(i = 0; i < cfgRef->layers; i++)
+	for(i = 0; i < layers; i++)
 	{
 		// Set node type and recurrent network size
 		if(i == 0)
@@ -70,46 +68,46 @@ int lstm_alloc_network(struct LSTM_STRUCT* lstm)
 		layerRef[i].nodeCount = nodeList[i];
 
 		// Set activation function
-		if(cfgRef->inputTFunc < 0 || cfgRef->inputTFunc >= LSTM_TFUNC_AMOUNT)
+		if(lstmCfg->inputTFunc < 0 || lstmCfg->inputTFunc >= LSTM_TFUNC_AMOUNT)
 		{
 			ret = LSTM_INVALID_ARG;
 			goto ERR;
 		}
 		else
 		{
-			layerRef[i].inputTFunc = lstm_transfer_list[cfgRef->inputTFunc];
-			layerRef[i].inputDTFunc = lstm_transfer_derivative_list[cfgRef->inputTFunc];
+			layerRef[i].inputTFunc = lstm_transfer_list[lstmCfg->inputTFunc];
+			layerRef[i].inputDTFunc = lstm_transfer_derivative_list[lstmCfg->inputTFunc];
 		}
 
-		if(cfgRef->outputTFunc < 0 || cfgRef->outputTFunc >= LSTM_TFUNC_AMOUNT)
+		if(lstmCfg->outputTFunc < 0 || lstmCfg->outputTFunc >= LSTM_TFUNC_AMOUNT)
 		{
 			ret = LSTM_INVALID_ARG;
 			goto ERR;
 		}
 		else
 		{
-			layerRef[i].outputTFunc = lstm_transfer_list[cfgRef->outputTFunc];
-			layerRef[i].outputDTFunc = lstm_transfer_derivative_list[cfgRef->outputTFunc];
+			layerRef[i].outputTFunc = lstm_transfer_list[lstmCfg->outputTFunc];
+			layerRef[i].outputDTFunc = lstm_transfer_derivative_list[lstmCfg->outputTFunc];
 		}
 
-		if(cfgRef->gateTFunc < 0 || cfgRef->gateTFunc >= LSTM_TFUNC_AMOUNT)
+		if(lstmCfg->gateTFunc < 0 || lstmCfg->gateTFunc >= LSTM_TFUNC_AMOUNT)
 		{
 			ret = LSTM_INVALID_ARG;
 			goto ERR;
 		}
 		else
 		{
-			layerRef[i].gateTFunc = lstm_transfer_list[cfgRef->gateTFunc];
-			layerRef[i].gateDTFunc = lstm_transfer_derivative_list[cfgRef->gateTFunc];
+			layerRef[i].gateTFunc = lstm_transfer_list[lstmCfg->gateTFunc];
+			layerRef[i].gateDTFunc = lstm_transfer_derivative_list[lstmCfg->gateTFunc];
 		}
 	}
 
 	// Assign value
-	lstm->layerList = layerRef;
+	*layerListPtr = layerRef;
 	goto RET;
 
 ERR:
-	for(i = 0; i < cfgRef->layers; i++)
+	for(i = 0; i < layers; i++)
 	{
 		lstm_layer_delete(&layerRef[i]);
 	}
