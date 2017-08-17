@@ -20,6 +20,12 @@ struct LSTM_BASE
 	double th;			// Threshold of the node
 	double thGrad;		// Gradient summation of threshold
 	double thDelta;		// Momentum of threshold
+
+	double calc;		// Calcalution temp: value before activation function
+	double out;			// Network output value
+
+	struct LSTM_BUF outQue;		// out queue
+	struct LSTM_BUF calcQue;	// calc queue
 };
 
 struct LSTM_NODE
@@ -29,17 +35,11 @@ struct LSTM_NODE
 	struct LSTM_BASE igNet;		// Input gate network
 	struct LSTM_BASE inputNet;	// Input network
 
+	double output;				// Output of node
+	double cell;				// Cell value of node
+
 	struct LSTM_BUF outputQue;	// Output queue
 	struct LSTM_BUF cellQue;	// Cell value queue
-
-	struct LSTM_BUF ogQue;		// Output gate queue
-	struct LSTM_BUF ogCalcQue;	// Output gate temp calculation queue
-
-	struct LSTM_BUF fgQue;		// Forget gate queue
-	struct LSTM_BUF fgCalcQue;	// Forget gate temp calculation queue
-
-	struct LSTM_BUF igQue;		// Input gate queue
-	struct LSTM_BUF igCalcQue;	// Input gate temp calculation queue
 
 	double grad;	// Node gradient, for bp calculation
 	double rHold;	// For recurrent forward computation
