@@ -84,6 +84,7 @@ void lstm_layer_delete(struct LSTM_LAYER* layerPtr)
 	{
 		lstm_node_delete(&layerPtr->nodeList[i]);
 	}
+	lstm_free(layerPtr->nodeList);
 
 	// Zero memory
 	memset(layerPtr, 0, sizeof(struct LSTM_LAYER));
@@ -102,6 +103,7 @@ void lstm_struct_delete(struct LSTM_STRUCT* lstm)
 	{
 		lstm_layer_delete(&lstm->layerList[i]);
 	}
+	lstm_free(lstm->layerList);
 
 	// Delete config
 	lstm_config_struct_delete(&lstm->config);
