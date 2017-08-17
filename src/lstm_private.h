@@ -5,7 +5,7 @@
 
 #ifdef DEBUG
 #include <stdio.h>
-#define lstm_free(ptr)	fprintf(stderr, "%s(): free(%s)\n", __FUNCTION__, #ptr); free(ptr)
+#define lstm_free(ptr)	fprintf(stderr, "%s(): free(%s), %p\n", __FUNCTION__, #ptr, ptr); free(ptr)
 #else
 #define lstm_free(ptr)	free(ptr)
 #endif
