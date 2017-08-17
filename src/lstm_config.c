@@ -14,7 +14,7 @@
 #define LSTM_DEFAULT_LRATE		0.01
 #define LSTM_DEFAULT_MCOEF		0.1
 
-int lstm_config_clone(lstm_config_t* lstmCfgPtr, lstm_config_t lstmCfgSrc)
+int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc)
 {
 	int ret = LSTM_NO_ERROR;
 	struct LSTM_CONFIG_STRUCT* tmpLstmCfg;
@@ -52,7 +52,7 @@ RET:
 	return ret;
 }
 
-int lstm_config_struct_clone(struct LSTM_CONFIG_STRUCT* dst, struct LSTM_CONFIG_STRUCT* src)
+int lstm_config_struct_clone(struct LSTM_CONFIG_STRUCT* dst, const struct LSTM_CONFIG_STRUCT* src)
 {
 	int ret = LSTM_NO_ERROR;
 	int* tmpNodeList;
