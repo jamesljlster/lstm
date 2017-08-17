@@ -2,7 +2,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "lstm.h"
 #include "lstm_private.h"
 #include "lstm_builtin_math.h"
 

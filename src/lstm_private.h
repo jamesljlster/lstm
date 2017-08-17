@@ -1,6 +1,9 @@
 #ifndef __LSTM_PRIVATE_H__
 #define __LSTM_PRIVATE_H__
 
+#include <stdlib.h>
+
+#include "lstm.h"
 #include "lstm_types.h"
 
 // Private definitions

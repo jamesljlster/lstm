@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lstm.h"
 #include "lstm_private.h"
 
 #include "debug.h"
