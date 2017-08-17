@@ -3,7 +3,12 @@
 
 #include "lstm_types.h"
 
-#define lstm_free(ptr)	if(ptr != NULL) {free(ptr); ptr = NULL;}
+#ifdef DEBUG
+#include <stdio.h>
+#define lstm_free(ptr)	fprintf(stderr, "%s(): free(%s)\n", __FUNCTION__, #ptr); free(ptr)
+#else
+#define lstm_free(ptr)	free(ptr)
+#endif
 
 #ifdef __cplusplus
 extern "C" {
