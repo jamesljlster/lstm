@@ -25,7 +25,7 @@ void lstm_buf_delete(struct LSTM_BUF* bufPtr);
 void lstm_base_delete(struct LSTM_BASE* basePtr);
 void lstm_node_delete(struct LSTM_NODE* nodePtr);
 void lstm_layer_delete(struct LSTM_LAYER* layerPtr);
-void lstm_delete_struct(struct LSTM_STRUCT* lstm);
+void lstm_struct_delete(struct LSTM_STRUCT* lstm);
 
 // Private zero memory function
 void lstm_zeromem(struct LSTM_STRUCT* lstm);

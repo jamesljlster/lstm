@@ -46,7 +46,7 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 	goto RET;
 
 ERR:
-	lstm_delete_struct(tmpLstmPtr);
+	lstm_struct_delete(tmpLstmPtr);
 	lstm_free(tmpLstmPtr);
 
 RET:

@@ -10,7 +10,7 @@ void lstm_delete(lstm_t lstm)
 {
 	LOG("enter");
 
-	lstm_delete_struct(lstm);
+	lstm_struct_delete(lstm);
 	lstm_free(lstm);
 
 	LOG("exit");
@@ -92,7 +92,7 @@ void lstm_layer_delete(struct LSTM_LAYER* layerPtr)
 	LOG("exit");
 }
 
-void lstm_delete_struct(struct LSTM_STRUCT* lstm)
+void lstm_struct_delete(struct LSTM_STRUCT* lstm)
 {
 	int i;
 
