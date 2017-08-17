@@ -3,12 +3,28 @@
 
 #include "lstm_types.h"
 
+// Private definitions
+enum LSTM_NODE_TYPE
+{
+	LSTM_FULL_NODE,
+	LSTM_OUTPUT_NODE
+};
+
+// Macros
 #ifdef DEBUG
 #include <stdio.h>
 #define lstm_free(ptr)	fprintf(stderr, "%s(): free(%s), %p\n", __FUNCTION__, #ptr, ptr); free(ptr)
 #else
 #define lstm_free(ptr)	free(ptr)
 #endif
+
+#define lstm_alloc(ptr, len, type, retVar, errLabel) \
+	ptr = calloc(len, sizeof(type)); \
+	if(ptr == NULL) \
+	{ \
+		ret = LSTM_MEM_FAILED; \
+		goto errLabel; \
+	}
 
 #ifdef __cplusplus
 extern "C" {
