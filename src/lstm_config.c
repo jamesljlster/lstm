@@ -34,7 +34,7 @@ int lstm_config_clone(lstm_config_t* lstmCfgPtr, lstm_config_t lstmCfgSrc)
 	lstm_config_zeromem(tmpLstmCfg);
 
 	// Clone config struct
-	ret = lstm_config_clone_struct(tmpLstmCfg, lstmCfgSrc);
+	ret = lstm_config_struct_clone(tmpLstmCfg, lstmCfgSrc);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto ERR;
@@ -53,7 +53,7 @@ RET:
 	return ret;
 }
 
-int lstm_config_clone_struct(struct LSTM_CONFIG_STRUCT* dst, struct LSTM_CONFIG_STRUCT* src)
+int lstm_config_struct_clone(struct LSTM_CONFIG_STRUCT* dst, struct LSTM_CONFIG_STRUCT* src)
 {
 	int ret = LSTM_NO_ERROR;
 	int* tmpNodeList;
@@ -411,13 +411,13 @@ void lstm_config_delete(lstm_config_t lstmCfg)
 {
 	LOG("enter");
 
-	lstm_config_delete_struct(lstmCfg);
+	lstm_config_struct_delete(lstmCfg);
 	free(lstmCfg);
 
 	LOG("exit");
 }
 
-void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfg)
+void lstm_config_struct_delete(struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	LOG("enter");
 

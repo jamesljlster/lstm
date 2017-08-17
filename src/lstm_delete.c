@@ -105,7 +105,7 @@ void lstm_struct_delete(struct LSTM_STRUCT* lstm)
 	}
 
 	// Delete config
-	lstm_config_delete_struct(&lstm->config);
+	lstm_config_struct_delete(&lstm->config);
 
 	// Zero memory
 	memset(lstm, 0, sizeof(struct LSTM_STRUCT));

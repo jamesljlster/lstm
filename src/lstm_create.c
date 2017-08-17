@@ -32,7 +32,7 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 	lstm_zeromem(tmpLstmPtr);
 
 	// Clone config
-	ret = lstm_config_clone_struct(&tmpLstmPtr->config, lstmCfg);
+	ret = lstm_config_struct_clone(&tmpLstmPtr->config, lstmCfg);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto ERR;
