@@ -13,7 +13,7 @@ void lstm_zeromem(struct LSTM_STRUCT* lstmPtr)
 	memset(lstmPtr, 0, sizeof(struct LSTM_STRUCT));
 }
 
-int lstm_create(lstm_t lstmPtr, lstm_config_t lstmCfg)
+int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 {
 	int ret = LSTM_NO_ERROR;
 	struct LSTM_STRUCT* tmpLstmPtr = NULL;
@@ -41,10 +41,8 @@ int lstm_create(lstm_t lstmPtr, lstm_config_t lstmCfg)
 	goto RET;
 
 ERR:
-	if(tmpLstmPtr != NULL)
-	{
-		free(tmpLstmPtr);
-	}
+	lstm_delete_struct(tmpLstmPtr);
+	lstm_free(tmpLstmPtr);
 
 RET:
 	LOG("exit");

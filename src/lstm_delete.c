@@ -1,9 +1,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lstm.h"
 #include "lstm_private.h"
 
 #include "debug.h"
+
+void lstm_delete(lstm_t lstm)
+{
+	LOG("enter");
+
+	lstm_delete_struct(lstm);
+	lstm_free(lstm);
+
+	LOG("exit");
+}
 
 void lstm_buf_delete(struct LSTM_BUF* bufPtr)
 {

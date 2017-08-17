@@ -14,10 +14,18 @@
 extern "C" {
 #endif
 
+// Private config functions
 void lstm_config_zeromem(struct LSTM_CONFIG_STRUCT* lstmCfg);
 int lstm_config_init(struct LSTM_CONFIG_STRUCT* lstmCfg);
 void lstm_config_delete_struct(struct LSTM_CONFIG_STRUCT* lstmCfg);
 int lstm_config_clone_struct(struct LSTM_CONFIG_STRUCT* dst, struct LSTM_CONFIG_STRUCT* src);
+
+// Private delete functions
+void lstm_buf_delete(struct LSTM_BUF* bufPtr);
+void lstm_base_delete(struct LSTM_BASE* basePtr);
+void lstm_node_delete(struct LSTM_NODE* nodePtr);
+void lstm_layer_delete(struct LSTM_LAYER* layerPtr);
+void lstm_delete_struct(struct LSTM_STRUCT* lstm);
 
 #ifdef __cplusplus
 }
