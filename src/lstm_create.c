@@ -38,6 +38,11 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 	}
 
 	// Allocate network
+	ret = lstm_network_alloc(&tmpLstmPtr->layerList, lstmCfg);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
 
 	// Assign value
 	*lstmPtr = tmpLstmPtr;
@@ -52,3 +57,4 @@ RET:
 	LOG("exit");
 	return ret;
 }
+
