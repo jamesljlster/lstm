@@ -50,6 +50,11 @@ void lstm_struct_delete(struct LSTM_STRUCT* lstm);
 // Private zero memory function
 void lstm_zeromem(struct LSTM_STRUCT* lstm);
 
+// Private allocate function
+int lstm_layer_alloc(struct LSTM_LAYER* layerPtr, int nodeCount, int nodeType, int netSize, int reNetSize);
+int lstm_node_alloc(struct LSTM_NODE* nodePtr, int nodeType, int netSize, int reNetSize);
+int lstm_base_alloc(struct LSTM_BASE* basePtr, int netSize, int reNetSize);
+
 #ifdef __cplusplus
 }
 #endif
