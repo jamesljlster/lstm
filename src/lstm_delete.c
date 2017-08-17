@@ -41,6 +41,9 @@ void lstm_base_delete(struct LSTM_BASE* basePtr)
 	lstm_free(basePtr->rGrad);
 	lstm_free(basePtr->rDelta);
 
+	lstm_buf_delete(&basePtr->outQue);
+	lstm_buf_delete(&basePtr->calcQue);
+
 	// Zero memory
 	memset(basePtr, 0, sizeof(struct LSTM_BASE));
 
@@ -60,12 +63,6 @@ void lstm_node_delete(struct LSTM_NODE* nodePtr)
 	// Delete queue buffers
 	lstm_buf_delete(&nodePtr->outputQue);
 	lstm_buf_delete(&nodePtr->cellQue);
-	lstm_buf_delete(&nodePtr->ogQue);
-	lstm_buf_delete(&nodePtr->ogCalcQue);
-	lstm_buf_delete(&nodePtr->fgQue);
-	lstm_buf_delete(&nodePtr->fgCalcQue);
-	lstm_buf_delete(&nodePtr->igQue);
-	lstm_buf_delete(&nodePtr->igCalcQue);
 
 	// Zero memory
 	memset(nodePtr, 0, sizeof(struct LSTM_NODE));
