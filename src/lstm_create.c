@@ -8,9 +8,9 @@
 
 #include "debug.h"
 
-void lstm_zeromem(struct LSTM_STRUCT* lstmPtr)
+void lstm_zeromem(struct LSTM_STRUCT* lstm)
 {
-	memset(lstmPtr, 0, sizeof(struct LSTM_STRUCT));
+	memset(lstm, 0, sizeof(struct LSTM_STRUCT));
 }
 
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
@@ -37,6 +37,11 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 	{
 		goto ERR;
 	}
+
+	// Allocate network
+
+	// Assign value
+	*lstmPtr = tmpLstmPtr;
 
 	goto RET;
 
