@@ -80,11 +80,14 @@ void lstm_layer_delete(struct LSTM_LAYER* layerPtr)
 	LOG("enter");
 
 	// Delete node list
-	for(i = 0; i < layerPtr->nodeCount; i++)
+	if(layerPtr->nodeList != NULL)
 	{
-		lstm_node_delete(&layerPtr->nodeList[i]);
+		for(i = 0; i < layerPtr->nodeCount; i++)
+		{
+			lstm_node_delete(&layerPtr->nodeList[i]);
+		}
+		lstm_free(layerPtr->nodeList);
 	}
-	lstm_free(layerPtr->nodeList);
 
 	// Zero memory
 	memset(layerPtr, 0, sizeof(struct LSTM_LAYER));
@@ -99,11 +102,14 @@ void lstm_struct_delete(struct LSTM_STRUCT* lstm)
 	LOG("enter");
 
 	// Delete layers
-	for(i = 0; i < lstm->config.layers; i++)
+	if(lstm->layerList != NULL)
 	{
-		lstm_layer_delete(&lstm->layerList[i]);
+		for(i = 0; i < lstm->config.layers; i++)
+		{
+			lstm_layer_delete(&lstm->layerList[i]);
+		}
+		lstm_free(lstm->layerList);
 	}
-	lstm_free(lstm->layerList);
 
 	// Delete config
 	lstm_config_struct_delete(&lstm->config);
