@@ -3,7 +3,7 @@
 
 #include "debug.h"
 
-void rnn_forward_computation(lstm_t lstm, double* input, double* output)
+void lstm_forward_computation(lstm_t lstm, double* input, double* output)
 {
 	int i, j, k;
 	int indexTmp;
