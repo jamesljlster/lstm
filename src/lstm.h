@@ -118,6 +118,7 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
 void lstm_delete(lstm_t lstm);
 
 void lstm_forward_computation(lstm_t lstm, double* input, double* output);
+void lstm_forward_computation_erase(lstm_t lstm);
 
 #ifdef __cplusplus
 }

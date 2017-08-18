@@ -3,6 +3,36 @@
 
 #include "debug.h"
 
+void lstm_forward_computation_erase(lstm_t lstm)
+{
+	int i, j;
+	int indexTmp;
+
+	struct LSTM_LAYER* layerRef = lstm->layerList;
+
+	LOG("enter");
+
+	// Set indexTmp to last hidden layer index
+	indexTmp = lstm->config.layers - 2;
+
+	// Clear hidden layer outputs
+	for(i = 0; i < layerRef[indexTmp].nodeCount; i++)
+	{
+		layerRef[indexTmp].nodeList[i].output = 0;
+	}
+
+	// Clear cell value
+	for(i = 1; i <= indexTmp; i++)
+	{
+		for(j = 0; j < layerRef[indexTmp].nodeCount; j++)
+		{
+			layerRef[indexTmp].nodeList[j].cell = 0;
+		}
+	}
+
+	LOG("exit");
+}
+
 void lstm_forward_computation(lstm_t lstm, double* input, double* output)
 {
 	int i, j, k;
