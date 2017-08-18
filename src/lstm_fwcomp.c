@@ -27,7 +27,7 @@ void lstm_forward_computation(lstm_t lstm, double* input, double* output)
 		layerRef[indexTmp].nodeList[i].rHold = layerRef[indexTmp].nodeList[i].output;
 	}
 
-#define __rnn_fwcomp_base(layerIndex, baseName, tfuncName) \
+#define __lstm_fwcomp_base(layerIndex, baseName, tfuncName) \
 	for(j = 0; j < layerRef[layerIndex].nodeCount; j++) \
 	{ \
 		calcTmp = 0; \
@@ -54,10 +54,10 @@ void lstm_forward_computation(lstm_t lstm, double* input, double* output)
 	for(i = 1; i < cfgRef->layers - 1; i++)
 	{
 		// Processing base network
-		__rnn_fwcomp_base(i, ogNet, gateTFunc);
-		__rnn_fwcomp_base(i, fgNet, gateTFunc);
-		__rnn_fwcomp_base(i, igNet, gateTFunc);
-		__rnn_fwcomp_base(i, inputNet, inputTFunc);
+		__lstm_fwcomp_base(i, ogNet, gateTFunc);
+		__lstm_fwcomp_base(i, fgNet, gateTFunc);
+		__lstm_fwcomp_base(i, igNet, gateTFunc);
+		__lstm_fwcomp_base(i, inputNet, inputTFunc);
 
 		// Find layer outputs
 		for(j = 0; j < layerRef[i].nodeCount; j++)
