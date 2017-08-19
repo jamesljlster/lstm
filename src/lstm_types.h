@@ -82,6 +82,8 @@ struct LSTM_STRUCT
 	struct LSTM_LAYER* layerList;
 
 	struct LSTM_CONFIG_STRUCT config;
+
+	double* gradHold;
 };
 
 #endif

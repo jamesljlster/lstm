@@ -44,6 +44,9 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 		goto ERR;
 	}
 
+	// Allocate gradient hold buffer
+	lstm_alloc(tmpLstmPtr->gradHold, lstmCfg->nodeList[1], double, ret, ERR);
+
 	// Assign value
 	*lstmPtr = tmpLstmPtr;
 
