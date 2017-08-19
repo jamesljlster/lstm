@@ -8,9 +8,12 @@ void lstm_forward_computation_erase(lstm_t lstm)
 	int i, j;
 	int indexTmp;
 
-	struct LSTM_LAYER* layerRef = lstm->layerList;
+	struct LSTM_LAYER* layerRef;
 
 	LOG("enter");
+
+	// Set reference
+	layerRef = lstm->layerList;
 
 	// Set indexTmp to last hidden layer index
 	indexTmp = lstm->config.layers - 2;
@@ -39,10 +42,14 @@ void lstm_forward_computation(lstm_t lstm, double* input, double* output)
 	int indexTmp;
 	double calcTmp, ig, fg, og;
 
-	struct LSTM_CONFIG_STRUCT* cfgRef = &lstm->config;
-	struct LSTM_LAYER* layerRef = lstm->layerList;
+	struct LSTM_CONFIG_STRUCT* cfgRef;
+	struct LSTM_LAYER* layerRef;
 
 	LOG("enter");
+
+	// Set reference
+	cfgRef = &lstm->config;
+	layerRef = lstm->layerList;
 
 	// Copy inputs
 	for(i = 0; i < cfgRef->inputs; i++)
