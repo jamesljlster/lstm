@@ -29,7 +29,6 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 
 	struct LSTM_LAYER* layerRef;
 	struct LSTM_CONFIG_STRUCT* cfgRef;
-	double* gradHold;
 
 	double* tmpPtr = NULL;
 	int queLen = 0;
@@ -39,7 +38,6 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 	// Get reference
 	layerRef = lstm->layerList;
 	cfgRef = &lstm->config;
-	gradHold = lstm->gradHold;
 
 	// Re-Allocate queue space and set value
 	queLen = lstm->queueLen + 1;
@@ -119,51 +117,205 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 			// Backpropagation from output layer
 			for(i = cfgRef->layers - 2; i > 0; i--)
 			{
-				// Node gradient
 				for(j = 0; j < layerRef[i].nodeCount; j++)
 				{
+					// Node gradient
 					calcTmp = 0;
 					for(k = 0; k < layerRef[i + 1].nodeCount; k++)
 					{
-						calcTmp += layerRef[i + 1].nodeList[k].inputNet.grad *
-							layerRef[i + 1].nodeList[k].inputNet.weight[j];
+						calcTmp += layerRef[i + 1].nodeList[k].ogNet.grad *
+							layerRef[i + 1].nodeList[k].ogNet.weight[j];
+
+						if(i > cfgRef->layers - 2)
+						{
+							calcTmp += layerRef[i + 1].nodeList[k].fgNet.grad *
+								layerRef[i + 1].nodeList[k].fgNet.weight[j];
+							calcTmp += layerRef[i + 1].nodeList[k].igNet.grad *
+								layerRef[i + 1].nodeList[k].igNet.weight[j];
+							calcTmp += layerRef[i + 1].nodeList[k].inputNet.grad *
+								layerRef[i + 1].nodeList[k].inputNet.weight[j];
+						}
 					}
 					layerRef[i].nodeList[j].grad = calcTmp;
-				}
 
-				// Output gate gradient
-				layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad *
-					layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-					layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re]);
+					// Output gate gradient
+					layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad *
+						layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re]);
 
-				// Forget gate gradient
-				if(re > 0)
-				{
-					layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad *
+					// Forget gate gradient
+					if(re > 0)
+					{
+						layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad *
+							layerRef[i].nodeList[j].ogNet.outQue.list[re] *
+							layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+							layerRef[i].nodeList[j].cellQue.list[re - 1] *
+							layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re]);
+					}
+
+					// Input gate gradient
+					layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad *
 						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
 						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].nodeList[j].cellQue.list[re - 1] *
-						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re]);
+						layerRef[i].nodeList[j].inputNet.outQue.list[re] *
+						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re]);
+
+					// Input gradient
+					layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad *
+						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
+						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+						layerRef[i].nodeList[j].igNet.outQue.list[re] *
+						layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re]);
 				}
-
-				// Input gate gradient
-				layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad *
-					layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-					layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-					layerRef[i].nodeList[j].inputNet.outQue.list[re] *
-					layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re]);
-
-				// Input gradient
-				layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad *
-					layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-					layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-					layerRef[i].nodeList[j].igNet.outQue.list[re] *
-					layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re]);
 			}
 		}
 		else
 		{
+			// Backup recurrent gradient
+			for(j = 0; j < layerRef[1].nodeCount; j++)
+			{
+				layerRef[1].nodeList[j].ogNet.gradHold = layerRef[1].nodeList[j].ogNet.grad;
+				layerRef[1].nodeList[j].fgNet.gradHold = layerRef[1].nodeList[j].fgNet.grad;
+				layerRef[1].nodeList[j].igNet.gradHold = layerRef[1].nodeList[j].igNet.grad;
+				layerRef[1].nodeList[j].inputNet.gradHold = layerRef[1].nodeList[j].inputNet.grad;
+			}
 
+			// Backpropagation form recurrent factor
+			for(i = cfgRef->layers - 2; i > 0; i++)
+			{
+				for(j = 0; j < layerRef[i].nodeCount; j++)
+				{
+					// Node gradient
+					if(i == cfgRef->layers - 2)
+					{
+						// Recurrent factor
+						calcTmp = 0;
+						for(k = 0; k < layerRef[1].nodeCount; k++)
+						{
+							calcTmp += layerRef[1].nodeList[k].ogNet.gradHold *
+								layerRef[1].nodeList[k].ogNet.rWeight[j];
+							calcTmp += layerRef[1].nodeList[k].fgNet.gradHold *
+								layerRef[1].nodeList[k].fgNet.rWeight[j];
+							calcTmp += layerRef[1].nodeList[k].igNet.gradHold *
+								layerRef[1].nodeList[k].igNet.rWeight[j];
+							calcTmp += layerRef[1].nodeList[k].inputNet.gradHold *
+								layerRef[1].nodeList[k].inputNet.rWeight[j];
+						}
+						layerRef[i].nodeList[j].grad = calcTmp;
+					}
+					else
+					{
+						// Common factor
+						calcTmp = 0;
+						for(k = 0; k < layerRef[i + 1].nodeCount; k++)
+						{
+							calcTmp += layerRef[i + 1].nodeList[k].ogNet.grad *
+								layerRef[i + 1].nodeList[k].ogNet.weight[j];
+							calcTmp += layerRef[i + 1].nodeList[k].fgNet.grad *
+								layerRef[i + 1].nodeList[k].fgNet.weight[j];
+							calcTmp += layerRef[i + 1].nodeList[k].igNet.grad *
+								layerRef[i + 1].nodeList[k].igNet.weight[j];
+							calcTmp += layerRef[i + 1].nodeList[k].inputNet.grad *
+								layerRef[i + 1].nodeList[k].inputNet.weight[j];
+						}
+						layerRef[i].nodeList[j].grad = calcTmp;
+					}
+
+					// Output gate gradient
+					layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad *
+						layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re]);
+
+					// Forget gate gradient
+					if(re > 0)
+					{
+						layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad *
+							layerRef[i].nodeList[j].ogNet.outQue.list[re] *
+							layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+							layerRef[i].nodeList[j].cellQue.list[re - 1] *
+							layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re]);
+					}
+
+					// Input gate gradient
+					layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad *
+						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
+						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+						layerRef[i].nodeList[j].inputNet.outQue.list[re] *
+						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re]);
+
+					// Input gradient
+					layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad *
+						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
+						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
+						layerRef[i].nodeList[j].igNet.outQue.list[re] *
+						layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re]);
+				}
+			}
+		}
+
+		// Sum gradient
+		for(i = cfgRef->layers - 2; i > 0; i--)
+		{
+			for(j = 0; j < layerRef[i].nodeCount; j++)
+			{
+				// Sum weight gradient
+				for(k = 0; k < layerRef[i - 1].nodeCount; k++)
+				{
+					// Output gate network
+					layerRef[i].nodeList[j].ogNet.weight[k] +=
+						layerRef[i].nodeList[j].ogNet.grad *
+						layerRef[i - 1].nodeList[k].outputQue.list[re];
+
+					// Forget gate network
+					layerRef[i].nodeList[j].fgNet.weight[k] +=
+						layerRef[i].nodeList[j].fgNet.grad *
+						layerRef[i - 1].nodeList[j].outputQue.list[re];
+
+					// Input gate network
+					layerRef[i].nodeList[j].igNet.weight[k] +=
+						layerRef[i].nodeList[j].igNet.grad *
+						layerRef[i - 1].nodeList[j].outputQue.list[re];
+
+					// Input netwrok
+					layerRef[i].nodeList[j].inputNet.weight[k] +=
+						layerRef[i].nodeList[j].inputNet.grad *
+						layerRef[i - 1].nodeList[j].outputQue.list[re];
+				}
+
+				// Sum recurrent weight gradient
+				if(i == 1 && re > 0)
+				{
+					indexTmp = cfgRef->layers - 2;
+					for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
+					{
+						// Output gate network
+						layerRef[i].nodeList[j].ogNet.rWeight[k] +=
+							layerRef[i].nodeList[j].ogNet.grad *
+							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+
+						// Forget gate network
+						layerRef[i].nodeList[j].fgNet.rWeight[k] +=
+							layerRef[i].nodeList[j].fgNet.grad *
+							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+
+						// Input gate network
+						layerRef[i].nodeList[j].igNet.rWeight[k] +=
+							layerRef[i].nodeList[j].igNet.grad *
+							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+
+						// Input network
+						layerRef[i].nodeList[j].inputNet.rWeight[k] +=
+							layerRef[i].nodeList[j].inputNet.grad *
+							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+					}
+				}
+
+				// Sum threshold gradient
+				layerRef[i].nodeList[j].ogNet.thGrad += layerRef[i].nodeList[j].ogNet.grad;
+				layerRef[i].nodeList[j].igNet.thGrad += layerRef[i].nodeList[j].igNet.grad;
+				layerRef[i].nodeList[j].fgNet.thGrad += layerRef[i].nodeList[j].fgNet.grad;
+				layerRef[i].nodeList[j].inputNet.thGrad += layerRef[i].nodeList[j].inputNet.grad;
+			}
 		}
 	}
 
