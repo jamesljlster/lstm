@@ -23,6 +23,7 @@ struct LSTM_BASE
 
 	double calc;		// Calcalution temp: value before activation function
 	double out;			// Network output value
+	double grad;		// Gradient value
 
 	struct LSTM_BUF outQue;		// out queue
 	struct LSTM_BUF calcQue;	// calc queue
