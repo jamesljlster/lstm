@@ -117,6 +117,9 @@ double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
 void lstm_delete(lstm_t lstm);
 
+void lstm_rand_network(lstm_t lstm);
+void lstm_zero_network(lstm_t lstm);
+
 void lstm_forward_computation(lstm_t lstm, double* input, double* output);
 void lstm_forward_computation_erase(lstm_t lstm);
 
