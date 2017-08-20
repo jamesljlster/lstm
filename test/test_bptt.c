@@ -183,10 +183,104 @@ int main()
 			printf("Output node: %d\n", j);
 			printf("    grad:   %lf\n", lstm->layerList[cfg->layers - 1].nodeList[j].inputNet.grad);
 			printf("    thGrad: %lf\n", lstm->layerList[cfg->layers - 1].nodeList[j].inputNet.thGrad);
-			printf("    wGrad: ");
+			printf("    wGrad:  ");
 			for(k = 0; k < lstm->layerList[cfg->layers - 2].nodeCount; k++)
 			{
 				printf("%lf, ", lstm->layerList[cfg->layers - 1].nodeList[j].inputNet.wGrad[k]);
+			}
+			printf("\n");
+		}
+		printf("\n");
+
+		printf("=== BP: Hidden layer ===\n");
+		for(i = cfg->layers - 2; i > 0; i--)
+		{
+			for(j = 0; j < H_NODES; j++)
+			{
+				printf("Hidden node: %d\n", j);
+				printf("    grad:  %lf\n", lstm->layerList[i].nodeList[j].grad);
+				printf("\n");
+
+				printf("    [Output gate]\n");
+				printf("        grad:   %lf\n", lstm->layerList[i].nodeList[j].ogNet.grad);
+				printf("        thGrad: %lf\n", lstm->layerList[i].nodeList[j].ogNet.thGrad);
+				printf("        wGrad:  ");
+				for(k = 0; k < lstm->layerList[i - 1].nodeCount; k++)
+				{
+					printf("%lf, ", lstm->layerList[i].nodeList[j].ogNet.wGrad[k]);
+				}
+				printf("\n");
+				if(i == 1)
+				{
+					printf("        rGrad:  ");
+					for(k = 0; k < lstm->layerList[cfg->layers - 2].nodeCount; k++)
+					{
+						printf("%lf, ", lstm->layerList[i].nodeList[j].ogNet.rGrad[k]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+
+				printf("    [Forget gate]\n");
+				printf("        grad:   %lf\n", lstm->layerList[i].nodeList[j].fgNet.grad);
+				printf("        thGrad: %lf\n", lstm->layerList[i].nodeList[j].fgNet.thGrad);
+				printf("        wGrad:  ");
+				for(k = 0; k < lstm->layerList[i - 1].nodeCount; k++)
+				{
+					printf("%lf, ", lstm->layerList[i].nodeList[j].fgNet.wGrad[k]);
+				}
+				printf("\n");
+				if(i == 1)
+				{
+					printf("        rGrad:  ");
+					for(k = 0; k < lstm->layerList[cfg->layers - 2].nodeCount; k++)
+					{
+						printf("%lf, ", lstm->layerList[i].nodeList[j].fgNet.rGrad[k]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+
+				printf("    [Input gate]\n");
+				printf("        grad:   %lf\n", lstm->layerList[i].nodeList[j].igNet.grad);
+				printf("        thGrad: %lf\n", lstm->layerList[i].nodeList[j].igNet.thGrad);
+				printf("        wGrad:  ");
+				for(k = 0; k < lstm->layerList[i - 1].nodeCount; k++)
+				{
+					printf("%lf, ", lstm->layerList[i].nodeList[j].igNet.wGrad[k]);
+				}
+				printf("\n");
+				if(i == 1)
+				{
+					printf("        rGrad:  ");
+					for(k = 0; k < lstm->layerList[cfg->layers - 2].nodeCount; k++)
+					{
+						printf("%lf, ", lstm->layerList[i].nodeList[j].igNet.rGrad[k]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+
+				printf("    [Input net]\n");
+				printf("        grad:   %lf\n", lstm->layerList[i].nodeList[j].inputNet.grad);
+				printf("        thGrad: %lf\n", lstm->layerList[i].nodeList[j].inputNet.thGrad);
+				printf("        wGrad:  ");
+				for(k = 0; k < lstm->layerList[i - 1].nodeCount; k++)
+				{
+					printf("%lf, ", lstm->layerList[i].nodeList[j].inputNet.wGrad[k]);
+				}
+				printf("\n");
+				if(i == 1)
+				{
+					printf("        rGrad:  ");
+					for(k = 0; k < lstm->layerList[cfg->layers - 2].nodeCount; k++)
+					{
+						printf("%lf, ", lstm->layerList[i].nodeList[j].inputNet.rGrad[k]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+
 			}
 		}
 	}
