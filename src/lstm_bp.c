@@ -267,9 +267,12 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 						layerRef[i - 1].nodeList[k].outputQue.list[re];
 
 					// Forget gate network
-					layerRef[i].nodeList[j].fgNet.wGrad[k] +=
-						layerRef[i].nodeList[j].fgNet.grad *
-						layerRef[i - 1].nodeList[k].outputQue.list[re];
+					if(re > 0)
+					{
+						layerRef[i].nodeList[j].fgNet.wGrad[k] +=
+							layerRef[i].nodeList[j].fgNet.grad *
+							layerRef[i - 1].nodeList[k].outputQue.list[re];
+					}
 
 					// Input gate network
 					layerRef[i].nodeList[j].igNet.wGrad[k] +=
@@ -294,9 +297,12 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 
 						// Forget gate network
-						layerRef[i].nodeList[j].fgNet.rGrad[k] +=
-							layerRef[i].nodeList[j].fgNet.grad *
-							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+						if(re > 0)
+						{
+							layerRef[i].nodeList[j].fgNet.rGrad[k] +=
+								layerRef[i].nodeList[j].fgNet.grad *
+								layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+						}
 
 						// Input gate network
 						layerRef[i].nodeList[j].igNet.rGrad[k] +=
@@ -313,7 +319,10 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 				// Sum threshold gradient
 				layerRef[i].nodeList[j].ogNet.thGrad += layerRef[i].nodeList[j].ogNet.grad;
 				layerRef[i].nodeList[j].igNet.thGrad += layerRef[i].nodeList[j].igNet.grad;
-				layerRef[i].nodeList[j].fgNet.thGrad += layerRef[i].nodeList[j].fgNet.grad;
+				if(re > 0)
+				{
+					layerRef[i].nodeList[j].fgNet.thGrad += layerRef[i].nodeList[j].fgNet.grad;
+				}
 				layerRef[i].nodeList[j].inputNet.thGrad += layerRef[i].nodeList[j].inputNet.grad;
 			}
 		}
