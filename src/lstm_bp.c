@@ -262,24 +262,24 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 				for(k = 0; k < layerRef[i - 1].nodeCount; k++)
 				{
 					// Output gate network
-					layerRef[i].nodeList[j].ogNet.weight[k] +=
+					layerRef[i].nodeList[j].ogNet.wGrad[k] +=
 						layerRef[i].nodeList[j].ogNet.grad *
 						layerRef[i - 1].nodeList[k].outputQue.list[re];
 
 					// Forget gate network
-					layerRef[i].nodeList[j].fgNet.weight[k] +=
+					layerRef[i].nodeList[j].fgNet.wGrad[k] +=
 						layerRef[i].nodeList[j].fgNet.grad *
-						layerRef[i - 1].nodeList[j].outputQue.list[re];
+						layerRef[i - 1].nodeList[k].outputQue.list[re];
 
 					// Input gate network
-					layerRef[i].nodeList[j].igNet.weight[k] +=
+					layerRef[i].nodeList[j].igNet.wGrad[k] +=
 						layerRef[i].nodeList[j].igNet.grad *
-						layerRef[i - 1].nodeList[j].outputQue.list[re];
+						layerRef[i - 1].nodeList[k].outputQue.list[re];
 
 					// Input netwrok
-					layerRef[i].nodeList[j].inputNet.weight[k] +=
+					layerRef[i].nodeList[j].inputNet.wGrad[k] +=
 						layerRef[i].nodeList[j].inputNet.grad *
-						layerRef[i - 1].nodeList[j].outputQue.list[re];
+						layerRef[i - 1].nodeList[k].outputQue.list[re];
 				}
 
 				// Sum recurrent weight gradient
@@ -289,22 +289,22 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 					for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
 					{
 						// Output gate network
-						layerRef[i].nodeList[j].ogNet.rWeight[k] +=
+						layerRef[i].nodeList[j].ogNet.rGrad[k] +=
 							layerRef[i].nodeList[j].ogNet.grad *
 							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 
 						// Forget gate network
-						layerRef[i].nodeList[j].fgNet.rWeight[k] +=
+						layerRef[i].nodeList[j].fgNet.rGrad[k] +=
 							layerRef[i].nodeList[j].fgNet.grad *
 							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 
 						// Input gate network
-						layerRef[i].nodeList[j].igNet.rWeight[k] +=
+						layerRef[i].nodeList[j].igNet.rGrad[k] +=
 							layerRef[i].nodeList[j].igNet.grad *
 							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 
 						// Input network
-						layerRef[i].nodeList[j].inputNet.rWeight[k] +=
+						layerRef[i].nodeList[j].inputNet.rGrad[k] +=
 							layerRef[i].nodeList[j].inputNet.grad *
 							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 					}
