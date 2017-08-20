@@ -328,6 +328,7 @@ RET:
 void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit)
 {
 	int i, j, k;
+	int indexTmp;
 
 	struct LSTM_LAYER* layerRef;
 	struct LSTM_CONFIG_STRUCT* cfgRef;
@@ -393,10 +394,10 @@ void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumC
 	}
 
 	// Adjust recurrent weight
-	i = cfgRef->layers - 2;
-	for(j = 0; j < layerRef[i].nodeCount; j++)
+	indexTmp = cfgRef->layers - 2;
+	for(j = 0; j < layerRef[1].nodeCount; j++)
 	{
-		for(k = 0; k < layerRef[1].nodeCount; k++)
+		for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
 		{
 			__lstm_bptt_adjust(ogNet.rWeight[k], ogNet.rGrad[k], ogNet.rDelta[k]);
 			__lstm_bptt_adjust(fgNet.rWeight[k], fgNet.rGrad[k], fgNet.rDelta[k]);
@@ -408,5 +409,71 @@ void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumC
 	LOG("exit");
 }
 
-int lstm_bptt_erase(lstm_t lstm);
+void lstm_bptt_erase(lstm_t lstm)
+{
+	int i, j, k;
+	int indexTmp;
+	struct LSTM_LAYER* layerRef;
+	struct LSTM_CONFIG_STRUCT* cfgRef;
+
+	LOG("enter");
+
+	// Get referenct
+	layerRef = lstm->layerList;
+	cfgRef = &lstm->config;
+
+	// Reset queue length
+	lstm->queueLen = 0;
+
+	// Clear output layer gradient
+	i = cfgRef->layers - 1;
+	for(j = 0; j < layerRef[i].nodeCount; j++)
+	{
+		// Clear weight gradient
+		for(k = 0; k < layerRef[i - 1].nodeCount; k++)
+		{
+			layerRef[i].nodeList[j].inputNet.wGrad[k] = 0;
+		}
+
+		// Clear threshold gradient
+		layerRef[i].nodeList[j].inputNet.thGrad = 0;
+	}
+
+	// Clear hidden layer gradient
+	for(i = cfgRef->layers - 2; i > 0; i--)
+	{
+		for(j = 0; j < layerRef[i].nodeCount; j++)
+		{
+			// Clear weight gradient
+			for(k = 0; k < layerRef[i - 1].nodeCount; k++)
+			{
+				layerRef[i].nodeList[j].ogNet.wGrad[k] = 0;
+				layerRef[i].nodeList[j].fgNet.wGrad[k] = 0;
+				layerRef[i].nodeList[j].igNet.wGrad[k] = 0;
+				layerRef[i].nodeList[j].inputNet.wGrad[k] = 0;
+			}
+
+			// Clear threshold gradient
+			layerRef[i].nodeList[j].ogNet.thGrad = 0;
+			layerRef[i].nodeList[j].fgNet.thGrad = 0;
+			layerRef[i].nodeList[j].igNet.thGrad = 0;
+			layerRef[i].nodeList[j].inputNet.thGrad = 0;
+		}
+	}
+
+	// Clear recurrent gradient
+	indexTmp = cfgRef->layers - 2;
+	for(j = 0; j < layerRef[1].nodeCount; j++)
+	{
+		for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
+		{
+			layerRef[1].nodeList[j].ogNet.rWeight[k] = 0;
+			layerRef[1].nodeList[j].fgNet.rWeight[k] = 0;
+			layerRef[1].nodeList[j].igNet.rWeight[k] = 0;
+			layerRef[1].nodeList[j].inputNet.rWeight[k] = 0;
+		}
+	}
+
+	LOG("exit");
+}
 

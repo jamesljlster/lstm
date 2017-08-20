@@ -122,7 +122,7 @@ void lstm_forward_computation_erase(lstm_t lstm);
 
 int lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
 void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit);
-int lstm_bptt_erase(lstm_t lstm);
+void lstm_bptt_erase(lstm_t lstm);
 
 #ifdef __cplusplus
 }
