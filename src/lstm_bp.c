@@ -325,6 +325,88 @@ RET:
 	return ret;
 }
 
-int lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit);
+void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit)
+{
+	int i, j, k;
+
+	struct LSTM_LAYER* layerRef;
+	struct LSTM_CONFIG_STRUCT* cfgRef;
+
+	double calcTmp;
+
+	LOG("enter");
+
+	// Get reference
+	layerRef = lstm->layerList;
+	cfgRef = &lstm->config;
+
+#define __lstm_bptt_adjust(link, gradLink, deltaLink) \
+	if(layerRef[i].nodeList[j].gradLink > gradLimit) \
+	{ \
+		layerRef[i].nodeList[j].gradLink = gradLimit; \
+	} \
+	else if(layerRef[i].nodeList[j].gradLink < -gradLimit) \
+	{ \
+		layerRef[i].nodeList[j].gradLink = -gradLimit; \
+	} \
+	calcTmp = layerRef[i].nodeList[j].link + \
+		learningRate * layerRef[i].nodeList[j].gradLink + \
+		momentumCoef * layerRef[i].nodeList[j].deltaLink; \
+	layerRef[i].nodeList[j].deltaLink = calcTmp - \
+		layerRef[i].nodeList[j].link; \
+	layerRef[i].nodeList[j].link = calcTmp;
+
+	// Adjust output layer
+	i = cfgRef->layers - 1;
+	for(j = 0; j < layerRef[i].nodeCount; j++)
+	{
+		// Adjust weight
+		for(k = 0; k < layerRef[i - 1].nodeCount; k++)
+		{
+			__lstm_bptt_adjust(inputNet.weight[k], inputNet.wGrad[k], inputNet.wDelta[k]);
+		}
+
+		// Adjust threshold
+		__lstm_bptt_adjust(inputNet.th, inputNet.thGrad, inputNet.thDelta);
+	}
+
+	// Adjust hidden layer
+	for(i = cfgRef->layers - 2; i > 0; i--)
+	{
+		for(j = 0; j < layerRef[i].nodeCount; j++)
+		{
+			// Adjust weight
+			for(k = 0; k < layerRef[i - 1].nodeCount; k++)
+			{
+				__lstm_bptt_adjust(ogNet.weight[k], ogNet.wGrad[k], ogNet.wDelta[k]);
+				__lstm_bptt_adjust(fgNet.weight[k], fgNet.wGrad[k], fgNet.wDelta[k]);
+				__lstm_bptt_adjust(igNet.weight[k], igNet.wGrad[k], igNet.wDelta[k]);
+				__lstm_bptt_adjust(inputNet.weight[k], inputNet.wGrad[k], inputNet.wDelta[k]);
+			}
+
+			// Adjust threshold
+			__lstm_bptt_adjust(ogNet.th, ogNet.thGrad, ogNet.thDelta);
+			__lstm_bptt_adjust(fgNet.th, fgNet.thGrad, fgNet.thDelta);
+			__lstm_bptt_adjust(igNet.th, igNet.thGrad, igNet.thDelta);
+			__lstm_bptt_adjust(inputNet.th, inputNet.thGrad, inputNet.thDelta);
+		}
+	}
+
+	// Adjust recurrent weight
+	i = cfgRef->layers - 2;
+	for(j = 0; j < layerRef[i].nodeCount; j++)
+	{
+		for(k = 0; k < layerRef[1].nodeCount; k++)
+		{
+			__lstm_bptt_adjust(ogNet.rWeight[k], ogNet.rGrad[k], ogNet.rDelta[k]);
+			__lstm_bptt_adjust(fgNet.rWeight[k], fgNet.rGrad[k], fgNet.rDelta[k]);
+			__lstm_bptt_adjust(igNet.rWeight[k], igNet.rGrad[k], igNet.rDelta[k]);
+			__lstm_bptt_adjust(inputNet.rWeight[k], inputNet.rGrad[k], inputNet.rDelta[k]);
+		}
+	}
+
+	LOG("exit");
+}
+
 int lstm_bptt_erase(lstm_t lstm);
 
