@@ -297,12 +297,9 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 
 						// Forget gate network
-						if(re > 0)
-						{
-							layerRef[i].nodeList[j].fgNet.rGrad[k] +=
-								layerRef[i].nodeList[j].fgNet.grad *
-								layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
-						}
+						layerRef[i].nodeList[j].fgNet.rGrad[k] +=
+							layerRef[i].nodeList[j].fgNet.grad *
+							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
 
 						// Input gate network
 						layerRef[i].nodeList[j].igNet.rGrad[k] +=
