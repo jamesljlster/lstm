@@ -123,17 +123,17 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 					calcTmp = 0;
 					for(k = 0; k < layerRef[i + 1].nodeCount; k++)
 					{
-						calcTmp += layerRef[i + 1].nodeList[k].ogNet.grad *
-							layerRef[i + 1].nodeList[k].ogNet.weight[j];
+						calcTmp += layerRef[i + 1].nodeList[k].inputNet.grad *
+							layerRef[i + 1].nodeList[k].inputNet.weight[j];
 
-						if(i > cfgRef->layers - 2)
+						if(i < cfgRef->layers - 2)
 						{
+							calcTmp += layerRef[i + 1].nodeList[k].ogNet.grad *
+								layerRef[i + 1].nodeList[k].ogNet.weight[j];
 							calcTmp += layerRef[i + 1].nodeList[k].fgNet.grad *
 								layerRef[i + 1].nodeList[k].fgNet.weight[j];
 							calcTmp += layerRef[i + 1].nodeList[k].igNet.grad *
 								layerRef[i + 1].nodeList[k].igNet.weight[j];
-							calcTmp += layerRef[i + 1].nodeList[k].inputNet.grad *
-								layerRef[i + 1].nodeList[k].inputNet.weight[j];
 						}
 					}
 					layerRef[i].nodeList[j].grad = calcTmp;
@@ -181,7 +181,7 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 			}
 
 			// Backpropagation form recurrent factor
-			for(i = cfgRef->layers - 2; i > 0; i++)
+			for(i = cfgRef->layers - 2; i > 0; i--)
 			{
 				for(j = 0; j < layerRef[i].nodeCount; j++)
 				{
