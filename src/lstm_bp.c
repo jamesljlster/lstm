@@ -109,6 +109,32 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 		}
 	}
 
+#define __lstm_bptt_find_og_grad() \
+	layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad * \
+		layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
+		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re])
+
+#define __lstm_bptt_find_fg_grad() \
+	layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad * \
+		layerRef[i].nodeList[j].ogNet.outQue.list[re] * \
+		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
+		layerRef[i].nodeList[j].cellQue.list[re - 1] * \
+		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re])
+
+#define __lstm_bptt_find_ig_grad() \
+	layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad * \
+		layerRef[i].nodeList[j].ogNet.outQue.list[re] * \
+		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
+		layerRef[i].nodeList[j].inputNet.outQue.list[re] * \
+		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re])
+
+#define __lstm_bptt_find_input_grad() \
+	layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad * \
+		layerRef[i].nodeList[j].ogNet.outQue.list[re] * \
+		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
+		layerRef[i].nodeList[j].igNet.outQue.list[re] * \
+		layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re])
+
 	// Find gradient: Hidden layers
 	for(re = queLen - 1; re >= 0; re--)
 	{
@@ -138,34 +164,14 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 					}
 					layerRef[i].nodeList[j].grad = calcTmp;
 
-					// Output gate gradient
-					layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad *
-						layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re]);
-
-					// Forget gate gradient
+					// Find base gradient
+					__lstm_bptt_find_og_grad();
+					__lstm_bptt_find_ig_grad();
+					__lstm_bptt_find_input_grad();
 					if(re > 0)
 					{
-						layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad *
-							layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-							layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-							layerRef[i].nodeList[j].cellQue.list[re - 1] *
-							layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re]);
+						__lstm_bptt_find_fg_grad();
 					}
-
-					// Input gate gradient
-					layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad *
-						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].nodeList[j].inputNet.outQue.list[re] *
-						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re]);
-
-					// Input gradient
-					layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad *
-						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].nodeList[j].igNet.outQue.list[re] *
-						layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re]);
 				}
 			}
 		}
@@ -221,34 +227,14 @@ int lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 						layerRef[i].nodeList[j].grad = calcTmp;
 					}
 
-					// Output gate gradient
-					layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad *
-						layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re]);
-
-					// Forget gate gradient
+					// Find base gradient
+					__lstm_bptt_find_og_grad();
+					__lstm_bptt_find_ig_grad();
+					__lstm_bptt_find_input_grad();
 					if(re > 0)
 					{
-						layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad *
-							layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-							layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-							layerRef[i].nodeList[j].cellQue.list[re - 1] *
-							layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re]);
+						__lstm_bptt_find_fg_grad();
 					}
-
-					// Input gate gradient
-					layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad *
-						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].nodeList[j].inputNet.outQue.list[re] *
-						layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re]);
-
-					// Input gradient
-					layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad *
-						layerRef[i].nodeList[j].ogNet.outQue.list[re] *
-						layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) *
-						layerRef[i].nodeList[j].igNet.outQue.list[re] *
-						layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re]);
 				}
 			}
 		}
