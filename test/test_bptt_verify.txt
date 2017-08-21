@@ -1,0 +1,226 @@
+Inputs: 2
+Outputs: 1
+Layers: 3
+
+Input tfunc index: 2
+Output tfunc index: 2
+Gate tfunc index: 0
+
+Nodes of 0 layer: 2
+Nodes of 1 layer: 2
+Nodes of 2 layer: 1
+
+=== Hidden layer 0 ===
+Hidden node 0:
+    [Input net]
+        calc: -0.500000
+        out:  -0.462117
+
+    [Input gate]
+        calc: -0.120000
+        out:  0.470036
+
+    [Forget gate]
+        calc: 0.290000
+        out:  0.571996
+
+    [Output gate]
+        calc: 0.710000
+        out:  0.670401
+
+    cell:   -0.217212
+    output: -0.143371
+
+Hidden node 1:
+    [Input net]
+        calc: 1.170000
+        out:  0.824272
+
+    [Input gate]
+        calc: 0.990000
+        out:  0.729088
+
+    [Forget gate]
+        calc: 0.810000
+        out:  0.692110
+
+    [Output gate]
+        calc: 0.560000
+        out:  0.636453
+
+    cell:   0.600967
+    output: 0.342244
+
+1 of 2 input: 0.400000
+2 of 2 input: 0.300000
+1 of 1 output: 0.775372
+1 of 1 error: -0.275372
+
+=== BP: Output layer ===
+Output node: 0
+    grad:   -0.109818
+    thGrad: -0.109818
+    wGrad:  0.015745, -0.037585, 
+
+=== BP: Hidden layer ===
+Hidden node: 0
+    grad:  -0.054909
+
+    [Output gate]
+        grad:   0.002595
+        thGrad: 0.002595
+        wGrad:  0.001038, 0.000778, 
+        rGrad:  0.000000, 0.000000, 
+
+    [Forget gate]
+        grad:   0.000000
+        thGrad: 0.000000
+        wGrad:  0.000000, 0.000000, 
+        rGrad:  0.000000, 0.000000, 
+
+    [Input gate]
+        grad:   0.004044
+        thGrad: 0.004044
+        wGrad:  0.001617, 0.001213, 
+        rGrad:  0.000000, 0.000000, 
+
+    [Input net]
+        grad:   -0.012985
+        thGrad: -0.012985
+        wGrad:  -0.005194, -0.003896, 
+        rGrad:  0.000000, 0.000000, 
+
+Hidden node: 1
+    grad:  -0.065891
+
+    [Output gate]
+        grad:   -0.008198
+        thGrad: -0.008198
+        wGrad:  -0.003279, -0.002459, 
+        rGrad:  0.000000, 0.000000, 
+
+    [Forget gate]
+        grad:   0.000000
+        thGrad: 0.000000
+        wGrad:  0.000000, 0.000000, 
+        rGrad:  0.000000, 0.000000, 
+
+    [Input gate]
+        grad:   -0.004853
+        thGrad: -0.004853
+        wGrad:  -0.001941, -0.001456, 
+        rGrad:  0.000000, 0.000000, 
+
+    [Input net]
+        grad:   -0.006967
+        thGrad: -0.006967
+        wGrad:  -0.002787, -0.002090, 
+        rGrad:  0.000000, 0.000000, 
+
+=== Hidden layer 0 ===
+Hidden node 0:
+    [Input net]
+        calc: -0.984987
+        out:  -0.755217
+
+    [Input gate]
+        calc: -0.365437
+        out:  0.409644
+
+    [Forget gate]
+        calc: 0.283999
+        out:  0.570526
+
+    [Output gate]
+        calc: 1.003548
+        out:  0.731756
+
+    cell:   -0.433295
+    output: -0.298608
+
+Hidden node 1:
+    [Input net]
+        calc: 1.714874
+        out:  0.937243
+
+    [Input gate]
+        calc: 1.295325
+        out:  0.785047
+
+    [Forget gate]
+        calc: 0.855888
+        out:  0.701801
+
+    [Output gate]
+        calc: 0.326339
+        out:  0.580868
+
+    cell:   1.157539
+    output: 0.476449
+
+1 of 2 input: 1.000000
+2 of 2 input: 0.100000
+1 of 1 output: 0.776528
+1 of 1 error: -0.176528
+
+=== BP: Output layer ===
+Output node: 0
+    grad:   -0.070082
+    thGrad: -0.179900
+    wGrad:  0.036672, -0.070975, 
+
+=== BP: Hidden layer ===
+Hidden node: 0
+    grad:  0.006557
+
+    [Output gate]
+        grad:   -0.000310
+        thGrad: 0.005092
+        wGrad:  0.003721, 0.000966, 
+        rGrad:  -0.000402, 0.000961, 
+
+    [Forget gate]
+        grad:   0.001137
+        thGrad: 0.001137
+        wGrad:  0.001137, 0.000114, 
+        rGrad:  -0.000163, 0.000389, 
+
+    [Input gate]
+        grad:   -0.000483
+        thGrad: 0.007464
+        wGrad:  0.005328, 0.001459, 
+        rGrad:  -0.000560, 0.001336, 
+
+    [Input net]
+        grad:   0.001551
+        thGrad: -0.015196
+        wGrad:  -0.008335, -0.003807, 
+        rGrad:  0.000539, -0.001287, 
+
+Hidden node: 1
+    grad:  0.008108
+
+    [Output gate]
+        grad:   0.001009
+        thGrad: -0.015586
+        wGrad:  -0.011273, -0.002997, 
+        rGrad:  0.001204, -0.002874, 
+
+    [Forget gate]
+        grad:   -0.001005
+        thGrad: -0.001005
+        wGrad:  -0.001005, -0.000101, 
+        rGrad:  0.000144, -0.000344, 
+
+    [Input gate]
+        grad:   0.000597
+        thGrad: -0.005520
+        wGrad:  -0.002966, -0.001403, 
+        rGrad:  0.000181, -0.000433, 
+
+    [Input net]
+        grad:   0.000857
+        thGrad: -0.006873
+        wGrad:  -0.003207, -0.001909, 
+        rGrad:  0.000109, -0.000261, 
+
