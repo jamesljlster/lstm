@@ -16,12 +16,15 @@ struct LSTM_XML_ELEM
 
 	struct LSTM_XML_ATTR* attrList;
 	int attrLen;
+
+	struct LSTM_XML_ELEM* elemList;
+	int elemLen;
 };
 
 // XML structure
 struct LSTM_XML
 {
-	struct LSTM_XML_ATTRIBUTE* header;
+	struct LSTM_XML_ATTR* header;
 	int headLen;
 
 	struct LSTM_XML_ELEM* elemList;
@@ -34,10 +37,12 @@ extern "C" {
 
 // Public functions
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath);
-int lstm_xml_delete(struct LSTM_XML* xmlPtr);
+void lstm_xml_delete(struct LSTM_XML* xmlPtr);
 
 // Private functions
 int lstm_xml_fread_to_end(char** strPtr, const char* filePath);
+void lstm_xml_elem_delete(struct LSTM_XML_ELEM* xmlElemPtr);
+void lstm_xml_attr_delete(struct LSTM_XML_ATTR* xmlAttrPtr);
 
 #ifdef __cplusplus
 }
