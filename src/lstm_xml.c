@@ -30,7 +30,11 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 	goto RET;
 
 RET:
-	lstm_free(xml);
+	if(xml != NULL)
+	{
+		lstm_xml_delete(xml)
+		lstm_free(xml);
+	}
 
 	LOG("exit");
 	return ret;
