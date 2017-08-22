@@ -410,8 +410,11 @@ void lstm_config_delete(lstm_config_t lstmCfg)
 {
 	LOG("enter");
 
-	lstm_config_struct_delete(lstmCfg);
-	free(lstmCfg);
+	if(lstmCfg != NULL)
+	{
+		lstm_config_struct_delete(lstmCfg);
+		free(lstmCfg);
+	}
 
 	LOG("exit");
 }

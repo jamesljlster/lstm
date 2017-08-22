@@ -9,8 +9,11 @@ void lstm_delete(lstm_t lstm)
 {
 	LOG("enter");
 
-	lstm_struct_delete(lstm);
-	lstm_free(lstm);
+	if(lstm != NULL)
+	{
+		lstm_struct_delete(lstm);
+		lstm_free(lstm);
+	}
 
 	LOG("exit");
 }
