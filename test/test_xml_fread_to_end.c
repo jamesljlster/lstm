@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 
 	for(i = 1; i < argc; i++)
 	{
-		iResult = lstm_xml_fread_to_end(&tmp, argv[i]);
+		iResult = lstm_xml_fread_to_end(&tmp, NULL, argv[i]);
 		if(iResult < 0)
 		{
 			printf("Failed to read %s\n", argv[i]);

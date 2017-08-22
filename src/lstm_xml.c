@@ -11,6 +11,8 @@
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;
+
+	int xmlLen;
 	char* xml = NULL;
 
 	struct LSTM_XML* tmpXmlPtr;
@@ -18,7 +20,7 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 	LOG("enter");
 
 	// Read file to end
-	ret = lstm_xml_fread_to_end(&xml, filePath);
+	ret = lstm_xml_fread_to_end(&xml, &xmlLen, filePath);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto RET;
@@ -37,6 +39,13 @@ RET:
 	}
 
 	LOG("exit");
+	return ret;
+}
+
+int lstm_xml_parse_header(char* xml, int* procIndex)
+{
+	int ret = LSTM_NO_ERROR;
+
 	return ret;
 }
 
@@ -111,7 +120,7 @@ void lstm_xml_attr_delete(struct LSTM_XML_ATTR* xmlAttrPtr)
 	LOG("exit");
 }
 
-int lstm_xml_fread_to_end(char** strPtr, const char* filePath)
+int lstm_xml_fread_to_end(char** strPtr, int* lenPtr, const char* filePath)
 {
 	int i, iResult;
 	int ret = LSTM_NO_ERROR;
@@ -149,7 +158,14 @@ int lstm_xml_fread_to_end(char** strPtr, const char* filePath)
 	}
 
 	// Assign value
-	*strPtr = tmpPtr;
+	if(strPtr != NULL)
+	{
+		*strPtr = tmpPtr;
+	}
+	if(lenPtr != NULL)
+	{
+		*lenPtr = fileLen;
+	}
 
 	goto RET;
 
