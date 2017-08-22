@@ -45,11 +45,14 @@ RET:
 	return ret;
 }
 
-int lstm_xml_parse_header(char* xml, int xmlLen, int* procIndex)
+int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int* procIndex)
 {
 	int i;
+	int tmpIndex = 0;
 	int ret = LSTM_NO_ERROR;
-	int forceRead;
+	int tmpStat;
+
+	char preChar = '\0';
 
 	struct LSTM_XML_PSTAT pStat;
 	struct LSTM_XML_STR strBuf;
@@ -58,27 +61,87 @@ int lstm_xml_parse_header(char* xml, int xmlLen, int* procIndex)
 
 	// Zero memory
 	memset(&pStat, 0, sizeof(struct LSTM_XML_PSTAT));
-	memset(&pStat, 0, sizeof(struct LSTM_XML_STR));
+	memset(&strBuf, 0, sizeof(struct LSTM_XML_STR));
 
-	// Parsing
-	forceRead = 0;
-	for(i = 0; i < xmlLen; i++)
+	// Find "<?"
+	tmpStat = 0;
+	for(i = 0; i < xmlLen && tmpStat == 0; i++)
 	{
-		if(xml[i] <= ' ')
+		switch(xmlSrc[i])
 		{
-			if(forceRead > 0)
-			{
+			case '?':
+				if(preChar == '<')
+				{
+					tmpIndex = i + 1;
+					tmpStat = 1;
+				}
+				break;
 
-			}
-			else
-			{
-				continue;
-			}
+			case '<':
+			case '\t':
+			case ' ':
+				break;
+
+			default:
+				ret = LSTM_PARSE_FAILED;
+				goto RET;
+		}
+
+		preChar = xmlSrc[i];
+	}
+
+	// Checking
+	if(tmpStat == 0)
+	{
+		goto RET;
+	}
+
+	// Append character to string until "?>"
+	tmpStat = 0;
+	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
+	{
+		switch(xmlSrc[i])
+		{
+			case '?':
+				if(i < xmlLen - 1)
+				{
+					if(xmlSrc[i + 1] == '>')
+					{
+						tmpIndex = i + 1;
+						tmpStat = 1;
+					}
+					else
+					{
+						ret = LSTM_PARSE_FAILED;
+						goto RET;
+					}
+				}
+				break;
+
+			default:
+				ret = lstm_xml_str_append(&strBuf, xmlSrc[i]);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto RET;
+				}
 		}
 	}
 
-	LOG("exit");
+	// Checking
+	if(tmpStat == 0)
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto RET;
+	}
 
+	printf("%s\n", strBuf.buf);
+
+ERR:
+
+RET:
+	lstm_free(strBuf.buf);
+
+	LOG("exit");
 	return ret;
 }
 
