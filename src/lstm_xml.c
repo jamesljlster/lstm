@@ -69,15 +69,22 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int
 	{
 		switch(xmlSrc[i])
 		{
-			case '?':
-				if(preChar == '<')
+			case '<':
+				if(i < xmlLen - 1)
 				{
-					tmpIndex = i + 1;
-					tmpStat = 1;
+					if(xmlSrc[i + 1] == '?')
+					{
+						tmpIndex = i + 2;
+						tmpStat = 1;
+					}
+					else
+					{
+						ret = LSTM_PARSE_FAILED;
+						goto RET;
+					}
 				}
 				break;
 
-			case '<':
 			case '\t':
 			case ' ':
 				break;
@@ -96,7 +103,6 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int
 		goto RET;
 	}
 
-	// Append character to string until "?>"
 	tmpStat = 0;
 	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
 	{
@@ -107,7 +113,7 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int
 				{
 					if(xmlSrc[i + 1] == '>')
 					{
-						tmpIndex = i + 1;
+						tmpIndex = i + 2;
 						tmpStat = 1;
 					}
 					else
@@ -147,7 +153,7 @@ RET:
 
 int lstm_xml_str_append(struct LSTM_XML_STR* strPtr, char ch)
 {
-	int ret = LSTM_MEM_FAILED;
+	int ret = LSTM_NO_ERROR;
 	int tmpLen;
 
 	void* allocTmp;
@@ -166,10 +172,15 @@ int lstm_xml_str_append(struct LSTM_XML_STR* strPtr, char ch)
 			ret = LSTM_MEM_FAILED;
 			goto RET;
 		}
+		else
+		{
+			strPtr->buf = allocTmp;
+		}
 	}
 
 	// Append character
 	strPtr->buf[strPtr->strLen] = ch;
+	strPtr->buf[strPtr->strLen + 1] = '\0';
 	strPtr->strLen++;
 
 RET:

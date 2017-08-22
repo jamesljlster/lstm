@@ -21,7 +21,6 @@ int main(int argc, char* argv[])
 		else
 		{
 			printf("%s:\n%s\n", argv[i], tmp);
-			free(tmp);
 		}
 	}
 
@@ -31,6 +30,8 @@ int main(int argc, char* argv[])
 		printf("lstm_xml_parse_header() failed!\n");
 		return -1;
 	}
+
+	free(tmp);
 
 	return 0;
 }
