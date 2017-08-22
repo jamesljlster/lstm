@@ -15,7 +15,7 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 	int xmlLen;
 	char* xml = NULL;
 
-	struct LSTM_XML* tmpXmlPtr;
+	struct LSTM_XML* tmpXmlPtr = NULL;
 
 	LOG("enter");
 
@@ -31,21 +31,86 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 
 	goto RET;
 
-RET:
-	if(xml != NULL)
+ERR:
+	if(tmpXmlPtr != NULL)
 	{
-		lstm_xml_delete(xml)
-		lstm_free(xml);
+		lstm_xml_delete(tmpXmlPtr);
+		lstm_free(tmpXmlPtr);
 	}
+
+RET:
+	lstm_free(xml);
 
 	LOG("exit");
 	return ret;
 }
 
-int lstm_xml_parse_header(char* xml, int* procIndex)
+int lstm_xml_parse_header(char* xml, int xmlLen, int* procIndex)
 {
+	int i;
 	int ret = LSTM_NO_ERROR;
+	int forceRead;
 
+	struct LSTM_XML_PSTAT pStat;
+	struct LSTM_XML_STR strBuf;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&pStat, 0, sizeof(struct LSTM_XML_PSTAT));
+	memset(&pStat, 0, sizeof(struct LSTM_XML_STR));
+
+	// Parsing
+	forceRead = 0;
+	for(i = 0; i < xmlLen; i++)
+	{
+		if(xml[i] <= ' ')
+		{
+			if(forceRead > 0)
+			{
+
+			}
+			else
+			{
+				continue;
+			}
+		}
+	}
+
+	LOG("exit");
+
+	return ret;
+}
+
+int lstm_xml_str_append(struct LSTM_XML_STR* strPtr, char ch)
+{
+	int ret = LSTM_MEM_FAILED;
+	int tmpLen;
+
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Find new memory length
+	tmpLen = strPtr->strLen + 2;
+
+	// Reallocate memory
+	if(tmpLen > strPtr->memLen)
+	{
+		allocTmp = realloc(strPtr->buf, tmpLen * sizeof(char));
+		if(allocTmp == NULL)
+		{
+			ret = LSTM_MEM_FAILED;
+			goto RET;
+		}
+	}
+
+	// Append character
+	strPtr->buf[strPtr->strLen] = ch;
+	strPtr->strLen++;
+
+RET:
+	LOG("exit");
 	return ret;
 }
 
