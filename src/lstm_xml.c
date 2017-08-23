@@ -55,7 +55,169 @@ RET:
 
 int lstm_xml_parse_element(struct LSTM_XML_ELEM** elemListPtr, int* elemLenPtr, const char* xmlSrc, int xmlLen, int* procIndex)
 {
+	int i;
+	int tmpIndex = 0;
 	int ret = LSTM_NO_ERROR;
+	int tmpStat;
+
+	char** strList = NULL;
+	int strCount = 0;
+
+	struct LSTM_XML_ELEM tmpElem;
+
+	int childElemLen = 0;
+	struct LSTM_XML_ELEM* childElemList = NULL;
+
+	int tmpAttrLen = 0;
+	struct LSTM_XML_ATTR* tmpAttrList = NULL;
+
+	struct LSTM_STR strBuf;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&strBuf, 0, sizeof(struct LSTM_STR));
+	memset(&tmpElem, 0, sizeof(struct LSTM_XML_ELEM));
+
+	// Set start processing index
+	tmpIndex = *procIndex;
+
+	// Find "<"
+	tmpStat = 0;
+	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
+	{
+		switch(xmlSrc[i])
+		{
+			case '<':
+				tmpIndex = i + 1;
+				tmpStat = 1;
+				break;
+
+			case '\t':
+			case ' ':
+				break;
+
+			default:
+				ret = LSTM_PARSE_FAILED;
+				goto RET;
+		}
+	}
+
+	// Checking
+	if(tmpStat == 0)
+	{
+		goto RET;
+	}
+
+	// Read to ">"
+	tmpStat = 0;
+	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
+	{
+		switch(xmlSrc[i])
+		{
+			case '>':
+				tmpIndex = i + 1;
+				tmpStat = 1;
+				break;
+
+			default:
+				ret = lstm_str_append(&strBuf, xmlSrc[i]);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto RET;
+				}
+		}
+	}
+
+	// Checking
+	if(tmpStat == 0)
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto RET;
+	}
+
+	// Set procIndex
+	*procIndex = tmpIndex;
+
+	// Split string
+	ret = lstm_xml_split(&strList, &strCount, strBuf.str);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Find attribute count
+	if((strCount - 1) % 3 != 0)
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto RET;
+	}
+	else
+	{
+		tmpAttrLen = (strCount - 1) / 3;
+	}
+
+	// Memory allocation: attribute list
+	lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
+	tmpIndex = 1;
+	for(i = 0; i < tmpAttrLen; i++)
+	{
+		// Checking
+		ret = lstm_strcmp(strList[tmpIndex + 1], "=");
+		if(ret != LSTM_NO_ERROR)
+		{
+			goto ERR;
+		}
+
+		// Set value
+		tmpAttrList[i].name = strList[tmpIndex];
+		tmpAttrList[i].content = strList[tmpIndex + 2];
+
+		strList[tmpIndex] = NULL;
+		strList[tmpIndex + 2] = NULL;
+
+		tmpIndex += 3;
+	}
+
+	// Assign tag
+	tmpElem.name = strList[0];
+	strList[0] = NULL;
+
+	// Assign attribute
+	tmpElem.attrList = tmpAttrList;
+	tmpElem.attrLen = tmpAttrLen;
+	tmpAttrList = NULL;
+	tmpAttrLen = 0;
+
+	goto RET;
+
+ERR:
+	lstm_xml_elem_delete(&tmpElem);
+
+RET:
+	// Delete attribute list
+	for(i = 0; i < tmpAttrLen; i++)
+	{
+		lstm_xml_attr_delete(&tmpAttrList[i]);
+	}
+	lstm_free(tmpAttrList);
+
+	// Delete child element list
+	for(i = 0; i < childElemLen; i++)
+	{
+		lstm_xml_elem_delete(&childElemList[i]);
+	}
+	lstm_free(childElemList);
+
+	// Delete string list
+	for(i = 0; i < strCount; i++)
+	{
+		lstm_free(strList[i]);
+	}
+	lstm_free(strList);
+	lstm_free(strBuf.str);
+
+	LOG("exit");
 	return ret;
 }
 
@@ -79,9 +241,12 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 	// Zero memory
 	memset(&strBuf, 0, sizeof(struct LSTM_STR));
 
+	// Set start processing index
+	tmpIndex = *procIndex;
+
 	// Find "<?"
 	tmpStat = 0;
-	for(i = 0; i < xmlLen && tmpStat == 0; i++)
+	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
 	{
 		switch(xmlSrc[i])
 		{
@@ -146,6 +311,9 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 				}
 		}
 	}
+
+	// Set procIndex
+	*procIndex = tmpIndex;
 
 	// Checking
 	if(tmpStat == 0)
