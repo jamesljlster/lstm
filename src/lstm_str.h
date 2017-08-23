@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 int lstm_str_append(struct LSTM_STR* strPtr, char ch);
+int lstm_strcmp(const char* src1, const char* src2);
 
 #ifdef __cpluspluc
 }

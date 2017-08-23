@@ -1,9 +1,33 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "lstm.h"
 #include "lstm_str.h"
 
 #include "debug.h"
+
+int lstm_strcmp(const char* src1, const char* src2)
+{
+	int cmpLen;
+	int srcLen;
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+	cmpLen = strlen(src1);
+	srcLen = strlen(src2);
+	if(cmpLen != srcLen)
+	{
+		ret = LSTM_PARSE_FAILED;
+	}
+	else
+	{
+		ret = strncmp(src1, src2, cmpLen);
+	}
+
+	LOG("exit");
+	return ret;
+}
 
 int lstm_str_append(struct LSTM_STR* strPtr, char ch)
 {
