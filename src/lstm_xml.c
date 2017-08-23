@@ -12,6 +12,7 @@
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;
+	int procIndex;
 
 	int xmlLen;
 	char* xml = NULL;
@@ -30,6 +31,13 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 	// Memory allocation: Root xml structure
 	lstm_alloc(tmpXmlPtr, 1, struct LSTM_XML, ret, RET);
 
+	// Parse header
+	ret = lstm_xml_parse_header(tmpXmlPtr, xml, xmlLen, &procIndex);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
+
 	goto RET;
 
 ERR:
@@ -43,6 +51,12 @@ RET:
 	lstm_free(xml);
 
 	LOG("exit");
+	return ret;
+}
+
+int lstm_xml_parse_element(struct LSTM_XML_ELEM** elemListPtr, int* elemLenPtr, const char* xmlSrc, int xmlLen, int* procIndex)
+{
+	int ret = LSTM_NO_ERROR;
 	return ret;
 }
 
