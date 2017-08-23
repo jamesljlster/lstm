@@ -14,6 +14,7 @@ extern "C" {
 
 int lstm_str_append(struct LSTM_STR* strPtr, char ch);
 int lstm_strcmp(const char* src1, const char* src2);
+void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs);
 
 #ifdef __cpluspluc
 }

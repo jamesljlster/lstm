@@ -6,6 +6,106 @@
 
 #include "debug.h"
 
+void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
+{
+	int i, j;
+	int stat, chStat;
+	int validIndex = 0;
+	int trimLen;
+	int strLen;
+
+	char* tmpPtr;
+
+	LOG("enter");
+
+	// Checking
+	if(strPtr->strLen == 0)
+	{
+		return;
+	}
+
+	// Get reference
+	tmpPtr = strPtr->str;
+
+	// Get string length
+	trimLen = strlen(trimChs);
+	strLen = strlen(strPtr->str);
+
+	// Find first valid character
+	stat = 1;
+	for(i = 0; i < strLen; i++)
+	{
+		chStat = 0;
+		for(j = 0; j < trimLen; j++)
+		{
+			if(tmpPtr[i] == trimChs[j])
+			{
+				chStat = 1;
+				break;
+			}
+		}
+
+		if(chStat == 0)
+		{
+			stat = 0;
+			validIndex = i;
+			break;
+		}
+	}
+
+	// Checking status
+	if(stat == 1)
+	{
+		tmpPtr[0] = '\0';
+		strPtr->strLen = 0;
+		return;
+	}
+
+	// Move string
+	for(i = 0, j = validIndex; j < strLen; i++, j++)
+	{
+		tmpPtr[i] = tmpPtr[j];
+	}
+
+	// Find last valid character
+	stat = 1;
+	for(i = strLen - 1; i >= 0; i++)
+	{
+		chStat = 0;
+		for(j = 0; j < trimLen; j++)
+		{
+			if(tmpPtr[i] == trimChs[j])
+			{
+				chStat = 1;
+				break;
+			}
+		}
+
+		if(chStat == 0)
+		{
+			stat = 0;
+			validIndex = i;
+			break;
+		}
+	}
+
+	// Checking status
+	if(stat == 1)
+	{
+		tmpPtr[0] = '\0';
+		strPtr->strLen = 0;
+		return;
+	}
+
+	// Set terminate character
+	tmpPtr[validIndex + 1] = '\0';
+
+	// Find new string length
+	strPtr->strLen = strlen(strPtr->str);
+
+	LOG("exit");
+}
+
 int lstm_strcmp(const char* src1, const char* src2)
 {
 	int cmpLen;

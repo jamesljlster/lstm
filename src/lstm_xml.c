@@ -9,6 +9,8 @@
 
 #include "debug.h"
 
+#define LSTM_XML_TRIM_STR	" \t\r\n"
+
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;
@@ -463,6 +465,7 @@ int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSr
 		// Append string to list before append character
 		if(pStat.aStrB)
 		{
+			lstm_str_trim(&strBuf, LSTM_XML_TRIM_STR);
 			__lstm_xml_strlist_append();
 			pStat.aStrB = 0;
 		}
@@ -477,6 +480,7 @@ int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSr
 		// Append string to list after append character
 		if(pStat.aStrA)
 		{
+			lstm_str_trim(&strBuf, LSTM_XML_TRIM_STR);
 			__lstm_xml_strlist_append();
 			pStat.aStrA = 0;
 		}
