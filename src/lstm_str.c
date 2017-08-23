@@ -6,12 +6,36 @@
 
 #include "debug.h"
 
+int lstm_str_index_of(const char* src, char ch)
+{
+	int i;
+	int ret = LSTM_PARSE_FAILED;
+	int strLen;
+
+	LOG("enter");
+
+	// Find string length
+	strLen = strlen(src);
+
+	for(i = 0; i < strLen; i++)
+	{
+		if(src[i] == ch)
+		{
+			ret = i;
+			break;
+		}
+	}
+
+	LOG("exit");
+
+	return ret;
+}
+
 void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 {
 	int i, j;
-	int stat, chStat;
+	int stat;
 	int validIndex = 0;
-	int trimLen;
 	int strLen;
 
 	char* tmpPtr;
@@ -28,24 +52,13 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 	tmpPtr = strPtr->str;
 
 	// Get string length
-	trimLen = strlen(trimChs);
 	strLen = strlen(strPtr->str);
 
 	// Find first valid character
 	stat = 1;
 	for(i = 0; i < strLen; i++)
 	{
-		chStat = 0;
-		for(j = 0; j < trimLen; j++)
-		{
-			if(tmpPtr[i] == trimChs[j])
-			{
-				chStat = 1;
-				break;
-			}
-		}
-
-		if(chStat == 0)
+		if(lstm_str_index_of(trimChs, tmpPtr[i]) < 0)
 		{
 			stat = 0;
 			validIndex = i;
@@ -71,30 +84,12 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 	stat = 1;
 	for(i = strLen - 1; i >= 0; i++)
 	{
-		chStat = 0;
-		for(j = 0; j < trimLen; j++)
-		{
-			if(tmpPtr[i] == trimChs[j])
-			{
-				chStat = 1;
-				break;
-			}
-		}
-
-		if(chStat == 0)
+		if(lstm_str_index_of(trimChs, tmpPtr[i]) < 0)
 		{
 			stat = 0;
 			validIndex = i;
 			break;
 		}
-	}
-
-	// Checking status
-	if(stat == 1)
-	{
-		tmpPtr[0] = '\0';
-		strPtr->strLen = 0;
-		return;
 	}
 
 	// Set terminate character
