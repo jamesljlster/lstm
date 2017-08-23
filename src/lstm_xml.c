@@ -416,8 +416,6 @@ int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSr
 {
 	int i;
 	int ret = LSTM_NO_ERROR;
-	int finish;
-	int procIndex;
 
 	int strCount = 0;
 	char** strList = NULL;
@@ -446,104 +444,43 @@ int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSr
 		switch(xmlSrc[i])
 		{
 			case '<':
-				__lstm_xml_assert(pStat.attr || pStat.str, ret, ERR);
-				pStat.attr = !pStat.attr;
+				__lstm_xml_assert(pStat.brStr, ret, ERR);
+				pStat.brStr = 1;
+				pStat.aStrB = 1;
 				break;
 
 			case '>':
-				__lstm_xml_assert(!pStat.attr || pStat.str, ret, ERR);
-				pStat.attr = !pStat.attr;
-				pStat.append = 1;
-				break;
-
-			case '"':
-				if(pStat.str)
-				{
-					pStat.append = 1;
-				}
-				pStat.str = !pStat.str;
+				__lstm_xml_assert(!pStat.brStr, ret, ERR);
+				pStat.brStr = 0;
+				pStat.aStrA = 1;
 				break;
 
 			case ' ':
 			case '\t':
 				break;
+		}
 
-			default:
-				__lstm_xml_assert(!pStat.str, ret, ERR);
+		// Append string to list before append character
+		if(pStat.aStrB)
+		{
+			__lstm_xml_strlist_append();
+			pStat.aStrB = 0;
 		}
 
 		// Append character to string
-		ret = lstm_str_append(&strBuf, xmlSrc[procIndex]);
+		ret = lstm_str_append(&strBuf, xmlSrc[i]);
 		if(ret != LSTM_NO_ERROR)
 		{
 			goto ERR;
 		}
+
+		// Append string to list after append character
+		if(pStat.aStrA)
+		{
+			__lstm_xml_strlist_append();
+			pStat.aStrA = 0;
+		}
 	}
-
-	/*
-	forceRead = 0;
-	procIndex = 0;
-	finish = 0;
-	while(finish == 0)
-	{
-		if(forceRead)
-		{
-			if(src[procIndex] == '"')
-			{
-				forceRead = ~forceRead;
-				__lstm_xml_strlist_append();
-			}
-			else
-			{
-				ret = lstm_str_append(&strBuf, src[procIndex]);
-				if(ret != LSTM_NO_ERROR)
-				{
-					goto ERR;
-				}
-			}
-		}
-		else
-		{
-			if(src[procIndex] == '"')
-			{
-				forceRead = ~forceRead;
-				__lstm_xml_strlist_append();
-			}
-			else if(src[procIndex] == '=')
-			{
-				__lstm_xml_strlist_append();
-
-				ret = lstm_str_append(&strBuf, '=');
-				if(ret != LSTM_NO_ERROR)
-				{
-					goto ERR;
-				}
-
-				__lstm_xml_strlist_append();
-			}
-			else if(src[procIndex] == ' ' || src[procIndex] == '\0')
-			{
-				__lstm_xml_strlist_append();
-			}
-			else
-			{
-				ret = lstm_str_append(&strBuf, src[procIndex]);
-				if(ret != LSTM_NO_ERROR)
-				{
-					goto ERR;
-				}
-			}
-		}
-
-		// Check if end of string
-		if(src[procIndex] == '\0')
-		{
-			finish = 1;
-		}
-
-		procIndex++;
-	}
-	*/
 
 	// Assign value
 	*strListPtr = strList;
@@ -554,9 +491,9 @@ int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSr
 ERR:
 	if(strList != NULL)
 	{
-		for(procIndex = 0; procIndex < strCount; procIndex++)
+		for(i = 0; i < strCount; i++)
 		{
-			lstm_free(strList[procIndex]);
+			lstm_free(strList[i]);
 		}
 		lstm_free(strList);
 	}
