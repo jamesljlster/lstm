@@ -72,13 +72,11 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 	int tmpAttrLen = 0;
 	struct LSTM_XML_ATTR* tmpAttrList = NULL;
 
-	struct LSTM_XML_PSTAT pStat;
 	struct LSTM_STR strBuf;
 
 	LOG("enter");
 
 	// Zero memory
-	memset(&pStat, 0, sizeof(struct LSTM_XML_PSTAT));
 	memset(&strBuf, 0, sizeof(struct LSTM_STR));
 
 	// Find "<?"
