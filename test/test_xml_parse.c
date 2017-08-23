@@ -9,8 +9,6 @@ int main(int argc, char* argv[])
 {
 	int i, j, iResult;
 	int indexTmp;
-	int fLen;
-	char* tmp;
 
 	struct LSTM_XML xml;
 
@@ -18,28 +16,23 @@ int main(int argc, char* argv[])
 
 	for(i = 1; i < argc; i++)
 	{
-		iResult = lstm_xml_fread_to_end(&tmp, &fLen, argv[i]);
-		if(iResult < 0)
-		{
-			printf("Failed to read %s\n", argv[i]);
-		}
-
-		iResult = lstm_xml_parse_header(&xml, tmp, fLen, &indexTmp);
+		printf("Reading %s\n", argv[i]);
+		iResult = lstm_xml_parse(&xml, argv[i]);
 		if(iResult != LSTM_NO_ERROR)
 		{
-			printf("lstm_xml_parse_header() failed!\n");
-			return -1;
+			printf("lstm_xml_parse() failed!\n");
 		}
 		else
 		{
-			printf("XML Header:\n");
+			printf("=== Header ===\n");
 			for(j = 0; j < xml.headLen; j++)
 			{
 				printf("%s = %s\n", xml.header[j].name, xml.header[j].content);
 			}
-		}
+			printf("\n");
 
-		free(tmp);
+			lstm_xml_delete(&xml);
+		}
 	}
 
 	return 0;
