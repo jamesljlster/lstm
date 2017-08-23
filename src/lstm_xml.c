@@ -53,7 +53,8 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 	int ret = LSTM_NO_ERROR;
 	int tmpStat;
 
-	char preChar = '\0';
+	char** strList = NULL;
+	int strCount = 0;
 
 	struct LSTM_XML_PSTAT pStat;
 	struct LSTM_STR strBuf;
@@ -94,8 +95,6 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 				ret = LSTM_PARSE_FAILED;
 				goto RET;
 		}
-
-		preChar = xmlSrc[i];
 	}
 
 	// Checking
@@ -141,7 +140,22 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 		goto RET;
 	}
 
+	// Debuf
 	printf("%s\n", strBuf.str);
+
+	ret = lstm_xml_split(&strList, &strCount, strBuf.str);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
+
+	printf("Split:\n");
+	for(i = 0; i < strCount; i++)
+	{
+		printf("%s\n", strList[i]);
+	}
+
+	goto RET;
 
 ERR:
 
@@ -149,6 +163,88 @@ RET:
 	lstm_free(strBuf.str);
 
 	LOG("exit");
+	return ret;
+}
+
+int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
+{
+	int ret = LSTM_NO_ERROR;
+	int finish;
+	int procIndex;
+
+	int strCount = 0;
+	char** strList = NULL;
+
+	struct LSTM_STR strBuf;
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&strBuf, 0, sizeof(struct LSTM_STR));
+
+	// Split string
+	procIndex = 0;
+	finish = 0;
+	while(finish == 0)
+	{
+		if(src[procIndex] == ' ' || src[procIndex] == '\0')
+		{
+			if(strBuf.strLen > 0)
+			{
+				allocTmp = realloc(strList, sizeof(char**) * (strCount + 1));
+				if(allocTmp == NULL)
+				{
+					ret = LSTM_MEM_FAILED;
+					goto ERR;
+				}
+				else
+				{
+					strList = allocTmp;
+					strCount++;
+				}
+
+				strList[strCount - 1] = strBuf.str;
+				memset(&strBuf, 0, sizeof(struct LSTM_STR));
+
+				if(src[procIndex] == '\0')
+				{
+					finish = 1;
+				}
+			}
+		}
+		else
+		{
+			ret = lstm_str_append(&strBuf, src[procIndex]);
+			if(ret != LSTM_NO_ERROR)
+			{
+				goto ERR;
+			}
+		}
+
+		procIndex++;
+	}
+
+	// Assign value
+	*strListPtr = strList;
+	*strCountPtr = strCount;
+
+	goto RET;
+
+ERR:
+	if(strList != NULL)
+	{
+		for(procIndex = 0; procIndex < strCount; procIndex++)
+		{
+			lstm_free(strList[procIndex]);
+		}
+		lstm_free(strList);
+	}
+
+RET:
+	lstm_free(strBuf.str);
+	LOG("exit");
+
 	return ret;
 }
 

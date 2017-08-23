@@ -5,13 +5,6 @@
 
 #include "debug.h"
 
-int lstm_str_split(char*** strListPtr, int* strCountPtr, const char* src, const char* sepChs, const char* forceReadChs)
-{
-	int ret = LSTM_NO_ERROR;
-
-	return ret;
-}
-
 int lstm_str_append(struct LSTM_STR* strPtr, char ch)
 {
 	int ret = LSTM_NO_ERROR;
