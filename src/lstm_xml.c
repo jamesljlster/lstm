@@ -394,24 +394,6 @@ RET:
 	return ret;
 }
 
-int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
-{
-	int ret = LSTM_NO_ERROR;
-	int finish;
-	int procIndex;
-	int forceRead;
-
-	int strCount = 0;
-	char** strList = NULL;
-
-	struct LSTM_STR strBuf;
-	void* allocTmp;
-
-	LOG("enter");
-
-	// Zero memory
-	memset(&strBuf, 0, sizeof(struct LSTM_STR));
-
 #define __lstm_xml_strlist_append() \
 	if(strBuf.strLen > 0) \
 	{ \
@@ -429,6 +411,180 @@ int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
 		strList[strCount - 1] = strBuf.str; \
 		memset(&strBuf, 0, sizeof(struct LSTM_STR)); \
 	}
+
+int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSrc, int xmlLen)
+{
+	int i;
+	int ret = LSTM_NO_ERROR;
+	int finish;
+	int procIndex;
+
+	int strCount = 0;
+	char** strList = NULL;
+
+	struct LSTM_XML_PSTAT pStat;
+
+	struct LSTM_STR strBuf;
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&pStat, 0, sizeof(struct LSTM_XML_PSTAT));
+	memset(&strBuf, 0, sizeof(struct LSTM_STR));
+
+#define __lstm_xml_assert(cond, retVal, errLabel) \
+	if(cond) \
+	{ \
+		retVal = LSTM_PARSE_FAILED; \
+		goto errLabel; \
+	}
+
+	// Split string
+	for(i = 0; i < xmlLen; i++)
+	{
+		switch(xmlSrc[i])
+		{
+			case '<':
+				__lstm_xml_assert(pStat.attr || pStat.str, ret, ERR);
+				pStat.attr = !pStat.attr;
+				break;
+
+			case '>':
+				__lstm_xml_assert(!pStat.attr || pStat.str, ret, ERR);
+				pStat.attr = !pStat.attr;
+				pStat.append = 1;
+				break;
+
+			case '"':
+				if(pStat.str)
+				{
+					pStat.append = 1;
+				}
+				pStat.str = !pStat.str;
+				break;
+
+			case ' ':
+			case '\t':
+				break;
+
+			default:
+				__lstm_xml_assert(!pStat.str, ret, ERR);
+		}
+
+		// Append character to string
+		ret = lstm_str_append(&strBuf, xmlSrc[procIndex]);
+		if(ret != LSTM_NO_ERROR)
+		{
+			goto ERR;
+		}
+	}
+
+	/*
+	forceRead = 0;
+	procIndex = 0;
+	finish = 0;
+	while(finish == 0)
+	{
+		if(forceRead)
+		{
+			if(src[procIndex] == '"')
+			{
+				forceRead = ~forceRead;
+				__lstm_xml_strlist_append();
+			}
+			else
+			{
+				ret = lstm_str_append(&strBuf, src[procIndex]);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+			}
+		}
+		else
+		{
+			if(src[procIndex] == '"')
+			{
+				forceRead = ~forceRead;
+				__lstm_xml_strlist_append();
+			}
+			else if(src[procIndex] == '=')
+			{
+				__lstm_xml_strlist_append();
+
+				ret = lstm_str_append(&strBuf, '=');
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+
+				__lstm_xml_strlist_append();
+			}
+			else if(src[procIndex] == ' ' || src[procIndex] == '\0')
+			{
+				__lstm_xml_strlist_append();
+			}
+			else
+			{
+				ret = lstm_str_append(&strBuf, src[procIndex]);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+			}
+		}
+
+		// Check if end of string
+		if(src[procIndex] == '\0')
+		{
+			finish = 1;
+		}
+
+		procIndex++;
+	}
+	*/
+
+	// Assign value
+	*strListPtr = strList;
+	*strCountPtr = strCount;
+
+	goto RET;
+
+ERR:
+	if(strList != NULL)
+	{
+		for(procIndex = 0; procIndex < strCount; procIndex++)
+		{
+			lstm_free(strList[procIndex]);
+		}
+		lstm_free(strList);
+	}
+
+RET:
+	lstm_free(strBuf.str);
+	LOG("exit");
+
+	return ret;
+}
+
+int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
+{
+	int ret = LSTM_NO_ERROR;
+	int finish;
+	int procIndex;
+	int forceRead;
+
+	int strCount = 0;
+	char** strList = NULL;
+
+	struct LSTM_STR strBuf;
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&strBuf, 0, sizeof(struct LSTM_STR));
 
 	// Split string
 	forceRead = 0;

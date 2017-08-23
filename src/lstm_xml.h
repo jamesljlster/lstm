@@ -8,6 +8,7 @@ struct LSTM_XML_PSTAT
 	int attr;
 	int tag;
 	int str;
+	int append;
 };
 
 // XML attribute structure
