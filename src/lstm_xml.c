@@ -140,7 +140,7 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 		goto RET;
 	}
 
-	// Debuf
+	// Debug
 	printf("%s\n", strBuf.str);
 
 	ret = lstm_xml_split(&strList, &strCount, strBuf.str);
@@ -171,6 +171,7 @@ int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
 	int ret = LSTM_NO_ERROR;
 	int finish;
 	int procIndex;
+	int forceRead;
 
 	int strCount = 0;
 	char** strList = NULL;
@@ -183,43 +184,83 @@ int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
 	// Zero memory
 	memset(&strBuf, 0, sizeof(struct LSTM_STR));
 
+#define __lstm_xml_strlist_append() \
+	if(strBuf.strLen > 0) \
+	{ \
+		allocTmp = realloc(strList, sizeof(char**) * (strCount + 1)); \
+		if(allocTmp == NULL) \
+		{ \
+			ret = LSTM_MEM_FAILED; \
+			goto ERR; \
+		} \
+		else \
+		{ \
+			strList = allocTmp; \
+			strCount++; \
+		} \
+		strList[strCount - 1] = strBuf.str; \
+		memset(&strBuf, 0, sizeof(struct LSTM_STR)); \
+	}
+
 	// Split string
+	forceRead = 0;
 	procIndex = 0;
 	finish = 0;
 	while(finish == 0)
 	{
-		if(src[procIndex] == ' ' || src[procIndex] == '\0')
+		if(forceRead)
 		{
-			if(strBuf.strLen > 0)
+			if(src[procIndex] == '"')
 			{
-				allocTmp = realloc(strList, sizeof(char**) * (strCount + 1));
-				if(allocTmp == NULL)
+				forceRead = ~forceRead;
+				__lstm_xml_strlist_append();
+			}
+			else
+			{
+				ret = lstm_str_append(&strBuf, src[procIndex]);
+				if(ret != LSTM_NO_ERROR)
 				{
-					ret = LSTM_MEM_FAILED;
 					goto ERR;
-				}
-				else
-				{
-					strList = allocTmp;
-					strCount++;
-				}
-
-				strList[strCount - 1] = strBuf.str;
-				memset(&strBuf, 0, sizeof(struct LSTM_STR));
-
-				if(src[procIndex] == '\0')
-				{
-					finish = 1;
 				}
 			}
 		}
 		else
 		{
-			ret = lstm_str_append(&strBuf, src[procIndex]);
-			if(ret != LSTM_NO_ERROR)
+			if(src[procIndex] == '"')
 			{
-				goto ERR;
+				forceRead = ~forceRead;
+				__lstm_xml_strlist_append();
 			}
+			else if(src[procIndex] == '=')
+			{
+				__lstm_xml_strlist_append();
+
+				ret = lstm_str_append(&strBuf, '=');
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+
+				__lstm_xml_strlist_append();
+			}
+			else if(src[procIndex] == ' ' || src[procIndex] == '\0')
+			{
+				__lstm_xml_strlist_append();
+			}
+			else
+			{
+				ret = lstm_str_append(&strBuf, src[procIndex]);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+			}
+		}
+
+		// Check if end of string
+		if(src[procIndex] == '\0')
+		{
+			finish = 1;
 		}
 
 		procIndex++;
