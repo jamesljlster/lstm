@@ -1,13 +1,6 @@
 #ifndef __LSTM_XML_H__
 #define __LSTM_XML_H__
 
-struct LSTM_XML_STR
-{
-	char* buf;
-	int strLen;
-	int memLen;
-};
-
 // XML parsing state
 struct LSTM_XML_PSTAT
 {
@@ -60,9 +53,7 @@ int lstm_xml_fread_to_end(char** strPtr, int* lenPtr, const char* filePath);
 void lstm_xml_elem_delete(struct LSTM_XML_ELEM* xmlElemPtr);
 void lstm_xml_attr_delete(struct LSTM_XML_ATTR* xmlAttrPtr);
 
-int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int* procIndex);
-
-int lstm_xml_str_append(struct LSTM_XML_STR* strPtr, char ch);
+int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLen, int* procIndex);
 
 #ifdef __cplusplus
 }

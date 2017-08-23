@@ -5,6 +5,7 @@
 #include "lstm.h"
 #include "lstm_private.h"
 #include "lstm_xml.h"
+#include "lstm_str.h"
 
 #include "debug.h"
 
@@ -45,7 +46,7 @@ RET:
 	return ret;
 }
 
-int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int* procIndex)
+int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLen, int* procIndex)
 {
 	int i;
 	int tmpIndex = 0;
@@ -55,13 +56,13 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int
 	char preChar = '\0';
 
 	struct LSTM_XML_PSTAT pStat;
-	struct LSTM_XML_STR strBuf;
+	struct LSTM_STR strBuf;
 
 	LOG("enter");
 
 	// Zero memory
 	memset(&pStat, 0, sizeof(struct LSTM_XML_PSTAT));
-	memset(&strBuf, 0, sizeof(struct LSTM_XML_STR));
+	memset(&strBuf, 0, sizeof(struct LSTM_STR));
 
 	// Find "<?"
 	tmpStat = 0;
@@ -125,7 +126,7 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int
 				break;
 
 			default:
-				ret = lstm_xml_str_append(&strBuf, xmlSrc[i]);
+				ret = lstm_str_append(&strBuf, xmlSrc[i]);
 				if(ret != LSTM_NO_ERROR)
 				{
 					goto RET;
@@ -140,50 +141,13 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, char* xmlSrc, int xmlLen, int
 		goto RET;
 	}
 
-	printf("%s\n", strBuf.buf);
+	printf("%s\n", strBuf.str);
 
 ERR:
 
 RET:
-	lstm_free(strBuf.buf);
+	lstm_free(strBuf.str);
 
-	LOG("exit");
-	return ret;
-}
-
-int lstm_xml_str_append(struct LSTM_XML_STR* strPtr, char ch)
-{
-	int ret = LSTM_NO_ERROR;
-	int tmpLen;
-
-	void* allocTmp;
-
-	LOG("enter");
-
-	// Find new memory length
-	tmpLen = strPtr->strLen + 2;
-
-	// Reallocate memory
-	if(tmpLen > strPtr->memLen)
-	{
-		allocTmp = realloc(strPtr->buf, tmpLen * sizeof(char));
-		if(allocTmp == NULL)
-		{
-			ret = LSTM_MEM_FAILED;
-			goto RET;
-		}
-		else
-		{
-			strPtr->buf = allocTmp;
-		}
-	}
-
-	// Append character
-	strPtr->buf[strPtr->strLen] = ch;
-	strPtr->buf[strPtr->strLen + 1] = '\0';
-	strPtr->strLen++;
-
-RET:
 	LOG("exit");
 	return ret;
 }

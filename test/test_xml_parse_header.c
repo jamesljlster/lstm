@@ -22,16 +22,16 @@ int main(int argc, char* argv[])
 		{
 			printf("%s:\n%s\n", argv[i], tmp);
 		}
-	}
 
-	iResult = lstm_xml_parse_header(NULL, tmp, fLen, &indexTmp);
-	if(iResult != LSTM_NO_ERROR)
-	{
-		printf("lstm_xml_parse_header() failed!\n");
-		return -1;
-	}
+		iResult = lstm_xml_parse_header(NULL, tmp, fLen, &indexTmp);
+		if(iResult != LSTM_NO_ERROR)
+		{
+			printf("lstm_xml_parse_header() failed!\n");
+			return -1;
+		}
 
-	free(tmp);
+		free(tmp);
+	}
 
 	return 0;
 }
