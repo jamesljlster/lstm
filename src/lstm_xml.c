@@ -318,7 +318,6 @@ RET:
 
 int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char*** endPtr)
 {
-	int i, tmpIndex;
 	int ret = LSTM_NO_ERROR;
 
 	char* tagPtr = NULL;
@@ -326,9 +325,6 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char***
 	struct LSTM_XML_ATTR* tmpAttrList = NULL;
 
 	char** xmlStrList;
-
-	char** tmpStrList = NULL;
-	int tmpStrCount = 0;
 
 	struct LSTM_STR tmpStr;
 
@@ -390,248 +386,15 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char***
 	xmlPtr->headLen = tmpAttrLen;
 	*endPtr = &xmlStrList[1];
 
-	/*
-
-	// Split string
-	ret = lstm_xml_split(&tmpStrList, &tmpStrCount, tmpStr.str);
-	if(ret != LSTM_NO_ERROR)
-	{
-		goto RET;
-	}
-
-
-	// Find attribute count
-	if((tmpStrCount - 1) % 3 != 0)
-	{
-		ret = LSTM_PARSE_FAILED;
-		goto RET;
-	}
-	else
-	{
-		tmpAttrLen = (tmpStrCount - 1) / 3;
-	}
-
-	// Memory allocation: attribute list
-	lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
-	tmpIndex = 1;
-	for(i = 0; i < tmpAttrLen; i++)
-	{
-		// Checking
-		ret = lstm_strcmp(tmpStrList[tmpIndex + 1], "=");
-		if(ret != LSTM_NO_ERROR)
-		{
-			goto ERR;
-		}
-
-		// Set value
-		tmpAttrList[i].name = tmpStrList[tmpIndex];
-		tmpAttrList[i].content = tmpStrList[tmpIndex + 2];
-
-		tmpStrList[tmpIndex] = NULL;
-		tmpStrList[tmpIndex + 2] = NULL;
-
-		tmpIndex += 3;
-	}
-
-	*/
-
 	goto RET;
 
-ERR:
-	for(i = 0; i < tmpAttrLen; i++)
-	{
-		lstm_xml_attr_delete(&tmpAttrList[i]);
-	}
-	lstm_free(tmpAttrList);
-
 RET:
-	for(i = 0; i < tmpStrCount; i++)
-	{
-		lstm_free(tmpStrList[i]);
-	}
-	lstm_free(tmpStrList);
-
 	lstm_free(tmpStr.str);
 	lstm_free(tagPtr);
 
 	LOG("exit");
 	return ret;
 }
-
-/*
-int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLen, int* procIndex)
-{
-	int i;
-	int tmpIndex = 0;
-	int ret = LSTM_NO_ERROR;
-	int tmpStat;
-
-	char** strList = NULL;
-	int strCount = 0;
-
-	int tmpAttrLen = 0;
-	struct LSTM_XML_ATTR* tmpAttrList = NULL;
-
-	struct LSTM_STR strBuf;
-
-	LOG("enter");
-
-	// Zero memory
-	memset(&strBuf, 0, sizeof(struct LSTM_STR));
-
-	// Set start processing index
-	tmpIndex = *procIndex;
-
-	// Find "<?"
-	tmpStat = 0;
-	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
-	{
-		switch(xmlSrc[i])
-		{
-			case '<':
-				if(i < xmlLen - 1)
-				{
-					if(xmlSrc[i + 1] == '?')
-					{
-						tmpIndex = i + 2;
-						tmpStat = 1;
-					}
-					else
-					{
-						ret = LSTM_PARSE_FAILED;
-						goto RET;
-					}
-				}
-				break;
-
-			case '\t':
-			case ' ':
-				break;
-
-			default:
-				ret = LSTM_PARSE_FAILED;
-				goto RET;
-		}
-	}
-
-	// Checking
-	if(tmpStat == 0)
-	{
-		goto RET;
-	}
-
-	tmpStat = 0;
-	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
-	{
-		switch(xmlSrc[i])
-		{
-			case '?':
-				if(i < xmlLen - 1)
-				{
-					if(xmlSrc[i + 1] == '>')
-					{
-						tmpIndex = i + 2;
-						tmpStat = 1;
-					}
-					else
-					{
-						ret = LSTM_PARSE_FAILED;
-						goto RET;
-					}
-				}
-				break;
-
-			default:
-				ret = lstm_str_append(&strBuf, xmlSrc[i]);
-				if(ret != LSTM_NO_ERROR)
-				{
-					goto RET;
-				}
-		}
-	}
-
-	// Set procIndex
-	*procIndex = tmpIndex;
-
-	// Checking
-	if(tmpStat == 0)
-	{
-		ret = LSTM_PARSE_FAILED;
-		goto RET;
-	}
-
-	// Split string
-	ret = lstm_xml_split(&strList, &strCount, strBuf.str);
-	if(ret != LSTM_NO_ERROR)
-	{
-		goto RET;
-	}
-
-	// Check header tag
-	ret = lstm_strcmp(strList[0], "xml");
-	if(ret != LSTM_NO_ERROR)
-	{
-		goto RET;
-	}
-
-	// Find attribute count
-	if((strCount - 1) % 3 != 0)
-	{
-		ret = LSTM_PARSE_FAILED;
-		goto RET;
-	}
-	else
-	{
-		tmpAttrLen = (strCount - 1) / 3;
-	}
-
-	// Memory allocation: attribute list
-	lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
-	tmpIndex = 1;
-	for(i = 0; i < tmpAttrLen; i++)
-	{
-		// Checking
-		ret = lstm_strcmp(strList[tmpIndex + 1], "=");
-		if(ret != LSTM_NO_ERROR)
-		{
-			goto ERR;
-		}
-
-		// Set value
-		tmpAttrList[i].name = strList[tmpIndex];
-		tmpAttrList[i].content = strList[tmpIndex + 2];
-
-		strList[tmpIndex] = NULL;
-		strList[tmpIndex + 2] = NULL;
-
-		tmpIndex += 3;
-	}
-
-	// Assign value
-	xmlPtr->header = tmpAttrList;
-	xmlPtr->headLen = tmpAttrLen;
-
-	goto RET;
-
-ERR:
-	for(i = 0; i < tmpAttrLen; i++)
-	{
-		lstm_xml_attr_delete(&tmpAttrList[i]);
-	}
-	lstm_free(tmpAttrList);
-
-RET:
-	for(i = 0; i < strCount; i++)
-	{
-		lstm_free(strList[i]);
-	}
-	lstm_free(strList);
-	lstm_free(strBuf.str);
-
-	LOG("exit");
-	return ret;
-}
-*/
 
 #define __lstm_xml_strlist_append() \
 	if(strBuf.strLen > 0) \
