@@ -14,9 +14,7 @@
 
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
-	int i;
 	int ret = LSTM_NO_ERROR;
-	int procIndex;
 
 	int xmlLen;
 	char* xml = NULL;
@@ -50,6 +48,13 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 
 	// Parse header
 	ret = lstm_xml_parse_header(&tmpXml, (const char**)tmpPtr, &tmpPtr);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
+
+	// Parse element
+	ret = lstm_xml_parse_element(&tmpXml, (const char**)tmpPtr);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto ERR;
@@ -319,6 +324,7 @@ RET:
 	return ret;
 }
 
+/*
 int lstm_xml_elem_append(struct LSTM_XML_ELEM* elemPtr, struct LSTM_XML_ELEM* src)
 {
 	int ret = LSTM_NO_ERROR;
@@ -343,14 +349,15 @@ int lstm_xml_elem_append(struct LSTM_XML_ELEM* elemPtr, struct LSTM_XML_ELEM* sr
 	elemPtr->elemList[elemPtr->elemLen - 1] = *src;
 
 	// Zero memory
-	memset(src, 0, sizeof(struct LSTM_XML_ELEL));
+	memset(src, 0, sizeof(struct LSTM_XML_ELEM));
 
 RET:
 	LOG("exit");
 	return ret;
 }
+*/
 
-int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
+int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 {
 	int i;
 	int tmpLen;
@@ -367,7 +374,7 @@ int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
 	struct LSTM_STR tmpStr;
 
 	int ptrStackTop = -1;
-	int ptrStackMem = 0;
+	int ptrStackSize = 0;
 	void** ptrStack = NULL;
 
 	LOG("enter");
@@ -377,7 +384,7 @@ int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
 
 	// Push element pointer to stack
 	lstm_alloc(ptrStack, 1, void*, ret, RET);
-	ptrStackMem = 1;
+	ptrStackSize = 1;
 	ptrStackTop = 0;
 	ptrStack[ptrStackTop] = rootElem;
 
@@ -385,6 +392,7 @@ int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
 	tmpElem = rootElem;
 
 	// Parsing
+	i = 0;
 	while(strList[i] != NULL)
 	{
 		// Clone string
@@ -407,15 +415,41 @@ int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
 				goto ERR;
 			}
 
-			// Checking
+			// Parsing element tree
 			if(tmpStr.str[0] == '/')
 			{
+				if(tmpElem->name == NULL)
+				{
+					ret = LSTM_PARSE_FAILED;
+					goto ERR;
+				}
+				else
+				{
+					// Compare tag
+					ret = lstm_strcmp(&tmpStr.str[1], tmpElem->name);
+					if(ret != LSTM_NO_ERROR)
+					{
+						goto ERR;
+					}
+
+					// Pop pointer stack
+					if(ptrStackTop < 0)
+					{
+						ret = LSTM_PARSE_FAILED;
+						goto ERR;
+					}
+					else
+					{
+						tmpElem = ptrStack[ptrStackTop];
+						ptrStackTop--;
+					}
+				}
 			}
 			else
 			{
 				// Allocate child element
-				tmpLen = tmpElem.elemLen + 1;
-				allocTmp = realloc(tmpElem.elemList, tmpLen * sizeof(struct LSTM_XML_ELEM));
+				tmpLen = tmpElem->elemLen + 1;
+				allocTmp = realloc(tmpElem->elemList, tmpLen * sizeof(struct LSTM_XML_ELEM));
 				if(allocTmp == NULL)
 				{
 					ret = LSTM_NO_ERROR;
@@ -423,40 +457,67 @@ int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
 				}
 				else
 				{
-					tmpElem.elemList = allocTmp;
-					tmpElem.elemLen = tmpLen;
+					tmpElem->elemList = allocTmp;
+					tmpElem->elemLen = tmpLen;
 				}
 
 				// Set element
-				memset(&tmpElem[tmpLen - 1], 0, sizeof(LSTM_XML_ELEM));
-				tmpElem[tmpLen - 1].name = tagStr;
-				tmpElem[tmpLen - 1].attrList = attrList;
-				tmpElem[tmpLen - 1].attrLen = attrLen;
+				memset(&tmpElem->elemList[tmpLen - 1], 0, sizeof(struct LSTM_XML_ELEM));
+				tmpElem->elemList[tmpLen - 1].name = tagStr;
+				tmpElem->elemList[tmpLen - 1].attrList = attrList;
+				tmpElem->elemList[tmpLen - 1].attrLen = attrLen;
 
 				// Push pointer
+				if(ptrStackTop + 2 > ptrStackSize)
+				{
+					allocTmp = realloc(ptrStack, (ptrStackTop + 2) * sizeof(void*));
+					if(allocTmp == NULL)
+					{
+						ret = LSTM_MEM_FAILED;
+						goto ERR;
+					}
+					else
+					{
+						ptrStack = allocTmp;
+						ptrStackSize = ptrStackTop;
+					}
+				}
+
+				ptrStackTop++;
+				ptrStack[ptrStackTop] = tmpElem;
+
+				// Enter child element
+				tmpElem = &tmpElem->elemList[tmpLen - 1];
 			}
 
 			lstm_free(tmpStr.str);
 		}
 		else
 		{
-			tmpElem[tmpElem.elemLen - 1].text = tmpStr.str;
+			tmpElem[tmpElem->elemLen - 1].text = tmpStr.str;
 		}
 
 		i++;
 	}
 
-ERR:
-	for(i = 0; i < tmpElemLen; i++)
+	// Check pointer
+	if(tmpElem != rootElem)
 	{
-		lstm_xml_elem_delete(&tmpElemList[i]);
+		ret = LSTM_PARSE_FAILED;
+		goto ERR;
 	}
-	lstm_free(tmpElemList);
+
+	// Assign value
+	xmlPtr->elemList = rootElem->elemList;
+	xmlPtr->elemLen = rootElem->elemLen;
+
+	goto RET;
+
+ERR:
+	lstm_xml_elem_delete(rootElem);
 
 RET:
-	lstm_xml_elem_delete(&tmpElem);
-
-	lstm_free(elemStack);
+	lstm_free(rootElem);
 	lstm_free(ptrStack);
 
 	LOG("exit");
@@ -685,6 +746,8 @@ int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
 
 	// Zero memory
 	memset(&strBuf, 0, sizeof(struct LSTM_STR));
+
+	LOG("Target string: %s", src);
 
 	// Split string
 	forceRead = 0;
