@@ -104,12 +104,13 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 	}
 
 	// Move string
-	for(i = 0, j = validIndex; j < strLen; i++, j++)
+	for(i = 0, j = validIndex; j < strLen + 1; i++, j++)
 	{
 		tmpPtr[i] = tmpPtr[j];
 	}
 
 	// Find last valid character
+	strLen = strlen(tmpPtr);
 	stat = 1;
 	for(i = strLen - 1; i >= 0; i--)
 	{
@@ -121,8 +122,11 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 		}
 	}
 
-	// Set terminate character
-	tmpPtr[validIndex + 1] = '\0';
+	// Checking status
+	if(stat == 0)
+	{
+		tmpPtr[validIndex + 1] = '\0';
+	}
 
 	// Find new string length
 	strPtr->strLen = strlen(strPtr->str);
