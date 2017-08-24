@@ -70,7 +70,7 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 	// Checking
 	if(strPtr->strLen == 0)
 	{
-		return;
+		goto RET;
 	}
 
 	// Get reference
@@ -96,7 +96,7 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 	{
 		tmpPtr[0] = '\0';
 		strPtr->strLen = 0;
-		return;
+		goto RET;
 	}
 
 	// Move string
@@ -123,6 +123,7 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 	// Find new string length
 	strPtr->strLen = strlen(strPtr->str);
 
+RET:
 	LOG("exit");
 }
 
