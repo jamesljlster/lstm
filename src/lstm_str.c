@@ -22,9 +22,13 @@ int lstm_str_create(struct LSTM_STR* strPtr, const char* src)
 	strLen = strlen(src);
 	lstm_alloc(tmpStr.str, strLen + 1, char, ret, RET);
 
+	// Copy string
+	strncpy(tmpStr.str, src, strLen);
+
 	// Assign value
 	tmpStr.strLen = strLen;
 	tmpStr.memLen = strLen + 1;
+	*strPtr = tmpStr;
 
 RET:
 	LOG("exit");
