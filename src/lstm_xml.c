@@ -399,7 +399,7 @@ RET:
 #define __lstm_xml_strlist_append() \
 	if(strBuf.strLen > 0) \
 	{ \
-		allocTmp = realloc(strList, sizeof(char**) * (strCount + 1)); \
+		allocTmp = realloc(strList, sizeof(char*) * (strCount + 1)); \
 		if(allocTmp == NULL) \
 		{ \
 			ret = LSTM_MEM_FAILED; \
@@ -414,7 +414,7 @@ RET:
 		memset(&strBuf, 0, sizeof(struct LSTM_STR)); \
 	}
 
-int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSrc, int xmlLen)
+int lstm_xml_get_strlist(char*** strListPtr, const char* xmlSrc, int xmlLen)
 {
 	int i;
 	int ret = LSTM_NO_ERROR;
@@ -486,9 +486,21 @@ int lstm_xml_get_strlist(char*** strListPtr, int* strCountPtr, const char* xmlSr
 		}
 	}
 
+	// Append NULL to list
+	allocTmp = realloc(strList, sizeof(char*) * (strCount + 1));
+	if(allocTmp == NULL)
+	{
+		ret = LSTM_MEM_FAILED;
+		goto ERR;
+	}
+	else
+	{
+		strList = allocTmp;
+		strList[strCount] = NULL;
+	}
+
 	// Assign value
 	*strListPtr = strList;
-	*strCountPtr = strCount;
 
 	goto RET;
 

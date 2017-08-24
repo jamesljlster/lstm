@@ -12,7 +12,6 @@ int main(int argc, char* argv[])
 	char* xml;
 
 	char** strList;
-	int strCount;
 
 	for(i = 1; i < argc; i++)
 	{
@@ -23,7 +22,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			iResult = lstm_xml_get_strlist(&strList, &strCount, xml, xmlLen);
+			iResult = lstm_xml_get_strlist(&strList, xml, xmlLen);
 			if(iResult != LSTM_NO_ERROR)
 			{
 				printf("lstm_xml_get_strlist() failed!");
@@ -31,7 +30,7 @@ int main(int argc, char* argv[])
 			else
 			{
 				printf("%s:\n", argv[1]);
-				for(j = 0; j < strCount; j++)
+				for(j = 0; strList[j] != NULL; j++)
 				{
 					printf("%s\n", strList[j]);
 				}
