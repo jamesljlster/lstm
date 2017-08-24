@@ -321,6 +321,7 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char***
 	int i, tmpIndex;
 	int ret = LSTM_NO_ERROR;
 
+	char* tagPtr = NULL;
 	int tmpAttrLen = 0;
 	struct LSTM_XML_ATTR* tmpAttrList = NULL;
 
@@ -370,6 +371,27 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char***
 		lstm_str_trim(&tmpStr, "<>?");
 	}
 
+	// Parsing attribute
+	ret = lstm_xml_parse_attribute(&tagPtr, &tmpAttrList, &tmpAttrLen, tmpStr.str);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Check header tag
+	ret = lstm_strcmp(tagPtr, "xml");
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Assign value
+	xmlPtr->header = tmpAttrList;
+	xmlPtr->headLen = tmpAttrLen;
+	*endPtr = &xmlStrList[1];
+
+	/*
+
 	// Split string
 	ret = lstm_xml_split(&tmpStrList, &tmpStrCount, tmpStr.str);
 	if(ret != LSTM_NO_ERROR)
@@ -377,12 +399,6 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char***
 		goto RET;
 	}
 
-	// Check header tag
-	ret = lstm_strcmp(tmpStrList[0], "xml");
-	if(ret != LSTM_NO_ERROR)
-	{
-		goto RET;
-	}
 
 	// Find attribute count
 	if((tmpStrCount - 1) % 3 != 0)
@@ -417,10 +433,7 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char***
 		tmpIndex += 3;
 	}
 
-	// Assign value
-	xmlPtr->header = tmpAttrList;
-	xmlPtr->headLen = tmpAttrLen;
-	*endPtr = &xmlStrList[1];
+	*/
 
 	goto RET;
 
@@ -439,6 +452,7 @@ RET:
 	lstm_free(tmpStrList);
 
 	lstm_free(tmpStr.str);
+	lstm_free(tagPtr);
 
 	LOG("exit");
 	return ret;
