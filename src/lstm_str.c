@@ -111,7 +111,7 @@ void lstm_str_trim(struct LSTM_STR* strPtr, const char* trimChs)
 
 	// Find last valid character
 	stat = 1;
-	for(i = strLen - 1; i >= 0; i++)
+	for(i = strLen - 1; i >= 0; i--)
 	{
 		if(lstm_str_index_of(trimChs, tmpPtr[i]) < 0)
 		{
