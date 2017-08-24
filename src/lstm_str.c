@@ -166,9 +166,11 @@ int lstm_str_append(struct LSTM_STR* strPtr, char ch)
 	void* allocTmp;
 
 	LOG("enter");
+	LOG("Append \"%s\" with '%c'", strPtr->str, ch);
 
 	// Find new memory length
 	tmpLen = strPtr->strLen + 2;
+	LOG("New size: %d", tmpLen);
 
 	// Reallocate memory
 	if(tmpLen > strPtr->memLen)
@@ -182,6 +184,7 @@ int lstm_str_append(struct LSTM_STR* strPtr, char ch)
 		else
 		{
 			strPtr->str = allocTmp;
+			strPtr->memLen = tmpLen;
 		}
 	}
 
