@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,6 +70,7 @@ RET:
 	return ret;
 }
 
+/*
 int lstm_xml_parse_element(struct LSTM_XML_ELEM** elemListPtr, int* elemLenPtr, const char* xmlSrc, int xmlLen, int* procIndex)
 {
 	int i;
@@ -236,6 +238,7 @@ RET:
 	LOG("exit");
 	return ret;
 }
+*/
 
 int lstm_xml_parse_attribute(char** tagPtr, struct LSTM_XML_ATTR** attrListPtr, int* attrLenPtr, const char* attrStr)
 {
@@ -311,6 +314,150 @@ RET:
 		lstm_free(strList[i]);
 	}
 	lstm_free(strList);
+
+	LOG("exit");
+	return ret;
+}
+
+int lstm_xml_elem_append(struct LSTM_XML_ELEM* elemPtr, struct LSTM_XML_ELEM* src)
+{
+	int ret = LSTM_NO_ERROR;
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Resize element list
+	allocTmp = realloc(elemPtr->elemList, (elemPtr->elemLen + 1) * sizeof(struct LSTM_XML_ELEM));
+	if(allocTmp == NULL)
+	{
+		ret = LSTM_MEM_FAILED;
+		goto RET;
+	}
+	else
+	{
+		elemPtr->elemList = allocTmp;
+		elemPtr->elemLen++;
+	}
+
+	// Set element
+	elemPtr->elemList[elemPtr->elemLen - 1] = *src;
+
+	// Zero memory
+	memset(src, 0, sizeof(struct LSTM_XML_ELEL));
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_xml_parse_element(struct LSTM_XML* xmpPtr, const char** strList)
+{
+	int i;
+	int tmpLen;
+	int ret = LSTM_NO_ERROR;
+	void* allocTmp;
+
+	char* tagStr;
+	int attrLen = 0;
+	struct LSTM_XML_ATTR* attrList = NULL;
+
+	struct LSTM_XML_ELEM* rootElem = NULL;
+	struct LSTM_XML_ELEM* tmpElem = NULL;
+
+	struct LSTM_STR tmpStr;
+
+	int ptrStackTop = -1;
+	int ptrStackMem = 0;
+	void** ptrStack = NULL;
+
+	LOG("enter");
+
+	// Allocate memory for root element
+	lstm_alloc(rootElem, 1, struct LSTM_XML_ELEM, ret, RET);
+
+	// Push element pointer to stack
+	lstm_alloc(ptrStack, 1, void*, ret, RET);
+	ptrStackMem = 1;
+	ptrStackTop = 0;
+	ptrStack[ptrStackTop] = rootElem;
+
+	// Set initial pointer
+	tmpElem = rootElem;
+
+	// Parsing
+	while(strList[i] != NULL)
+	{
+		// Clone string
+		ret = lstm_str_create(&tmpStr, strList[i]);
+		if(ret != LSTM_NO_ERROR)
+		{
+			goto ERR;
+		}
+
+		// Check string
+		if(tmpStr.str[0] == '<')
+		{
+			// Trim string
+			lstm_str_trim(&tmpStr, "<>");
+
+			// Parse attribute
+			ret = lstm_xml_parse_attribute(&tagStr, &attrList, &attrLen, tmpStr.str);
+			if(ret != LSTM_NO_ERROR)
+			{
+				goto ERR;
+			}
+
+			// Checking
+			if(tmpStr.str[0] == '/')
+			{
+			}
+			else
+			{
+				// Allocate child element
+				tmpLen = tmpElem.elemLen + 1;
+				allocTmp = realloc(tmpElem.elemList, tmpLen * sizeof(struct LSTM_XML_ELEM));
+				if(allocTmp == NULL)
+				{
+					ret = LSTM_NO_ERROR;
+					goto ERR;
+				}
+				else
+				{
+					tmpElem.elemList = allocTmp;
+					tmpElem.elemLen = tmpLen;
+				}
+
+				// Set element
+				memset(&tmpElem[tmpLen - 1], 0, sizeof(LSTM_XML_ELEM));
+				tmpElem[tmpLen - 1].name = tagStr;
+				tmpElem[tmpLen - 1].attrList = attrList;
+				tmpElem[tmpLen - 1].attrLen = attrLen;
+
+				// Push pointer
+			}
+
+			lstm_free(tmpStr.str);
+		}
+		else
+		{
+			tmpElem[tmpElem.elemLen - 1].text = tmpStr.str;
+		}
+
+		i++;
+	}
+
+ERR:
+	for(i = 0; i < tmpElemLen; i++)
+	{
+		lstm_xml_elem_delete(&tmpElemList[i]);
+	}
+	lstm_free(tmpElemList);
+
+RET:
+	lstm_xml_elem_delete(&tmpElem);
+
+	lstm_free(elemStack);
+	lstm_free(ptrStack);
 
 	LOG("exit");
 	return ret;
