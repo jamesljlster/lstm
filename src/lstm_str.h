@@ -12,6 +12,7 @@ struct LSTM_STR
 extern "C" {
 #endif
 
+int lstm_str_create(struct LSTM_STR* strPtr, const char* src);
 int lstm_str_index_of(const char* src, char ch);
 int lstm_str_append(struct LSTM_STR* strPtr, char ch);
 int lstm_strcmp(const char* src1, const char* src2);

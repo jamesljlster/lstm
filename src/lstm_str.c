@@ -2,9 +2,34 @@
 #include <string.h>
 
 #include "lstm.h"
+#include "lstm_private.h"
 #include "lstm_str.h"
 
 #include "debug.h"
+
+int lstm_str_create(struct LSTM_STR* strPtr, const char* src)
+{
+	int ret = LSTM_NO_ERROR;
+	int strLen;
+	struct LSTM_STR tmpStr;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&tmpStr, 0, sizeof(struct LSTM_STR));
+
+	// Memory allocation
+	strLen = strlen(src);
+	lstm_alloc(tmpStr.str, strLen + 1, char, ret, RET);
+
+	// Assign value
+	tmpStr.strLen = strLen;
+	tmpStr.memLen = strLen + 1;
+
+RET:
+	LOG("exit");
+	return ret;
+}
 
 int lstm_str_index_of(const char* src, char ch)
 {
