@@ -5,6 +5,10 @@
 #include "lstm_private.h"
 #include "lstm_str.h"
 
+#ifdef DEBUG
+#undef DEBUG
+#endif
+
 #include "debug.h"
 
 int lstm_str_create(struct LSTM_STR* strPtr, const char* src)
@@ -166,11 +170,9 @@ int lstm_str_append(struct LSTM_STR* strPtr, char ch)
 	void* allocTmp;
 
 	LOG("enter");
-	LOG("Append \"%s\" with '%c'", strPtr->str, ch);
 
 	// Find new memory length
 	tmpLen = strPtr->strLen + 2;
-	LOG("New size: %d", tmpLen);
 
 	// Reallocate memory
 	if(tmpLen > strPtr->memLen)

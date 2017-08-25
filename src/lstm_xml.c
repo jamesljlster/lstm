@@ -7,6 +7,7 @@
 #include "lstm_private.h"
 #include "lstm_xml.h"
 #include "lstm_str.h"
+#include "lstm_pstack.h"
 
 #include "debug.h"
 
@@ -276,26 +277,30 @@ int lstm_xml_parse_attribute(char** tagPtr, struct LSTM_XML_ATTR** attrListPtr, 
 		tmpAttrLen = (strCount - 1) / 3;
 	}
 
-	// Memory allocation: attribute list
-	lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
-	tmpIndex = 1;
-	for(i = 0; i < tmpAttrLen; i++)
+	// Check attribute count
+	if(tmpAttrLen > 0)
 	{
-		// Checking
-		ret = lstm_strcmp(strList[tmpIndex + 1], "=");
-		if(ret != LSTM_NO_ERROR)
+		// Memory allocation: attribute list
+		lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
+		tmpIndex = 1;
+		for(i = 0; i < tmpAttrLen; i++)
 		{
-			goto ERR;
+			// Checking
+			ret = lstm_strcmp(strList[tmpIndex + 1], "=");
+			if(ret != LSTM_NO_ERROR)
+			{
+				goto ERR;
+			}
+
+			// Set value
+			tmpAttrList[i].name = strList[tmpIndex];
+			tmpAttrList[i].content = strList[tmpIndex + 2];
+
+			strList[tmpIndex] = NULL;
+			strList[tmpIndex + 2] = NULL;
+
+			tmpIndex += 3;
 		}
-
-		// Set value
-		tmpAttrList[i].name = strList[tmpIndex];
-		tmpAttrList[i].content = strList[tmpIndex + 2];
-
-		strList[tmpIndex] = NULL;
-		strList[tmpIndex + 2] = NULL;
-
-		tmpIndex += 3;
 	}
 
 	// Assign value
@@ -364,7 +369,7 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 	int ret = LSTM_NO_ERROR;
 	void* allocTmp;
 
-	char* tagStr;
+	char* tagStr = NULL;
 	int attrLen = 0;
 	struct LSTM_XML_ATTR* attrList = NULL;
 
@@ -373,20 +378,15 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 
 	struct LSTM_STR tmpStr;
 
-	int ptrStackTop = -1;
-	int ptrStackSize = 0;
-	void** ptrStack = NULL;
+	struct LSTM_PSTACK pStack;
 
 	LOG("enter");
 
+	// Initial pointer stack
+	lstm_pstack_init(&pStack);
+
 	// Allocate memory for root element
 	lstm_alloc(rootElem, 1, struct LSTM_XML_ELEM, ret, RET);
-
-	// Push element pointer to stack
-	lstm_alloc(ptrStack, 1, void*, ret, RET);
-	ptrStackSize = 1;
-	ptrStackTop = 0;
-	ptrStack[ptrStackTop] = rootElem;
 
 	// Set initial pointer
 	tmpElem = rootElem;
@@ -402,18 +402,13 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 			goto ERR;
 		}
 
+		LOG("Parsing \"%s\"", tmpStr.str);
+
 		// Check string
 		if(tmpStr.str[0] == '<')
 		{
 			// Trim string
 			lstm_str_trim(&tmpStr, "<>");
-
-			// Parse attribute
-			ret = lstm_xml_parse_attribute(&tagStr, &attrList, &attrLen, tmpStr.str);
-			if(ret != LSTM_NO_ERROR)
-			{
-				goto ERR;
-			}
 
 			// Parsing element tree
 			if(tmpStr.str[0] == '/')
@@ -433,20 +428,23 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 					}
 
 					// Pop pointer stack
-					if(ptrStackTop < 0)
+					tmpElem = lstm_pstack_pop(&pStack);
+					if(tmpElem == NULL)
 					{
 						ret = LSTM_PARSE_FAILED;
 						goto ERR;
-					}
-					else
-					{
-						tmpElem = ptrStack[ptrStackTop];
-						ptrStackTop--;
 					}
 				}
 			}
 			else
 			{
+				// Parse attribute
+				ret = lstm_xml_parse_attribute(&tagStr, &attrList, &attrLen, tmpStr.str);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+
 				// Allocate child element
 				tmpLen = tmpElem->elemLen + 1;
 				allocTmp = realloc(tmpElem->elemList, tmpLen * sizeof(struct LSTM_XML_ELEM));
@@ -468,23 +466,11 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 				tmpElem->elemList[tmpLen - 1].attrLen = attrLen;
 
 				// Push pointer
-				if(ptrStackTop + 2 > ptrStackSize)
+				ret = lstm_pstack_push(&pStack, tmpElem);
+				if(ret != LSTM_NO_ERROR)
 				{
-					allocTmp = realloc(ptrStack, (ptrStackTop + 2) * sizeof(void*));
-					if(allocTmp == NULL)
-					{
-						ret = LSTM_MEM_FAILED;
-						goto ERR;
-					}
-					else
-					{
-						ptrStack = allocTmp;
-						ptrStackSize = ptrStackTop;
-					}
+					goto ERR;
 				}
-
-				ptrStackTop++;
-				ptrStack[ptrStackTop] = tmpElem;
 
 				// Enter child element
 				tmpElem = &tmpElem->elemList[tmpLen - 1];
@@ -494,7 +480,7 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 		}
 		else
 		{
-			tmpElem[tmpElem->elemLen - 1].text = tmpStr.str;
+			tmpElem->text = tmpStr.str;
 		}
 
 		i++;
@@ -502,6 +488,13 @@ int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
 
 	// Check pointer
 	if(tmpElem != rootElem)
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto ERR;
+	}
+
+	// Checking syntax
+	if(rootElem->text != NULL || rootElem->attrList != NULL)
 	{
 		ret = LSTM_PARSE_FAILED;
 		goto ERR;
@@ -518,7 +511,7 @@ ERR:
 
 RET:
 	lstm_free(rootElem);
-	lstm_free(ptrStack);
+	lstm_pstack_delete(&pStack);
 
 	LOG("exit");
 	return ret;
@@ -746,8 +739,6 @@ int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
 
 	// Zero memory
 	memset(&strBuf, 0, sizeof(struct LSTM_STR));
-
-	LOG("Target string: %s", src);
 
 	// Split string
 	forceRead = 0;
