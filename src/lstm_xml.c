@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,16 +7,20 @@
 #include "lstm_private.h"
 #include "lstm_xml.h"
 #include "lstm_str.h"
+#include "lstm_pstack.h"
 
 #include "debug.h"
+
+#define LSTM_XML_TRIM_STR	" \t\r\n"
 
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;
-	int procIndex;
 
 	int xmlLen;
 	char* xml = NULL;
+	char** strList = NULL;
+	char** tmpPtr = NULL;
 
 	struct LSTM_XML tmpXml;
 
@@ -31,8 +36,26 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 		goto RET;
 	}
 
+	// Create xml string list
+	ret = lstm_xml_get_strlist(&strList, xml, xmlLen);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+	else
+	{
+		tmpPtr = strList;
+	}
+
 	// Parse header
-	ret = lstm_xml_parse_header(&tmpXml, xml, xmlLen, &procIndex);
+	ret = lstm_xml_parse_header(&tmpXml, (const char**)tmpPtr, &tmpPtr);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto ERR;
+	}
+
+	// Parse element
+	ret = lstm_xml_parse_element(&tmpXml, (const char**)tmpPtr);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto ERR;
@@ -53,6 +76,7 @@ RET:
 	return ret;
 }
 
+/*
 int lstm_xml_parse_element(struct LSTM_XML_ELEM** elemListPtr, int* elemLenPtr, const char* xmlSrc, int xmlLen, int* procIndex)
 {
 	int i;
@@ -220,117 +244,23 @@ RET:
 	LOG("exit");
 	return ret;
 }
+*/
 
-int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLen, int* procIndex)
+int lstm_xml_parse_attribute(char** tagPtr, struct LSTM_XML_ATTR** attrListPtr, int* attrLenPtr, const char* attrStr)
 {
-	int i;
-	int tmpIndex = 0;
+	int i, tmpIndex;
 	int ret = LSTM_NO_ERROR;
-	int tmpStat;
 
-	char** strList = NULL;
 	int strCount = 0;
+	char** strList = NULL;
 
 	int tmpAttrLen = 0;
 	struct LSTM_XML_ATTR* tmpAttrList = NULL;
 
-	struct LSTM_STR strBuf;
-
 	LOG("enter");
 
-	// Zero memory
-	memset(&strBuf, 0, sizeof(struct LSTM_STR));
-
-	// Set start processing index
-	tmpIndex = *procIndex;
-
-	// Find "<?"
-	tmpStat = 0;
-	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
-	{
-		switch(xmlSrc[i])
-		{
-			case '<':
-				if(i < xmlLen - 1)
-				{
-					if(xmlSrc[i + 1] == '?')
-					{
-						tmpIndex = i + 2;
-						tmpStat = 1;
-					}
-					else
-					{
-						ret = LSTM_PARSE_FAILED;
-						goto RET;
-					}
-				}
-				break;
-
-			case '\t':
-			case ' ':
-				break;
-
-			default:
-				ret = LSTM_PARSE_FAILED;
-				goto RET;
-		}
-	}
-
-	// Checking
-	if(tmpStat == 0)
-	{
-		goto RET;
-	}
-
-	tmpStat = 0;
-	for(i = tmpIndex; i < xmlLen && tmpStat == 0; i++)
-	{
-		switch(xmlSrc[i])
-		{
-			case '?':
-				if(i < xmlLen - 1)
-				{
-					if(xmlSrc[i + 1] == '>')
-					{
-						tmpIndex = i + 2;
-						tmpStat = 1;
-					}
-					else
-					{
-						ret = LSTM_PARSE_FAILED;
-						goto RET;
-					}
-				}
-				break;
-
-			default:
-				ret = lstm_str_append(&strBuf, xmlSrc[i]);
-				if(ret != LSTM_NO_ERROR)
-				{
-					goto RET;
-				}
-		}
-	}
-
-	// Set procIndex
-	*procIndex = tmpIndex;
-
-	// Checking
-	if(tmpStat == 0)
-	{
-		ret = LSTM_PARSE_FAILED;
-		goto RET;
-	}
-
 	// Split string
-	ret = lstm_xml_split(&strList, &strCount, strBuf.str);
-	if(ret != LSTM_NO_ERROR)
-	{
-		goto RET;
-	}
-
-	// Check header tag
-	ret = lstm_strcmp(strList[0], "xml");
+	ret = lstm_xml_split(&strList, &strCount, attrStr);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto RET;
@@ -347,31 +277,37 @@ int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char* xmlSrc, int xmlLe
 		tmpAttrLen = (strCount - 1) / 3;
 	}
 
-	// Memory allocation: attribute list
-	lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
-	tmpIndex = 1;
-	for(i = 0; i < tmpAttrLen; i++)
+	// Check attribute count
+	if(tmpAttrLen > 0)
 	{
-		// Checking
-		ret = lstm_strcmp(strList[tmpIndex + 1], "=");
-		if(ret != LSTM_NO_ERROR)
+		// Memory allocation: attribute list
+		lstm_alloc(tmpAttrList, tmpAttrLen, struct LSTM_XML_ATTR, ret, ERR);
+		tmpIndex = 1;
+		for(i = 0; i < tmpAttrLen; i++)
 		{
-			goto ERR;
+			// Checking
+			ret = lstm_strcmp(strList[tmpIndex + 1], "=");
+			if(ret != LSTM_NO_ERROR)
+			{
+				goto ERR;
+			}
+
+			// Set value
+			tmpAttrList[i].name = strList[tmpIndex];
+			tmpAttrList[i].content = strList[tmpIndex + 2];
+
+			strList[tmpIndex] = NULL;
+			strList[tmpIndex + 2] = NULL;
+
+			tmpIndex += 3;
 		}
-
-		// Set value
-		tmpAttrList[i].name = strList[tmpIndex];
-		tmpAttrList[i].content = strList[tmpIndex + 2];
-
-		strList[tmpIndex] = NULL;
-		strList[tmpIndex + 2] = NULL;
-
-		tmpIndex += 3;
 	}
 
 	// Assign value
-	xmlPtr->header = tmpAttrList;
-	xmlPtr->headLen = tmpAttrLen;
+	*attrListPtr = tmpAttrList;
+	*attrLenPtr = tmpAttrLen;
+	*tagPtr = strList[0];
+	strList[0] = NULL;
 
 	goto RET;
 
@@ -388,9 +324,401 @@ RET:
 		lstm_free(strList[i]);
 	}
 	lstm_free(strList);
-	lstm_free(strBuf.str);
 
 	LOG("exit");
+	return ret;
+}
+
+/*
+int lstm_xml_elem_append(struct LSTM_XML_ELEM* elemPtr, struct LSTM_XML_ELEM* src)
+{
+	int ret = LSTM_NO_ERROR;
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Resize element list
+	allocTmp = realloc(elemPtr->elemList, (elemPtr->elemLen + 1) * sizeof(struct LSTM_XML_ELEM));
+	if(allocTmp == NULL)
+	{
+		ret = LSTM_MEM_FAILED;
+		goto RET;
+	}
+	else
+	{
+		elemPtr->elemList = allocTmp;
+		elemPtr->elemLen++;
+	}
+
+	// Set element
+	elemPtr->elemList[elemPtr->elemLen - 1] = *src;
+
+	// Zero memory
+	memset(src, 0, sizeof(struct LSTM_XML_ELEM));
+
+RET:
+	LOG("exit");
+	return ret;
+}
+*/
+
+int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList)
+{
+	int i;
+	int tmpLen;
+	int ret = LSTM_NO_ERROR;
+	void* allocTmp;
+
+	char* tagStr = NULL;
+	int attrLen = 0;
+	struct LSTM_XML_ATTR* attrList = NULL;
+
+	struct LSTM_XML_ELEM* rootElem = NULL;
+	struct LSTM_XML_ELEM* tmpElem = NULL;
+
+	struct LSTM_STR tmpStr;
+
+	struct LSTM_PSTACK pStack;
+
+	LOG("enter");
+
+	// Initial pointer stack
+	lstm_pstack_init(&pStack);
+
+	// Allocate memory for root element
+	lstm_alloc(rootElem, 1, struct LSTM_XML_ELEM, ret, RET);
+
+	// Set initial pointer
+	tmpElem = rootElem;
+
+	// Parsing
+	i = 0;
+	while(strList[i] != NULL)
+	{
+		// Clone string
+		ret = lstm_str_create(&tmpStr, strList[i]);
+		if(ret != LSTM_NO_ERROR)
+		{
+			goto ERR;
+		}
+
+		LOG("Parsing \"%s\"", tmpStr.str);
+
+		// Check string
+		if(tmpStr.str[0] == '<')
+		{
+			// Trim string
+			lstm_str_trim(&tmpStr, "<>");
+
+			// Parsing element tree
+			if(tmpStr.str[0] == '/')
+			{
+				if(tmpElem->name == NULL)
+				{
+					ret = LSTM_PARSE_FAILED;
+					goto ERR;
+				}
+				else
+				{
+					// Compare tag
+					ret = lstm_strcmp(&tmpStr.str[1], tmpElem->name);
+					if(ret != LSTM_NO_ERROR)
+					{
+						goto ERR;
+					}
+
+					// Pop pointer stack
+					tmpElem = lstm_pstack_pop(&pStack);
+					if(tmpElem == NULL)
+					{
+						ret = LSTM_PARSE_FAILED;
+						goto ERR;
+					}
+				}
+			}
+			else
+			{
+				// Parse attribute
+				ret = lstm_xml_parse_attribute(&tagStr, &attrList, &attrLen, tmpStr.str);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+
+				// Allocate child element
+				tmpLen = tmpElem->elemLen + 1;
+				allocTmp = realloc(tmpElem->elemList, tmpLen * sizeof(struct LSTM_XML_ELEM));
+				if(allocTmp == NULL)
+				{
+					ret = LSTM_NO_ERROR;
+					goto ERR;
+				}
+				else
+				{
+					tmpElem->elemList = allocTmp;
+					tmpElem->elemLen = tmpLen;
+				}
+
+				// Set element
+				memset(&tmpElem->elemList[tmpLen - 1], 0, sizeof(struct LSTM_XML_ELEM));
+				tmpElem->elemList[tmpLen - 1].name = tagStr;
+				tmpElem->elemList[tmpLen - 1].attrList = attrList;
+				tmpElem->elemList[tmpLen - 1].attrLen = attrLen;
+
+				// Push pointer
+				ret = lstm_pstack_push(&pStack, tmpElem);
+				if(ret != LSTM_NO_ERROR)
+				{
+					goto ERR;
+				}
+
+				// Enter child element
+				tmpElem = &tmpElem->elemList[tmpLen - 1];
+			}
+
+			lstm_free(tmpStr.str);
+		}
+		else
+		{
+			tmpElem->text = tmpStr.str;
+		}
+
+		i++;
+	}
+
+	// Check pointer
+	if(tmpElem != rootElem)
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto ERR;
+	}
+
+	// Checking syntax
+	if(rootElem->text != NULL || rootElem->attrList != NULL)
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto ERR;
+	}
+
+	// Assign value
+	xmlPtr->elemList = rootElem->elemList;
+	xmlPtr->elemLen = rootElem->elemLen;
+
+	goto RET;
+
+ERR:
+	lstm_xml_elem_delete(rootElem);
+
+RET:
+	lstm_free(rootElem);
+	lstm_pstack_delete(&pStack);
+
+	LOG("exit");
+	return ret;
+}
+
+int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char*** endPtr)
+{
+	int ret = LSTM_NO_ERROR;
+
+	char* tagPtr = NULL;
+	int tmpAttrLen = 0;
+	struct LSTM_XML_ATTR* tmpAttrList = NULL;
+
+	char** xmlStrList;
+
+	struct LSTM_STR tmpStr;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&tmpStr, 0, sizeof(struct LSTM_STR));
+
+	// Cast pointer
+	xmlStrList = (char**)strList;
+
+	// Checking
+	if(xmlStrList[0] == NULL)
+	{
+		goto RET;
+	}
+
+	// Compare header
+	if(xmlStrList[0][0] == '<')
+	{
+		if(xmlStrList[0][1] != '?')
+		{
+			goto RET;
+		}
+	}
+	else
+	{
+		ret = LSTM_PARSE_FAILED;
+		goto RET;
+	}
+
+	// Processing header
+	ret = lstm_str_create(&tmpStr, xmlStrList[0]);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+	else
+	{
+		lstm_str_trim(&tmpStr, "<>?");
+	}
+
+	// Parsing attribute
+	ret = lstm_xml_parse_attribute(&tagPtr, &tmpAttrList, &tmpAttrLen, tmpStr.str);
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Check header tag
+	ret = lstm_strcmp(tagPtr, "xml");
+	if(ret != LSTM_NO_ERROR)
+	{
+		goto RET;
+	}
+
+	// Assign value
+	xmlPtr->header = tmpAttrList;
+	xmlPtr->headLen = tmpAttrLen;
+	*endPtr = &xmlStrList[1];
+
+	goto RET;
+
+RET:
+	lstm_free(tmpStr.str);
+	lstm_free(tagPtr);
+
+	LOG("exit");
+	return ret;
+}
+
+#define __lstm_xml_strlist_append() \
+	if(strBuf.strLen > 0) \
+	{ \
+		allocTmp = realloc(strList, sizeof(char*) * (strCount + 1)); \
+		if(allocTmp == NULL) \
+		{ \
+			ret = LSTM_MEM_FAILED; \
+			goto ERR; \
+		} \
+		else \
+		{ \
+			strList = allocTmp; \
+			strCount++; \
+		} \
+		strList[strCount - 1] = strBuf.str; \
+		memset(&strBuf, 0, sizeof(struct LSTM_STR)); \
+	}
+
+int lstm_xml_get_strlist(char*** strListPtr, const char* xmlSrc, int xmlLen)
+{
+	int i;
+	int ret = LSTM_NO_ERROR;
+
+	int strCount = 0;
+	char** strList = NULL;
+
+	struct LSTM_XML_PSTAT pStat;
+
+	struct LSTM_STR strBuf;
+	void* allocTmp;
+
+	LOG("enter");
+
+	// Zero memory
+	memset(&pStat, 0, sizeof(struct LSTM_XML_PSTAT));
+	memset(&strBuf, 0, sizeof(struct LSTM_STR));
+
+#define __lstm_xml_assert(cond, retVal, errLabel) \
+	if(cond) \
+	{ \
+		retVal = LSTM_PARSE_FAILED; \
+		goto errLabel; \
+	}
+
+	// Split string
+	for(i = 0; i < xmlLen; i++)
+	{
+		switch(xmlSrc[i])
+		{
+			case '<':
+				__lstm_xml_assert(pStat.brStr, ret, ERR);
+				pStat.brStr = 1;
+				pStat.aStrB = 1;
+				break;
+
+			case '>':
+				__lstm_xml_assert(!pStat.brStr, ret, ERR);
+				pStat.brStr = 0;
+				pStat.aStrA = 1;
+				break;
+
+			case ' ':
+			case '\t':
+				break;
+		}
+
+		// Append string to list before append character
+		if(pStat.aStrB)
+		{
+			lstm_str_trim(&strBuf, LSTM_XML_TRIM_STR);
+			__lstm_xml_strlist_append();
+			pStat.aStrB = 0;
+		}
+
+		// Append character to string
+		ret = lstm_str_append(&strBuf, xmlSrc[i]);
+		if(ret != LSTM_NO_ERROR)
+		{
+			goto ERR;
+		}
+
+		// Append string to list after append character
+		if(pStat.aStrA)
+		{
+			lstm_str_trim(&strBuf, LSTM_XML_TRIM_STR);
+			__lstm_xml_strlist_append();
+			pStat.aStrA = 0;
+		}
+	}
+
+	// Append NULL to list
+	allocTmp = realloc(strList, sizeof(char*) * (strCount + 1));
+	if(allocTmp == NULL)
+	{
+		ret = LSTM_MEM_FAILED;
+		goto ERR;
+	}
+	else
+	{
+		strList = allocTmp;
+		strList[strCount] = NULL;
+	}
+
+	// Assign value
+	*strListPtr = strList;
+
+	goto RET;
+
+ERR:
+	if(strList != NULL)
+	{
+		for(i = 0; i < strCount; i++)
+		{
+			lstm_free(strList[i]);
+		}
+		lstm_free(strList);
+	}
+
+RET:
+	lstm_free(strBuf.str);
+	LOG("exit");
+
 	return ret;
 }
 
@@ -411,24 +739,6 @@ int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src)
 
 	// Zero memory
 	memset(&strBuf, 0, sizeof(struct LSTM_STR));
-
-#define __lstm_xml_strlist_append() \
-	if(strBuf.strLen > 0) \
-	{ \
-		allocTmp = realloc(strList, sizeof(char**) * (strCount + 1)); \
-		if(allocTmp == NULL) \
-		{ \
-			ret = LSTM_MEM_FAILED; \
-			goto ERR; \
-		} \
-		else \
-		{ \
-			strList = allocTmp; \
-			strCount++; \
-		} \
-		strList[strCount - 1] = strBuf.str; \
-		memset(&strBuf, 0, sizeof(struct LSTM_STR)); \
-	}
 
 	// Split string
 	forceRead = 0;
