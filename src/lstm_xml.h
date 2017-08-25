@@ -6,11 +6,6 @@
 // XML parsing state
 struct LSTM_XML_PSTAT
 {
-	int elem;
-	int attr;
-	int tag;
-	int str;
-
 	int brStr;	// Status of reading string in bracket
 	int aStrA;	// Append string to list after append character
 	int aStrB;	// Append string to list before append character
