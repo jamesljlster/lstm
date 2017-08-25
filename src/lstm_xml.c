@@ -13,6 +13,99 @@
 
 #define LSTM_XML_TRIM_STR	" \t\r\n"
 
+void lstm_xml_fprint(FILE* fptr, struct LSTM_XML* xmlPtr)
+{
+	int i;
+
+	LOG("enter");
+
+	// Print header
+	fprintf(fptr, "<?xml");
+	lstm_xml_fprint_attribute(fptr, xmlPtr->header, xmlPtr->headLen);
+	fprintf(fptr, "?>\n");
+
+	// Print element
+	for(i = 0; i < xmlPtr->elemLen; i++)
+	{
+		lstm_xml_fprint_element(fptr, &xmlPtr->elemList[i], 0);
+	}
+
+	LOG("exit");
+}
+
+void lstm_xml_fprint_attribute(FILE* fptr, struct LSTM_XML_ATTR* attrPtr, int attrLen)
+{
+	int i;
+
+	LOG("enter");
+
+	for(i = 0; i < attrLen; i++)
+	{
+		fprintf(fptr, " %s=\"%s\"", attrPtr[i].name, attrPtr[i].content);
+	}
+
+	LOG("exit");
+}
+
+void lstm_xml_fprint_element(FILE* fptr, struct LSTM_XML_ELEM* elemPtr, int indent)
+{
+	int i;
+
+	LOG("enter");
+
+	// Print tag and attribute
+	lstm_xml_fprint_indent(fptr, indent);
+	fprintf(fptr, "<%s", elemPtr->name);
+	lstm_xml_fprint_attribute(fptr, elemPtr->attrList, elemPtr->attrLen);
+	fprintf(fptr, ">");
+
+	if(elemPtr->elemLen > 0)
+	{
+		// Print new line
+		fprintf(fptr, "\n");
+
+		// Print text
+		if(elemPtr->text != NULL)
+		{
+			lstm_xml_fprint_indent(fptr, indent + 1);
+			fprintf(fptr, "%s\n", elemPtr->text);
+		}
+
+		// Print child element
+		for(i = 0; i < elemPtr->elemLen; i++)
+		{
+			lstm_xml_fprint_element(fptr, &elemPtr->elemList[i], indent + 1);
+		}
+
+		// Print end tag indent
+		lstm_xml_fprint_indent(fptr, indent);
+	}
+	else
+	{
+		// Print text
+		fprintf(fptr, " %s ", elemPtr->text);
+	}
+
+	// Print end tag
+	fprintf(fptr, "</%s>\n", elemPtr->name);
+
+	LOG("exit");
+}
+
+void lstm_xml_fprint_indent(FILE* fptr, int indent)
+{
+	int i;
+
+	LOG("enter");
+
+	for(i = 0; i < indent; i++)
+	{
+		fprintf(fptr, "\t");
+	}
+
+	LOG("exit");
+}
+
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;

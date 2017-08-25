@@ -24,12 +24,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			printf("=== Header ===\n");
-			for(j = 0; j < xml.headLen; j++)
-			{
-				printf("%s = %s\n", xml.header[j].name, xml.header[j].content);
-			}
-			printf("\n");
+			lstm_xml_fprint(stdout, &xml);
 
 			lstm_xml_delete(&xml);
 		}
