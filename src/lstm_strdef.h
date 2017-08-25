@@ -36,4 +36,14 @@ enum LSTM_STR_LIST
 // LSTM reserve words list
 extern const char* lstm_str_list[];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int lstm_strdef_get_id(const char* str);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
