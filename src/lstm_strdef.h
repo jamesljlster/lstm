@@ -1,5 +1,5 @@
-#ifndef __LSTM_FILE_PROC_H__
-#define __LSTM_FILE_PROC_H__
+#ifndef __LSTM_STRDEF_H__
+#define __LSTM_STRDEF_H__
 
 // LSTM reserve words enumeration
 enum LSTM_STR_LIST
@@ -35,13 +35,5 @@ enum LSTM_STR_LIST
 
 // LSTM reserve words list
 extern const char* lstm_str_list[];
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

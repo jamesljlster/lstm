@@ -1,11 +1,4 @@
-#include <stdio.h>
-
-#include "lstm.h"
-#include "lstm_private.h"
-#include "lstm_xml.h"
 #include "lstm_file_proc.h"
-
-#include "debug.h"
 
 const char* lstm_str_list[] = {
 	"config",
