@@ -57,12 +57,10 @@ int lstm_xml_fread_to_end(char** strPtr, int* lenPtr, const char* filePath);
 void lstm_xml_elem_delete(struct LSTM_XML_ELEM* xmlElemPtr);
 void lstm_xml_attr_delete(struct LSTM_XML_ATTR* xmlAttrPtr);
 
-//int lstm_xml_elem_append(struct LSTM_XML_ELEM* elemPtr, struct LSTM_XML_ELEM* src);
-
 int lstm_xml_parse_header(struct LSTM_XML* xmlPtr, const char** strList, char*** endPtr);
 int lstm_xml_parse_element(struct LSTM_XML* xmlPtr, const char** strList);
-//int lstm_xml_parse_element(struct LSTM_XML_ELEM** elemListPtr, int* elemLenPtr, const char* xmlSrc, int xmlLen, int* procIndex);
 int lstm_xml_parse_attribute(char** tagPtr, struct LSTM_XML_ATTR** attrListPtr, int* attrLenPtr, const char* attrStr);
+
 int lstm_xml_get_strlist(char*** strListPtr, const char* xmlSrc, int xmlLen);
 int lstm_xml_split(char*** strListPtr, int* strCountPtr, const char* src);
 
