@@ -1,4 +1,3 @@
-#include "lstm_file_proc.h"
 
 const char* lstm_str_list[] = {
 	"config",
