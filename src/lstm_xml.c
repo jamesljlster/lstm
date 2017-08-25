@@ -108,6 +108,7 @@ void lstm_xml_fprint_indent(FILE* fptr, int indent)
 
 int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath)
 {
+	int i;
 	int ret = LSTM_NO_ERROR;
 
 	int xmlLen;
@@ -163,6 +164,11 @@ ERR:
 	lstm_xml_delete(&tmpXml);
 
 RET:
+	for(i = 0; strList[i] != NULL; i++)
+	{
+		lstm_free(strList[i]);
+	}
+	lstm_free(strList);
 	lstm_free(xml);
 
 	LOG("exit");
