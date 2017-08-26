@@ -9,7 +9,10 @@
 extern "C" {
 #endif
 
-int lstm_parse_network_xml(struct LSTM_STRUCT* lstm, struct LSTM_XML_ELEM* elemPtr);
+int lstm_parse_net_xml(struct LSTM_STRUCT* lstm, struct LSTM_XML_ELEM* elemPtr);
+int lstm_parse_net_layer_xml(struct LSTM_STRUCT* lstm, struct LSTM_XML_ELEM* elemPtr);
+int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LSTM_XML_ELEM* elemPtr);
+int lstm_parse_net_base_xml();
 
 int lstm_parse_config_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr);
 int lstm_parse_config_tfun_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr);

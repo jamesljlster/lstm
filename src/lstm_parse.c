@@ -27,6 +27,184 @@
 		goto errLabel; \
 	}
 
+int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int nodeIndex = -1;
+
+	char* tmpPtr;
+
+	int childElemLen;
+	struct LSTM_XML_ELEM* childElemPtr;
+
+	LOG("enter");
+
+	// Get reference
+	childElemLen = elemPtr->elemLen;
+	childElemPtr = elemPtr->elemList;
+
+	// Parsing attribute
+	for(i = 0; i < elemPtr->attrLen; i++)
+	{
+		strId = lstm_strdef_get_id(elemPtr->attrList[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_INDEX:
+				__lstm_strtol(nodeIndex, elemPtr->attrList[i].content, ret, RET);
+				break;
+		}
+	}
+
+	// Checking
+	if(nodeIndex >= lstm->layerList[layerIndex].nodeCount || nodeIndex < 0)
+	{
+		ret = LSTM_OUT_OF_RANGE;
+		goto RET;
+	}
+
+	// Parse network base
+	if(layerIndex < lstm->config.layers - 1)
+	{
+		// Parsing element
+		for(i = 0; i < childElemLen; i++)
+		{
+			strId = lstm_strdef_get_id(childElemPtr[i].name);
+			switch(strId)
+			{
+				case LSTM_STR_INPUT:
+					break;
+
+				case LSTM_STR_INPUT_GATE:
+					break;
+
+				case LSTM_STR_FORGET_GATE:
+					break;
+
+				case LSTM_STR_OUTPUT_GATE:
+					break;
+			}
+		}
+	}
+	else
+	{
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_parse_net_layer_xml(struct LSTM_STRUCT* lstm, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int layerType = -1;
+	int layerIndex = -1;
+
+	char* tmpPtr;
+
+	int childElemLen;
+	struct LSTM_XML_ELEM* childElemPtr;
+
+	LOG("enter");
+
+	// Get reference
+	childElemLen = elemPtr->elemLen;
+	childElemPtr = elemPtr->elemList;
+
+	// Parsing attribute
+	for(i = 0; i < elemPtr->attrLen; i++)
+	{
+		strId = lstm_strdef_get_id(elemPtr->attrList[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_TYPE:
+				layerType = lstm_strdef_get_id(elemPtr->attrList[i].content);
+				break;
+
+			case LSTM_STR_INDEX:
+				__lstm_strtol(layerIndex, elemPtr->attrList[i].content, ret, RET);
+				break;
+		}
+	}
+
+	// Set layer index
+	switch(layerType)
+	{
+		case LSTM_STR_HIDDEN:
+			layerIndex = layerIndex + 1;
+			break;
+
+		case LSTM_STR_OUTPUT:
+			layerIndex = lstm->config.layers - 1;
+			break;
+
+		default:
+			ret = LSTM_INVALID_ARG;
+			goto RET;
+	}
+
+	// Checking
+	if(layerIndex >= lstm->config.layers || layerIndex < 1)
+	{
+		ret = LSTM_OUT_OF_RANGE;
+		goto RET;
+	}
+
+	// Parsing element
+	for(i = 0; i < childElemLen; i++)
+	{
+		strId = lstm_strdef_get_id(childElemPtr[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_NODE:
+				lstm_run(lstm_parse_net_node_xml(lstm, layerIndex, &childElemPtr[i]), ret, RET);
+				break;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_parse_net_xml(struct LSTM_STRUCT* lstm, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int childElemLen;
+	struct LSTM_XML_ELEM* childElemPtr;
+
+	LOG("enter");
+
+	// Get reference
+	childElemLen = elemPtr->elemLen;
+	childElemPtr = elemPtr->elemList;
+
+	// Parsing
+	for(i = 0; i < childElemLen; i++)
+	{
+		strId = lstm_strdef_get_id(childElemPtr[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_LAYER:
+				lstm_run(lstm_parse_net_layer_xml(lstm, &childElemPtr[i]), ret, RET);
+				break;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
 int lstm_config_import(lstm_config_t* lstmCfgPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;
