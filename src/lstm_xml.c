@@ -33,7 +33,7 @@ struct LSTM_XML_ELEM* lstm_xml_get_element(struct LSTM_XML_ELEM* elemPtr, const 
 	int i;
 	struct LSTM_XML_ELEM* ret = NULL;
 
-	LOG("enter"); 
+	LOG("enter");
 
 	for(i = 0; i < elemPtr->elemLen; i++)
 	{
@@ -887,7 +887,7 @@ RET:
 		fclose(fRead);
 	}
 
-	LOG("exit"); 
+	LOG("exit");
 	return ret;
 }
 

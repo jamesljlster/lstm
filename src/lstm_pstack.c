@@ -40,7 +40,7 @@ int lstm_pstack_push(struct LSTM_PSTACK* pstack, void* ptr)
 			allocTmp = NULL;
 		}
 	}
-	
+
 	pstack->top++;
 	pstack->stack[pstack->top] = ptr;
 
@@ -77,4 +77,4 @@ void lstm_pstack_delete(struct LSTM_PSTACK* pstack)
 	lstm_pstack_init(pstack);
 
 	LOG("exit");
-} 
+}

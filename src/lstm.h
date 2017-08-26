@@ -18,8 +18,8 @@
  *@{
  */
 
-/** 
- *	\~English 
+/**
+ *	\~English
  *		Return value definitions of LSTM library.
  *
  *	\~Chinese-Traditional
