@@ -112,6 +112,8 @@ double lstm_config_get_learning_rate(lstm_config_t lstmCfg);
 void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef);
 double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
 
+int lstm_get_transfer_func_id(const char* tFuncName);
+
 /**
  *@}
  */

@@ -2,6 +2,7 @@
 
 #include "lstm.h"
 #include "lstm_builtin_math.h"
+#include "lstm_str.h"
 
 #include "debug.h"
 
@@ -46,6 +47,28 @@ char* lstm_transfer_func_name[] = {
 	"Identity",
 	"Rectifier Linear Unit"
 };
+
+int lstm_get_transfer_func_id(const char* tFuncName)
+{
+	int i;
+	int ret = LSTM_PARSE_FAILED;
+
+	LOG("enter");
+
+	for(i = 0; i < LSTM_TFUNC_AMOUNT; i++)
+	{
+		ret = lstm_strcmp(tFuncName, lstm_transfer_func_name[i]);
+		if(ret == LSTM_NO_ERROR)
+		{
+			ret = i;
+			goto RET;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
 
 double lstm_sigmoid(double x)
 {
