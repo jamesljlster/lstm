@@ -214,17 +214,22 @@ int lstm_config_set_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex, in
 	layerIndex = hiddenLayerIndex + 1;
 	if(layerIndex >= lstmCfg->layers || hiddenNodes <= 0)
 	{
-		ret = LSTM_INVALID_ARG;
+		ret = LSTM_OUT_OF_RANGE;
+		goto RET;
 	}
-	else
+
+	if(hiddenNodes <= 0)
 	{
-		// Set value
-		assert(lstmCfg->nodeList != NULL);
-		lstmCfg->nodeList[layerIndex] = hiddenNodes;
+		ret = LSTM_INVALID_ARG;
+		goto RET;
 	}
 
-	LOG("exit");
+	// Set value
+	assert(lstmCfg->nodeList != NULL);
+	lstmCfg->nodeList[layerIndex] = hiddenNodes;
 
+RET:
+	LOG("exit");
 	return ret;
 }
 
