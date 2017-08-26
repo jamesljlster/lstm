@@ -11,6 +11,7 @@
 	num = strtol(src, &tmpPtr, 10); \
 	if(src == tmpPtr) \
 	{ \
+		fprintf(stderr, "%s(): Failed to parse \"%s\" as integer!\n", __FUNCTION__, src); \
 		retVal = LSTM_PARSE_FAILED; \
 		goto errLabel; \
 	}
@@ -19,11 +20,48 @@
 	num = strtod(src, &tmpPtr); \
 	if(src == tmpPtr) \
 	{ \
+		fprintf(stderr, "%s(): Failed to parse \"%s\" as real number!\n", __FUNCTION__, src); \
 		retVal = LSTM_PARSE_FAILED; \
 		goto errLabel; \
 	}
 
-int lstm_parse_config_tfun_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr)
+int lstm_parse_config_hidden_nodes_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int layerIndex;
+	int nodes;
+	char* tmpPtr;
+
+	LOG("enter");
+
+	// Parse attribute
+	for(i = 0; i < elemPtr->attrLen; i++)
+	{
+		strId = lstm_strdef_get_id(elemPtr->attrList[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_INDEX:
+				// Parse layer index
+				__lstm_strtol(layerIndex, elemPtr->attrList[i].content, ret, RET);
+
+				// Parse nodes
+				__lstm_strtol(nodes, elemPtr->text, ret, RET);
+
+				// Set hidden nodes
+				lstm_run(lstm_config_set_hidden_nodes(lstmCfg, layerIndex, nodes), ret, RET);
+				break;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_parse_config_hidden_layer_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr)
 {
 	int i;
 	int strId;
@@ -41,6 +79,53 @@ int lstm_parse_config_tfun_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_X
 	childElemLen = elemPtr->elemLen;
 	childElemPtr = elemPtr->elemList;
 
+	// Parse attribute
+	for(i = 0; i < elemPtr->attrLen; i++)
+	{
+		strId = lstm_strdef_get_id(elemPtr->attrList[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_LAYERS:
+				__lstm_strtol(tmpVal, elemPtr->attrList[i].content, ret, RET);
+				lstm_run(lstm_config_set_hidden_layers(lstmCfg, tmpVal), ret, RET);
+				break;
+		}
+	}
+
+	// Parse element
+	for(i = 0; i < childElemLen; i++)
+	{
+		strId = lstm_strdef_get_id(childElemPtr[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_NODES:
+				lstm_run(lstm_parse_config_hidden_nodes_xml(lstmCfg, &childElemPtr[i]), ret, RET);
+				break;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_parse_config_tfun_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int tmpVal;
+
+	int childElemLen;
+	struct LSTM_XML_ELEM* childElemPtr;
+
+	LOG("enter");
+
+	// Get reference
+	childElemLen = elemPtr->elemLen;
+	childElemPtr = elemPtr->elemList;
+
 	// Parsing
 	for(i = 0; i < childElemLen; i++)
 	{
@@ -48,9 +133,13 @@ int lstm_parse_config_tfun_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_X
 		switch(strId)
 		{
 			case LSTM_STR_INPUT:
+				tmpVal = lstm_get_transfer_func_id(childElemPtr[i].text);
+				lstm_run(lstm_config_set_input_transfer_func(lstmCfg, tmpVal), ret, RET);
 				break;
 
 			case LSTM_STR_OUTPUT:
+				tmpVal = lstm_get_transfer_func_id(childElemPtr[i].text);
+				lstm_run(lstm_config_set_output_transfer_func(lstmCfg, tmpVal), ret, RET);
 				break;
 		}
 	}
@@ -96,6 +185,7 @@ int lstm_parse_config_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_EL
 				break;
 
 			case LSTM_STR_TFUNC:
+				lstm_run(lstm_parse_config_tfun_xml(lstmCfg, &childElemPtr[i]), ret, RET);
 				break;
 
 			case LSTM_STR_LRATE:
@@ -109,6 +199,7 @@ int lstm_parse_config_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_EL
 				break;
 
 			case LSTM_STR_H_LAYER:
+				lstm_run(lstm_parse_config_hidden_layer_xml(lstmCfg, &childElemPtr[i]), ret, RET);
 				break;
 		}
 	}
@@ -117,3 +208,4 @@ RET:
 	LOG("exit");
 	return ret;
 }
+

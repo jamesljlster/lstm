@@ -14,6 +14,7 @@ int lstm_parse_network_xml(struct LSTM_STRUCT* lstm, struct LSTM_XML_ELEM* elemP
 int lstm_parse_config_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr);
 int lstm_parse_config_tfun_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr);
 int lstm_parse_config_hidden_layer_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr);
+int lstm_parse_config_hidden_nodes_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_ELEM* elemPtr);
 
 #ifdef __cplusplus
 }
