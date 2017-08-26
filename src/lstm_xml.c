@@ -13,6 +13,37 @@
 
 #define LSTM_XML_TRIM_STR	" \t\r\n"
 
+struct LSTM_XML_ELEM* lstm_xml_get_element_root(struct LSTM_XML* xmlPtr, const char* elemName)
+{
+	struct LSTM_XML_ELEM tmpElem;
+
+	// Zero memory
+	memset(&tmpElem, 0, sizeof(struct LSTM_XML_ELEM));
+
+	// Get element
+	return lstm_xml_get_element(&tmpElem, elemName);
+}
+
+struct LSTM_XML_ELEM* lstm_xml_get_element(struct LSTM_XML_ELEM* elemPtr, const char* elemName)
+{
+	int i;
+	struct LSTM_XML_ELEM* ret = NULL;
+
+	LOG("enter"); 
+
+	for(i = 0; i < elemPtr->elemLen; i++)
+	{
+		if(lstm_strcmp(elemPtr->elemList[i].name, elemName) == LSTM_NO_ERROR)
+		{
+			ret = &elemPtr->elemList[i];
+			break;
+		}
+	}
+
+	LOG("exit");
+	return ret;
+}
+
 void lstm_xml_fprint(FILE* fptr, struct LSTM_XML* xmlPtr)
 {
 	int i;

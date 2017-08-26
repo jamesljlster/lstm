@@ -50,6 +50,9 @@ int lstm_xml_parse(struct LSTM_XML* xmlPtr, const char* filePath);
 void lstm_xml_delete(struct LSTM_XML* xmlPtr);
 void lstm_xml_fprint(FILE* fptr, struct LSTM_XML* xmlPtr);
 
+struct LSTM_XML_ELEM* lstm_xml_get_element(struct LSTM_XML_ELEM* elemPtr, const char* elemName);
+struct LSTM_XML_ELEM* lstm_xml_get_element_root(struct LSTM_XML* xmlPtr, const char* elemName);
+
 // Private functions
 void lstm_xml_fprint_attribute(FILE* fptr, struct LSTM_XML_ATTR* attrPtr, int attrLen);
 void lstm_xml_fprint_element(FILE* fptr, struct LSTM_XML_ELEM* elemPtr, int indent);
