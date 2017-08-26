@@ -37,7 +37,7 @@ double (*lstm_transfer_derivative_list[])(double) = {
 char* lstm_transfer_func_name[] = {
 	"Sigmoid",
 	"Mod. Sigmoid",
-	"Hyperbolic tangent",
+	"Hyperbolic Tangent",
 	"Gaussian",
 	"Bent Identity",
 	"SoftPlus",
