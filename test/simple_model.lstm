@@ -4,8 +4,8 @@
 		<inputs> 2 </inputs>
 		<outputs> 1 </outputs>
 		<transfer_function>
-			<input> Hyperbolic Tangent </input>
-			<output> Hyperbolic Tangent </output>
+			<input> Hyperbolic tangent </input>
+			<output> Hyperbolic tangent </output>
 		</transfer_function>
 		<learning_rate> 0.01 </learning_rate>
 		<momentum_coefficient> 0.1 </momentum_coefficient>
