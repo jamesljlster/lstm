@@ -212,7 +212,7 @@ int lstm_config_set_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex, in
 
 	// Checking
 	layerIndex = hiddenLayerIndex + 1;
-	if(layerIndex >= lstmCfg->layers || hiddenNodes <= 0)
+	if(layerIndex >= lstmCfg->layers - 1 || layerIndex < 0)
 	{
 		ret = LSTM_OUT_OF_RANGE;
 		goto RET;
