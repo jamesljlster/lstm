@@ -260,7 +260,7 @@ int lstm_config_set_input_transfer_func(lstm_config_t lstmCfg, int tFuncID)
 	LOG("enter");
 
 	// Checking
-	if(tFuncID >= LSTM_TFUNC_AMOUNT)
+	if(tFuncID >= LSTM_TFUNC_AMOUNT || tFuncID < 0)
 	{
 		ret = LSTM_INVALID_ARG;
 	}
@@ -286,7 +286,7 @@ int lstm_config_set_output_transfer_func(lstm_config_t lstmCfg, int tFuncID)
 	LOG("enter");
 
 	// Checking
-	if(tFuncID >= LSTM_TFUNC_AMOUNT)
+	if(tFuncID >= LSTM_TFUNC_AMOUNT || tFuncID < 0)
 	{
 		ret = LSTM_INVALID_ARG;
 	}
