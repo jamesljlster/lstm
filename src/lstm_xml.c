@@ -20,6 +20,10 @@ struct LSTM_XML_ELEM* lstm_xml_get_element_root(struct LSTM_XML* xmlPtr, const c
 	// Zero memory
 	memset(&tmpElem, 0, sizeof(struct LSTM_XML_ELEM));
 
+	// Set element
+	tmpElem.elemLen = xmlPtr->elemLen;
+	tmpElem.elemList = xmlPtr->elemList;
+
 	// Get element
 	return lstm_xml_get_element(&tmpElem, elemName);
 }
