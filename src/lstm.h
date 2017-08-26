@@ -31,7 +31,8 @@ enum LSTM_RETUEN_VALUE
 	LSTM_MEM_FAILED		= -1,	/*!< Memory allocation failed. @since 0.1.0 */
 	LSTM_INVALID_ARG	= -2,	/*!< Invalid argument(s) or setting(s). @since 0.1.0 */
 	LSTM_FILE_OP_FAILED	= -3,	/*!< File operation failed. @since 0.1.0 */
-	LSTM_PARSE_FAILED	= -4	/*!< Error occurred while parsing file. @since 0.1.0 */
+	LSTM_PARSE_FAILED	= -4,	/*!< Error occurred while parsing file. @since 0.1.0 */
+	LSTM_OUT_OF_RANGE	= -5	/*!< Operation out of range. @since 0.1.0 */
 };
 
 /** Transfer (activation) function index definitions. */
