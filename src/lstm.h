@@ -18,8 +18,8 @@
  *@{
  */
 
-/** 
- *	\~English 
+/**
+ *	\~English
  *		Return value definitions of LSTM library.
  *
  *	\~Chinese-Traditional
@@ -30,6 +30,9 @@ enum LSTM_RETUEN_VALUE
 	LSTM_NO_ERROR		= 0,	/*!< No error occured while running called function. @since 0.1.0 */
 	LSTM_MEM_FAILED		= -1,	/*!< Memory allocation failed. @since 0.1.0 */
 	LSTM_INVALID_ARG	= -2,	/*!< Invalid argument(s) or setting(s). @since 0.1.0 */
+	LSTM_FILE_OP_FAILED	= -3,	/*!< File operation failed. @since 0.1.0 */
+	LSTM_PARSE_FAILED	= -4,	/*!< Error occurred while parsing file. @since 0.1.0 */
+	LSTM_OUT_OF_RANGE	= -5	/*!< Operation out of range. @since 0.1.0 */
 };
 
 /** Transfer (activation) function index definitions. */
@@ -45,7 +48,7 @@ enum LSTM_TRANSFER_FUNC
 	LSTM_SINC				= 7,	/*!< Sinc function. @since 0.1.0 */
 	LSTM_SINUSOID			= 8,	/*!< Sinusoid (sine) function. @since 0.1.0 */
 	LSTM_IDENTITY			= 9,	/*!< Identity function. @since 0.1.0 */
-	LSTM_RELU				= 10,	/*!< Rectifier linear unit function. @since 0.1.0 */
+	LSTM_RELU				= 10	/*!< Rectifier linear unit function. @since 0.1.0 */
 };
 
 /**
@@ -110,12 +113,22 @@ double lstm_config_get_learning_rate(lstm_config_t lstmCfg);
 void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef);
 double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
 
+int lstm_config_import(lstm_config_t* lstmCfgPtr, const char* filePath);
+int lstm_config_export(lstm_config_t lstmCfg, const char* filePath);
+
+int lstm_get_transfer_func_id(const char* tFuncName);
+
+lstm_config_t lstm_get_config(lstm_t lstm);
+
 /**
  *@}
  */
 
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
 void lstm_delete(lstm_t lstm);
+
+int lstm_import(lstm_t* lstmPtr, const char* filePath);
+int lstm_export(lstm_t lstm, const char* filePath);
 
 void lstm_rand_network(lstm_t lstm);
 void lstm_zero_network(lstm_t lstm);

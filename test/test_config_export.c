@@ -2,18 +2,23 @@
 
 #include <lstm.h>
 #include <lstm_private.h>
-#include <lstm_print.h>
 
-int main()
+int main(int argc, char* argv[])
 {
 	int i;
 	int iResult;
 	lstm_config_t cfg;
 
-	iResult = lstm_config_create(&cfg);
+	if(argc < 2)
+	{
+		printf("Assign a lstm config xml file to run the program\n");
+		return 0;
+	}
+
+	iResult = lstm_config_import(&cfg, argv[1]);
 	if(iResult < 0)
 	{
-		printf("lstm_config_create() failed with error: %d\n", iResult);
+		printf("lstm_config_import() failed with error: %d\n", iResult);
 		return -1;
 	}
 
@@ -27,12 +32,16 @@ int main()
 	printf("Gate tfunc index: %d\n", cfg->gateTFunc);
 	printf("\n");
 
-	// Print in xml
-	lstm_fprint_config(stdout, cfg, 0);
-
 	for(i = 0; i < cfg->layers; i++)
 	{
 		printf("Nodes of %d layer: %d\n", i, cfg->nodeList[i]);
+	}
+
+	// Export
+	iResult = lstm_config_export(cfg, "test_config_export.lstm");
+	if(iResult < 0)
+	{
+		printf("lstm_config_export() failed with error: %d\n", iResult);
 	}
 
 	// Cleanup

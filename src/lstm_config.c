@@ -14,6 +14,11 @@
 #define LSTM_DEFAULT_LRATE		0.01
 #define LSTM_DEFAULT_MCOEF		0.1
 
+lstm_config_t lstm_get_config(lstm_t lstm)
+{
+	return &lstm->config;
+}
+
 int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc)
 {
 	int ret = LSTM_NO_ERROR;
@@ -212,19 +217,24 @@ int lstm_config_set_hidden_nodes(lstm_config_t lstmCfg, int hiddenLayerIndex, in
 
 	// Checking
 	layerIndex = hiddenLayerIndex + 1;
-	if(layerIndex >= lstmCfg->layers || hiddenNodes <= 0)
+	if(layerIndex >= lstmCfg->layers - 1 || layerIndex < 0)
+	{
+		ret = LSTM_OUT_OF_RANGE;
+		goto RET;
+	}
+
+	if(hiddenNodes <= 0)
 	{
 		ret = LSTM_INVALID_ARG;
-	}
-	else
-	{
-		// Set value
-		assert(lstmCfg->nodeList != NULL);
-		lstmCfg->nodeList[layerIndex] = hiddenNodes;
+		goto RET;
 	}
 
+	// Set value
+	assert(lstmCfg->nodeList != NULL);
+	lstmCfg->nodeList[layerIndex] = hiddenNodes;
+
+RET:
 	LOG("exit");
-
 	return ret;
 }
 
@@ -260,7 +270,7 @@ int lstm_config_set_input_transfer_func(lstm_config_t lstmCfg, int tFuncID)
 	LOG("enter");
 
 	// Checking
-	if(tFuncID >= LSTM_TFUNC_AMOUNT)
+	if(tFuncID >= LSTM_TFUNC_AMOUNT || tFuncID < 0)
 	{
 		ret = LSTM_INVALID_ARG;
 	}
@@ -286,7 +296,7 @@ int lstm_config_set_output_transfer_func(lstm_config_t lstmCfg, int tFuncID)
 	LOG("enter");
 
 	// Checking
-	if(tFuncID >= LSTM_TFUNC_AMOUNT)
+	if(tFuncID >= LSTM_TFUNC_AMOUNT || tFuncID < 0)
 	{
 		ret = LSTM_INVALID_ARG;
 	}
