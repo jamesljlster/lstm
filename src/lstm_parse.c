@@ -28,10 +28,11 @@
 		goto errLabel; \
 	}
 
-int lstm_import(lstm_config_t* lstmCfgPtr, const char* filePath)
+int lstm_import(lstm_t* lstmPtr, const char* filePath)
 {
 	int ret = LSTM_NO_ERROR;
 	struct LSTM_XML xml;
+	struct LSTM_XML_ELEM* rootElemPtr = NULL;
 	struct LSTM_XML_ELEM* elemPtr = NULL;
 
 	lstm_config_t tmpCfg = NULL;
@@ -46,16 +47,17 @@ int lstm_import(lstm_config_t* lstmCfgPtr, const char* filePath)
 	// Create config
 	lstm_run(lstm_config_create(&tmpCfg), ret, RET);
 
-	// Find xml config node
-	elemPtr = lstm_xml_get_element_root(&xml, lstm_str_list[LSTM_STR_MODEL]);
-	if(elemPtr == NULL)
+	// Find lstm root element node
+	rootElemPtr = lstm_xml_get_element_root(&xml, lstm_str_list[LSTM_STR_MODEL]);
+	if(rootElemPtr == NULL)
 	{
 		LOG("%s not found in xml!", lstm_str_list[LSTM_STR_MODEL]);
 		ret = LSTM_PARSE_FAILED;
 		goto RET;
 	}
 
-	elemPtr = lstm_xml_get_element(elemPtr, lstm_str_list[LSTM_STR_CONFIG]);
+	// Find xml config node
+	elemPtr = lstm_xml_get_element(rootElemPtr, lstm_str_list[LSTM_STR_CONFIG]);
 	if(elemPtr == NULL)
 	{
 		LOG("%s not found in xml!", lstm_str_list[LSTM_STR_CONFIG]);
@@ -70,7 +72,7 @@ int lstm_import(lstm_config_t* lstmCfgPtr, const char* filePath)
 	lstm_run(lstm_create(&tmpLstm, tmpCfg), ret, ERR);
 
 	// Find xml network node
-	elemPtr = lstm_xml_get_element(elemPtr, lstm_str_list[LSTM_STR_NETWORK]);
+	elemPtr = lstm_xml_get_element(rootElemPtr, lstm_str_list[LSTM_STR_NETWORK]);
 	if(elemPtr == NULL)
 	{
 		LOG("%s not found in xml!", lstm_str_list[LSTM_STR_NETWORK]);
@@ -82,7 +84,7 @@ int lstm_import(lstm_config_t* lstmCfgPtr, const char* filePath)
 	lstm_run(lstm_parse_net_xml(tmpLstm, elemPtr), ret, ERR);
 
 	// Assign value
-	*lstmCfgPtr = tmpCfg;
+	*lstmPtr = tmpLstm;
 	goto RET;
 
 ERR:
