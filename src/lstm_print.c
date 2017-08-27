@@ -229,7 +229,7 @@ void lstm_fprint_config(FILE* fptr, struct LSTM_CONFIG_STRUCT* lstmCfg, int inde
 	// Print hidden nodes
 	for(i = 0; i < lstmCfg->layers - 2; i++)
 	{
-		tmpPtr = lstm_str_list[LSTM_STR_VALUE];
+		tmpPtr = lstm_str_list[LSTM_STR_NODES];
 		__lstm_fprint_indent(indent + 2, "<%s %s=\"%d\"> %d </%s>\n",
 				tmpPtr, lstm_str_list[LSTM_STR_INDEX], i, lstmCfg->nodeList[i + 1], tmpPtr);
 	}
