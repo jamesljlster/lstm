@@ -14,6 +14,11 @@
 #define LSTM_DEFAULT_LRATE		0.01
 #define LSTM_DEFAULT_MCOEF		0.1
 
+lstm_config_t lstm_get_config(lstm_t lstm)
+{
+	return &lstm->config;
+}
+
 int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc)
 {
 	int ret = LSTM_NO_ERROR;
