@@ -14,6 +14,43 @@
 	lstm_xml_fprint_indent(fptr, indent); \
 	fprintf(fptr, fstr, ##__VA_ARGS__)
 
+int lstm_config_export(lstm_config_t lstmCfg, const char* filePath)
+{
+	int ret = LSTM_NO_ERROR;
+	FILE* fWrite = NULL;
+
+	LOG("enter");
+
+	// Open file
+	fWrite = fopen(filePath, "w");
+	if(fWrite == NULL)
+	{
+		ret = LSTM_FILE_OP_FAILED;
+		goto RET;
+	}
+
+	// Print xml header
+	fprintf(fWrite, "<?xml version=\"1.0\"?>\n");
+
+	// Print model
+	fprintf(fWrite, "<%s>\n", lstm_str_list[LSTM_STR_MODEL]);
+
+	// Print config
+	lstm_fprint_config(fWrite, lstmCfg, 1);
+
+	// Print end model
+	fprintf(fWrite, "</%s>\n", lstm_str_list[LSTM_STR_MODEL]);
+
+RET:
+	if(fWrite != NULL)
+	{
+		fclose(fWrite);
+	}
+
+	LOG("exit");
+	return ret;
+}
+
 void lstm_fprint_vector(FILE* fptr, double* vector, int vectorLen, int indent)
 {
 	int i;

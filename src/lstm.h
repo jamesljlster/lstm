@@ -114,6 +114,7 @@ void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef);
 double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
 
 int lstm_config_import(lstm_config_t* lstmCfgPtr, const char* filePath);
+int lstm_config_export(lstm_config_t lstmCfg, const char* filePath);
 
 int lstm_get_transfer_func_id(const char* tFuncName);
 
