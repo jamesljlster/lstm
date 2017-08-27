@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<lstm_model>
+	<config>
+		<inputs> 2 </inputs>
+		<outputs> 1 </outputs>
+		<transfer_function>
+			<input> Hyperbolic Tangent </input>
+			<output> Hyperbolic Tangent </output>
+		</transfer_function>
+		<learning_rate> 0.01 </learning_rate>
+		<momentum_coefficient> 0.1 </momentum_coefficient>
+		<hidden_layer layers = "1">
+			<nodes index = "0"> 2 </nodes>
+		</hidden_layer>
+	</config>
+
+	<network>
+		<layer type = "hidden" index = "0">
+			<node index = "0">
+				<input>
+					<weight>
+						<value index = "0"> -0.9 </value>
+						<value index = "1"> -0.8 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> -0.7 </value>
+						<value index = "1"> -0.6 </value>
+					</recurrent>
+					<threshold> 0.1 </threshold>
+				</input>
+				<input_gate>
+					<weight>
+						<value index = "0"> -0.5 </value>
+						<value index = "1"> -0.4 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> -0.3 </value>
+						<value index = "1"> -0.2 </value>
+					</recurrent>
+					<threshold> 0.2 </threshold>
+				</input_gate>
+				<forget_gate>
+					<weight>
+						<value index = "0"> -0.1 </value>
+						<value index = "1"> 0.1 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> 0.2 </value>
+						<value index = "1"> 0.3 </value>
+					</recurrent>
+					<threshold> 0.3 </threshold>
+				</forget_gate>
+				<output_gate>
+					<weight>
+						<value index = "0"> 0.4 </value>
+						<value index = "1"> 0.5 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> 0.6 </value>
+						<value index = "1"> 0.7 </value>
+					</recurrent>
+					<threshold> 0.4 </threshold>
+				</output_gate>
+			</node>
+
+			<node index = "1">
+				<input>
+					<weight>
+						<value index = "0"> 1.0 </value>
+						<value index = "1"> 0.9 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> 0.8 </value>
+						<value index = "1"> 0.7 </value>
+					</recurrent>
+					<threshold> 0.5 </threshold>
+				</input>
+				<input_gate>
+					<weight>
+						<value index = "0"> 0.6 </value>
+						<value index = "1"> 0.5 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> 0.4 </value>
+						<value index = "1"> 0.3 </value>
+					</recurrent>
+					<threshold> 0.6 </threshold>
+				</input_gate>
+				<forget_gate>
+					<weight>
+						<value index = "0"> 0.2 </value>
+						<value index = "1"> 0.1 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> -0.1 </value>
+						<value index = "1"> -0.2 </value>
+					</recurrent>
+					<threshold> 0.7 </threshold>
+				</forget_gate>
+				<output_gate>
+					<weight>
+						<value index = "0"> -0.3 </value>
+						<value index = "1"> -0.4 </value>
+					</weight>
+					<recurrent>
+						<value index = "0"> -0.5 </value>
+						<value index = "1"> -0.6 </value>
+					</recurrent>
+					<threshold> 0.8 </threshold>
+				</output_gate>
+			</node>
+		</layer>
+
+		<layer type = "output">
+			<node index = "0">
+				<weight>
+					<value index = "0"> 0.5 </value>
+					<value index = "1"> 0.6 </value>
+				</weight>
+				<threshold> 0.9 </threshold>
+			</node>
+		</layer>
+
+	</network>
+</lstm_model>
