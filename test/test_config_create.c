@@ -2,6 +2,7 @@
 
 #include <lstm.h>
 #include <lstm_private.h>
+#include <lstm_print.h>
 
 int main()
 {
@@ -25,7 +26,10 @@ int main()
 	printf("Output tfunc index: %d\n", cfg->outputTFunc);
 	printf("Gate tfunc index: %d\n", cfg->gateTFunc);
 	printf("\n");
-	
+
+	// Print in xml
+	lstm_fprint_config(stdout, cfg, 0);
+
 	for(i = 0; i < cfg->layers; i++)
 	{
 		printf("Nodes of %d layer: %d\n", i, cfg->nodeList[i]);
