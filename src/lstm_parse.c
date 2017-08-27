@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,13 +28,68 @@
 		goto errLabel; \
 	}
 
-int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LSTM_XML_ELEM* elemPtr)
+int lstm_parse_net_vector_xml(double* vector, int vectorLen, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i, j;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int index;
+	double value;
+	char* tmpPtr;
+
+	int childElemLen;
+	struct LSTM_XML_ELEM* childElemPtr;
+
+	LOG("enter");
+
+	// Get reference
+	childElemLen = elemPtr->elemLen;
+	childElemPtr = elemPtr->elemList;
+
+	// Parsing element
+	for(i = 0; i < childElemLen; i++)
+	{
+		strId = lstm_strdef_get_id(childElemPtr[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_VALUE:
+				// Parsing attribute
+				index = 0;
+				for(j = 0; j < childElemPtr[i].attrLen; j++)
+				{
+					strId = lstm_strdef_get_id(childElemPtr[i].attrList[j].name);
+					switch(strId)
+					{
+						case LSTM_STR_INDEX:
+							__lstm_strtol(index, childElemPtr[i].attrList[j].content, ret, RET);
+							break;
+					}
+				}
+
+				// Checking
+				if(index < 0 || index >= vectorLen)
+				{
+					ret = LSTM_OUT_OF_RANGE;
+					goto RET;
+				}
+
+				// Set value
+				__lstm_strtod(value, childElemPtr[i].text, ret, RET);
+				vector[index] = value;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_parse_net_base_xml(struct LSTM_BASE* basePtr, int netLen, int layerIndex, struct LSTM_XML_ELEM* elemPtr)
 {
 	int i;
 	int strId;
 	int ret = LSTM_NO_ERROR;
-
-	int nodeIndex = -1;
 
 	char* tmpPtr;
 
@@ -45,6 +101,60 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 	// Get reference
 	childElemLen = elemPtr->elemLen;
 	childElemPtr = elemPtr->elemList;
+
+	// Parsing element
+	for(i = 0; i < childElemLen; i++)
+	{
+		strId = lstm_strdef_get_id(childElemPtr[i].name);
+		switch(strId)
+		{
+			case LSTM_STR_WEIGHT:
+				assert(basePtr->weight != NULL);
+				lstm_run(lstm_parse_net_vector_xml(basePtr->weight, netLen, &childElemPtr[i]), ret, RET);
+				break;
+
+			case LSTM_STR_RECURRENT:
+				if(layerIndex == 1)
+				{
+					assert(basePtr->rWeight != NULL);
+					lstm_run(lstm_parse_net_vector_xml(basePtr->rWeight, netLen, &childElemPtr[i]), ret, RET);
+				}
+				break;
+
+			case LSTM_STR_THRESHOLD:
+				__lstm_strtod(basePtr->th, childElemPtr[i].text, ret, RET);
+				break;
+		}
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
+int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LSTM_XML_ELEM* elemPtr)
+{
+	int i;
+	int strId;
+	int ret = LSTM_NO_ERROR;
+
+	int nodeIndex = 0;
+
+	char* tmpPtr;
+
+	int childElemLen;
+	struct LSTM_XML_ELEM* childElemPtr;
+
+	struct LSTM_LAYER* layerRef;
+
+	LOG("enter");
+
+	// Get reference
+	childElemLen = elemPtr->elemLen;
+	childElemPtr = elemPtr->elemList;
+	layerRef = lstm->layerList;
+
+	assert(layerRef != NULL);
 
 	// Parsing attribute
 	for(i = 0; i < elemPtr->attrLen; i++)
@@ -65,6 +175,8 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 		goto RET;
 	}
 
+	assert(layerRef[layerIndex].nodeList != NULL);
+
 	// Parse network base
 	if(layerIndex < lstm->config.layers - 1)
 	{
@@ -75,21 +187,46 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 			switch(strId)
 			{
 				case LSTM_STR_INPUT:
+					lstm_run(lstm_parse_net_base_xml(
+								&layerRef[layerIndex].nodeList[nodeIndex].inputNet,
+								layerRef[layerIndex - 1].nodeCount,
+								layerIndex, &childElemPtr[i]),
+							ret, RET);
 					break;
 
 				case LSTM_STR_INPUT_GATE:
+					lstm_run(lstm_parse_net_base_xml(
+								&layerRef[layerIndex].nodeList[nodeIndex].igNet,
+								layerRef[layerIndex - 1].nodeCount,
+								layerIndex, &childElemPtr[i]),
+							ret, RET);
 					break;
 
 				case LSTM_STR_FORGET_GATE:
+					lstm_run(lstm_parse_net_base_xml(
+								&layerRef[layerIndex].nodeList[nodeIndex].fgNet,
+								layerRef[layerIndex - 1].nodeCount,
+								layerIndex, &childElemPtr[i]),
+							ret, RET);
 					break;
 
 				case LSTM_STR_OUTPUT_GATE:
+					lstm_run(lstm_parse_net_base_xml(
+								&layerRef[layerIndex].nodeList[nodeIndex].ogNet,
+								layerRef[layerIndex - 1].nodeCount,
+								layerIndex, &childElemPtr[i]),
+							ret, RET);
 					break;
 			}
 		}
 	}
 	else
 	{
+		lstm_run(lstm_parse_net_base_xml(
+					&layerRef[layerIndex].nodeList[nodeIndex].inputNet,
+					layerRef[layerIndex - 1].nodeCount,
+					layerIndex, elemPtr),
+				ret, RET);
 	}
 
 RET:
