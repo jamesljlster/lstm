@@ -128,6 +128,7 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
 void lstm_delete(lstm_t lstm);
 
 int lstm_import(lstm_t* lstmPtr, const char* filePath);
+int lstm_export(lstm_t lstm, const char* filePath);
 
 void lstm_rand_network(lstm_t lstm);
 void lstm_zero_network(lstm_t lstm);
