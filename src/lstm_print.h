@@ -11,6 +11,12 @@ extern "C" {
 
 void lstm_fprint_config(FILE* fptr, struct LSTM_CONFIG_STRUCT* lstmCfg, int indent);
 
+void lstm_fprint_net(FILE* fptr, struct LSTM_STRUCT* lstm, int indent);
+void lstm_fprint_layer(FILE* fptr, struct LSTM_STRUCT* lstm, int layerIndex, int indent);
+void lstm_fprint_node(FILE* fptr, struct LSTM_STRUCT* lstm, int layerIndex, int nodeIndex, int indent);
+void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int layerIndex, int indent);
+void lstm_fprint_vector(FILE* fptr, double* vector, int vectorLen, int indent);
+
 #ifdef __cplusplus
 }
 #endif

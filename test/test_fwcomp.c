@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <lstm.h>
+#include <lstm_print.h>
 
 int main(int argc, char* argv[])
 {
@@ -34,7 +35,8 @@ int main(int argc, char* argv[])
 	inputs = lstm_config_get_inputs(cfg);
 	outputs = lstm_config_get_outputs(cfg);
 
-	//lstm_config_print(cfg);
+	lstm_fprint_config(stdout, cfg, 0);
+	lstm_fprint_net(stdout, lstm, 0);
 
 	// Memory allocation
 	input = calloc(inputs, sizeof(double));
