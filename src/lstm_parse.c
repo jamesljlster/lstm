@@ -28,6 +28,74 @@
 		goto errLabel; \
 	}
 
+int lstm_import(lstm_config_t* lstmCfgPtr, const char* filePath)
+{
+	int ret = LSTM_NO_ERROR;
+	struct LSTM_XML xml;
+	struct LSTM_XML_ELEM* elemPtr = NULL;
+
+	lstm_config_t tmpCfg = NULL;
+	lstm_t tmpLstm = NULL;
+
+	// Zero memory
+	memset(&xml, 0, sizeof(struct LSTM_XML));
+
+	// Parse xml
+	lstm_run(lstm_xml_parse(&xml, filePath), ret, RET);
+
+	// Create config
+	lstm_run(lstm_config_create(&tmpCfg), ret, RET);
+
+	// Find xml config node
+	elemPtr = lstm_xml_get_element_root(&xml, lstm_str_list[LSTM_STR_MODEL]);
+	if(elemPtr == NULL)
+	{
+		LOG("%s not found in xml!", lstm_str_list[LSTM_STR_MODEL]);
+		ret = LSTM_PARSE_FAILED;
+		goto RET;
+	}
+
+	elemPtr = lstm_xml_get_element(elemPtr, lstm_str_list[LSTM_STR_CONFIG]);
+	if(elemPtr == NULL)
+	{
+		LOG("%s not found in xml!", lstm_str_list[LSTM_STR_CONFIG]);
+		ret = LSTM_PARSE_FAILED;
+		goto RET;
+	}
+
+	// Parse config
+	lstm_run(lstm_parse_config_xml(tmpCfg, elemPtr), ret, RET);
+
+	// Create lstm networks
+	lstm_run(lstm_create(&tmpLstm, tmpCfg), ret, ERR);
+
+	// Find xml network node
+	elemPtr = lstm_xml_get_element(elemPtr, lstm_str_list[LSTM_STR_NETWORK]);
+	if(elemPtr == NULL)
+	{
+		LOG("%s not found in xml!", lstm_str_list[LSTM_STR_NETWORK]);
+		ret = LSTM_PARSE_FAILED;
+		goto ERR;
+	}
+
+	// Parse network
+	lstm_run(lstm_parse_net_xml(tmpLstm, elemPtr), ret, ERR);
+
+	// Assign value
+	*lstmCfgPtr = tmpCfg;
+	goto RET;
+
+ERR:
+	lstm_delete(tmpLstm);
+
+RET:
+	lstm_config_delete(tmpCfg);
+	lstm_xml_delete(&xml);
+
+	LOG("exit");
+	return ret;
+}
+
 int lstm_parse_net_vector_xml(double* vector, int vectorLen, struct LSTM_XML_ELEM* elemPtr)
 {
 	int i, j;

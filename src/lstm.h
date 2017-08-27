@@ -124,6 +124,8 @@ int lstm_get_transfer_func_id(const char* tFuncName);
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
 void lstm_delete(lstm_t lstm);
 
+int lstm_import(lstm_config_t* lstmCfgPtr, const char* filePath);
+
 void lstm_rand_network(lstm_t lstm);
 void lstm_zero_network(lstm_t lstm);
 
