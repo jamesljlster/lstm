@@ -11,7 +11,7 @@ int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFI
 {
 	int i;
 	int ret = LSTM_NO_ERROR;
-	int nodeType, reNetSize;
+	int nodeType, netSize, reNetSize;
 
 	int layers;
 	int* nodeList;
@@ -40,25 +40,29 @@ int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFI
 		{
 			nodeType = LSTM_INPUT_NODE;
 			reNetSize = 0;
+			netSize = 0;
 		}
 		else if(i == 1)
 		{
 			nodeType = LSTM_FULL_NODE;
 			reNetSize = nodeList[layers - 1];
+			netSize = nodeList[i - 1];
 		}
 		else if(i == layers - 1)
 		{
 			nodeType = LSTM_OUTPUT_NODE;
 			reNetSize = 0;
+			netSize = nodeList[i - 1];
 		}
 		else
 		{
 			nodeType = LSTM_FULL_NODE;
 			reNetSize = 0;
+			netSize = nodeList[i - 1];
 		}
 
 		// Allocate layer struct
-		ret = lstm_layer_alloc(&layerRef[i], nodeList[i], nodeType, nodeList[i], reNetSize);
+		ret = lstm_layer_alloc(&layerRef[i], nodeList[i], nodeType, netSize, reNetSize);
 		if(ret != LSTM_NO_ERROR)
 		{
 			goto ERR;
