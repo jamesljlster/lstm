@@ -10,7 +10,7 @@
 #define NUM_MAX			1
 #define	NUM_MIN			-1
 
-double lstm_rand()
+double lstm_rand(void)
 {
 	int randRange;
 
@@ -27,7 +27,7 @@ void lstm_rand_network(lstm_t lstm)
 
 	LOG("enter");
 
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	// Get reference
 	layerRef = lstm->layerList;

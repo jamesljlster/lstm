@@ -66,7 +66,7 @@ int lstm_base_alloc(struct LSTM_BASE* basePtr, int netSize, int reNetSize);
 int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFIG_STRUCT* lstmCfg);
 
 // Private rand function
-double lstm_rand();
+double lstm_rand(void);
 
 #ifdef __cplusplus
 }
