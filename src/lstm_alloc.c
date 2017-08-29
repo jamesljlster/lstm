@@ -7,7 +7,7 @@
 
 #include "debug.h"
 
-int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFIG_STRUCT* lstmCfg)
+int lstm_network_alloc(struct LSTM_STRUCT* lstm, const struct LSTM_CONFIG_STRUCT* lstmCfg)
 {
 	int i;
 	int ret = LSTM_NO_ERROR;
@@ -45,7 +45,7 @@ int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFI
 		else if(i == 1)
 		{
 			nodeType = LSTM_FULL_NODE;
-			reNetSize = nodeList[layers - 1];
+			reNetSize = nodeList[layers - 2];
 			netSize = nodeList[i - 1];
 		}
 		else if(i == layers - 1)
@@ -67,9 +67,6 @@ int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFI
 		{
 			goto ERR;
 		}
-
-		// Set node count
-		layerRef[i].nodeCount = nodeList[i];
 
 		// Set activation function
 		if(lstmCfg->inputTFunc < 0 || lstmCfg->inputTFunc >= LSTM_TFUNC_AMOUNT)
@@ -107,7 +104,8 @@ int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFI
 	}
 
 	// Assign value
-	*layerListPtr = layerRef;
+	lstm->layerList = layerRef;
+
 	goto RET;
 
 ERR:
@@ -232,6 +230,7 @@ int lstm_layer_alloc(struct LSTM_LAYER* layerPtr, int nodeCount, int nodeType, i
 
 	// Allocate node list
 	lstm_alloc(tmpLayer.nodeList, nodeCount, struct LSTM_NODE, ret, ERR);
+	tmpLayer.nodeCount = nodeCount;
 
 	// Allocate nodes
 	for(i = 0; i < nodeCount; i++)

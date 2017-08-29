@@ -114,9 +114,6 @@ void lstm_struct_delete(struct LSTM_STRUCT* lstm)
 	// Delete config
 	lstm_config_struct_delete(&lstm->config);
 
-	// Delete gradient hold buffer
-	lstm_free(lstm->gradHold);
-
 	// Zero memory
 	memset(lstm, 0, sizeof(struct LSTM_STRUCT));
 
