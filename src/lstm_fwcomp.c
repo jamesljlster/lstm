@@ -27,9 +27,9 @@ void lstm_forward_computation_erase(lstm_t lstm)
 	// Clear cell value
 	for(i = 1; i <= indexTmp; i++)
 	{
-		for(j = 0; j < layerRef[indexTmp].nodeCount; j++)
+		for(j = 0; j < layerRef[i].nodeCount; j++)
 		{
-			layerRef[indexTmp].nodeList[j].cell = 0;
+			layerRef[i].nodeList[j].cell = 0;
 		}
 	}
 
