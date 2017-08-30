@@ -460,10 +460,10 @@ void lstm_bptt_erase(lstm_t lstm)
 	{
 		for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
 		{
-			layerRef[1].nodeList[j].ogNet.rWeight[k] = 0;
-			layerRef[1].nodeList[j].fgNet.rWeight[k] = 0;
-			layerRef[1].nodeList[j].igNet.rWeight[k] = 0;
-			layerRef[1].nodeList[j].inputNet.rWeight[k] = 0;
+			layerRef[1].nodeList[j].ogNet.rGrad[k] = 0;
+			layerRef[1].nodeList[j].fgNet.rGrad[k] = 0;
+			layerRef[1].nodeList[j].igNet.rGrad[k] = 0;
+			layerRef[1].nodeList[j].inputNet.rGrad[k] = 0;
 		}
 	}
 
