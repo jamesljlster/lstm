@@ -317,7 +317,7 @@ RET:
 	return ret;
 }
 
-void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit)
+void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit)
 {
 	int i, j, k;
 	int indexTmp;
@@ -343,8 +343,8 @@ void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumC
 		layerRef[i].nodeList[j].gradLink = -gradLimit; \
 	} \
 	calcTmp = layerRef[i].nodeList[j].link + \
-		learningRate * layerRef[i].nodeList[j].gradLink + \
-		momentumCoef * layerRef[i].nodeList[j].deltaLink; \
+		lRate * layerRef[i].nodeList[j].gradLink + \
+		mCoef * layerRef[i].nodeList[j].deltaLink; \
 	layerRef[i].nodeList[j].deltaLink = calcTmp - \
 		layerRef[i].nodeList[j].link; \
 	layerRef[i].nodeList[j].link = calcTmp;
@@ -387,7 +387,8 @@ void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumC
 
 	// Adjust recurrent weight
 	indexTmp = cfgRef->layers - 2;
-	for(j = 0; j < layerRef[1].nodeCount; j++)
+	i = 1;
+	for(j = 0; j < layerRef[i].nodeCount; j++)
 	{
 		for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
 		{
@@ -459,10 +460,10 @@ void lstm_bptt_erase(lstm_t lstm)
 	{
 		for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
 		{
-			layerRef[1].nodeList[j].ogNet.rWeight[k] = 0;
-			layerRef[1].nodeList[j].fgNet.rWeight[k] = 0;
-			layerRef[1].nodeList[j].igNet.rWeight[k] = 0;
-			layerRef[1].nodeList[j].inputNet.rWeight[k] = 0;
+			layerRef[1].nodeList[j].ogNet.rGrad[k] = 0;
+			layerRef[1].nodeList[j].fgNet.rGrad[k] = 0;
+			layerRef[1].nodeList[j].igNet.rGrad[k] = 0;
+			layerRef[1].nodeList[j].inputNet.rGrad[k] = 0;
 		}
 	}
 

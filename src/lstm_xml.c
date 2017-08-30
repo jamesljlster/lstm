@@ -199,9 +199,12 @@ ERR:
 	lstm_xml_delete(&tmpXml);
 
 RET:
-	for(i = 0; strList[i] != NULL; i++)
+	if(strList != NULL)
 	{
-		lstm_free(strList[i]);
+		for(i = 0; strList[i] != NULL; i++)
+		{
+			lstm_free(strList[i]);
+		}
 	}
 	lstm_free(strList);
 	lstm_free(xml);
@@ -276,11 +279,14 @@ int lstm_xml_parse_attribute(char** tagPtr, struct LSTM_XML_ATTR** attrListPtr, 
 	goto RET;
 
 ERR:
-	for(i = 0; i < tmpAttrLen; i++)
+	if(tmpAttrList != NULL)
 	{
-		lstm_xml_attr_delete(&tmpAttrList[i]);
+		for(i = 0; i < tmpAttrLen; i++)
+		{
+			lstm_xml_attr_delete(&tmpAttrList[i]);
+		}
+		lstm_free(tmpAttrList);
 	}
-	lstm_free(tmpAttrList);
 
 RET:
 	for(i = 0; i < strCount; i++)

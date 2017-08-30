@@ -17,7 +17,7 @@ file(GLOB TEST_TXT
 list(REMOVE_ITEM TEST_TXT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
 
 # Set dependences
-set(PROJECT_DEPS lstm m)
+set(PROJECT_DEPS lstm)
 if(UNIX)
 	find_library(CONIO_LIB conio
 		"/usr/lib"
@@ -28,7 +28,7 @@ if(UNIX)
 		"/usr/local/include"
 		)
 
-	set(PROJECT_DEPS ${PROJECT_DEPS} ${CONIO_LIB})
+	set(PROJECT_DEPS ${PROJECT_DEPS} ${CONIO_LIB} m)
 	include_directories(${CONIO_INCLUDE_DIR})
 endif()
 

@@ -38,14 +38,11 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 	}
 
 	// Allocate network
-	ret = lstm_network_alloc(&tmpLstmPtr->layerList, lstmCfg);
+	ret = lstm_network_alloc(tmpLstmPtr, lstmCfg);
 	if(ret != LSTM_NO_ERROR)
 	{
 		goto ERR;
 	}
-
-	// Allocate gradient hold buffer
-	lstm_alloc(tmpLstmPtr->gradHold, lstmCfg->nodeList[1], double, ret, ERR);
 
 	// Assign value
 	*lstmPtr = tmpLstmPtr;

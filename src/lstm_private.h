@@ -63,10 +63,12 @@ int lstm_layer_alloc(struct LSTM_LAYER* layerPtr, int nodeCount, int nodeType, i
 int lstm_node_alloc(struct LSTM_NODE* nodePtr, int nodeType, int netSize, int reNetSize);
 int lstm_base_alloc(struct LSTM_BASE* basePtr, int netSize, int reNetSize);
 
-int lstm_network_alloc(struct LSTM_LAYER** layerListPtr, const struct LSTM_CONFIG_STRUCT* lstmCfg);
+int lstm_network_alloc(struct LSTM_STRUCT* lstm, const struct LSTM_CONFIG_STRUCT* lstmCfg);
 
-// Private rand function
-double lstm_rand();
+// Private init functions
+double lstm_rand(void);
+double lstm_zero(void);
+void lstm_init_network(lstm_t lstm, double (*initMethod)(void));
 
 #ifdef __cplusplus
 }

@@ -10,7 +10,7 @@
 #define NUM_MAX			1
 #define	NUM_MIN			-1
 
-double lstm_rand()
+double lstm_rand(void)
 {
 	int randRange;
 
@@ -19,7 +19,12 @@ double lstm_rand()
 	return (double)(rand() % randRange) / (double)(NUM_PRECISION) + (double)NUM_MIN;
 }
 
-void lstm_rand_network(lstm_t lstm)
+double lstm_zero(void)
+{
+	return 0;
+}
+
+void lstm_init_network(lstm_t lstm, double (*initMethod)(void))
 {
 	int i, j, k;
 	struct LSTM_LAYER* layerRef;
@@ -27,7 +32,7 @@ void lstm_rand_network(lstm_t lstm)
 
 	LOG("enter");
 
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	// Get reference
 	layerRef = lstm->layerList;
@@ -41,34 +46,34 @@ void lstm_rand_network(lstm_t lstm)
 			// Rand weight
 			for(k = 0; k < layerRef[i - 1].nodeCount; k++)
 			{
-				layerRef[i].nodeList[j].inputNet.weight[k] = lstm_rand();
+				layerRef[i].nodeList[j].inputNet.weight[k] = initMethod();
 				if(i < cfgRef->layers - 1)
 				{
-					layerRef[i].nodeList[j].ogNet.weight[k] = lstm_rand();
-					layerRef[i].nodeList[j].fgNet.weight[k] = lstm_rand();
-					layerRef[i].nodeList[j].igNet.weight[k] = lstm_rand();
+					layerRef[i].nodeList[j].ogNet.weight[k] = initMethod();
+					layerRef[i].nodeList[j].fgNet.weight[k] = initMethod();
+					layerRef[i].nodeList[j].igNet.weight[k] = initMethod();
 				}
 			}
 
 			// Rand recurrent weight
 			if(i == 1)
 			{
-				for(k = 0; k < layerRef[cfgRef->layers - 1].nodeCount; k++)
+				for(k = 0; k < layerRef[cfgRef->layers - 2].nodeCount; k++)
 				{
-					layerRef[i].nodeList[j].inputNet.rWeight[k] = lstm_rand();
-					layerRef[i].nodeList[j].ogNet.rWeight[k] = lstm_rand();
-					layerRef[i].nodeList[j].fgNet.rWeight[k] = lstm_rand();
-					layerRef[i].nodeList[j].igNet.rWeight[k] = lstm_rand();
+					layerRef[i].nodeList[j].inputNet.rWeight[k] = initMethod();
+					layerRef[i].nodeList[j].ogNet.rWeight[k] = initMethod();
+					layerRef[i].nodeList[j].fgNet.rWeight[k] = initMethod();
+					layerRef[i].nodeList[j].igNet.rWeight[k] = initMethod();
 				}
 			}
 
 			// Rand threshold
-			layerRef[i].nodeList[j].inputNet.th = lstm_rand();
+			layerRef[i].nodeList[j].inputNet.th = initMethod();
 			if(i < cfgRef->layers - 1)
 			{
-				layerRef[i].nodeList[j].ogNet.th = lstm_rand();
-				layerRef[i].nodeList[j].fgNet.th = lstm_rand();
-				layerRef[i].nodeList[j].igNet.th = lstm_rand();
+				layerRef[i].nodeList[j].ogNet.th = initMethod();
+				layerRef[i].nodeList[j].fgNet.th = initMethod();
+				layerRef[i].nodeList[j].igNet.th = initMethod();
 			}
 		}
 	}
@@ -76,58 +81,13 @@ void lstm_rand_network(lstm_t lstm)
 	LOG("exit");
 }
 
+void lstm_rand_network(lstm_t lstm)
+{
+	lstm_init_network(lstm, lstm_rand);
+}
+
 void lstm_zero_network(lstm_t lstm)
 {
-	int i, j, k;
-	struct LSTM_LAYER* layerRef;
-	struct LSTM_CONFIG_STRUCT* cfgRef;
-
-	LOG("enter");
-
-	// Get reference
-	layerRef = lstm->layerList;
-	cfgRef = &lstm->config;
-
-	// Rand network
-	for(i = 1; i < cfgRef->layers; i++)
-	{
-		for(j = 0; j < layerRef[i].nodeCount; j++)
-		{
-			// Rand weight
-			for(k = 0; k < layerRef[i - 1].nodeCount; k++)
-			{
-				layerRef[i].nodeList[j].inputNet.weight[k] = 0;
-				if(i < cfgRef->layers - 1)
-				{
-					layerRef[i].nodeList[j].ogNet.weight[k] = 0;
-					layerRef[i].nodeList[j].fgNet.weight[k] = 0;
-					layerRef[i].nodeList[j].igNet.weight[k] = 0;
-				}
-			}
-
-			// Rand recurrent weight
-			if(i == 1)
-			{
-				for(k = 0; k < layerRef[cfgRef->layers - 1].nodeCount; k++)
-				{
-					layerRef[i].nodeList[j].inputNet.rWeight[k] = 0;
-					layerRef[i].nodeList[j].ogNet.rWeight[k] = 0;
-					layerRef[i].nodeList[j].fgNet.rWeight[k] = 0;
-					layerRef[i].nodeList[j].igNet.rWeight[k] = 0;
-				}
-			}
-
-			// Rand threshold
-			layerRef[i].nodeList[j].inputNet.th = 0;
-			if(i < cfgRef->layers - 1)
-			{
-				layerRef[i].nodeList[j].ogNet.th = 0;
-				layerRef[i].nodeList[j].fgNet.th = 0;
-				layerRef[i].nodeList[j].igNet.th = 0;
-			}
-		}
-	}
-
-	LOG("exit");
+	lstm_init_network(lstm, lstm_zero);
 }
 

@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <conio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <lstm.h>
 #include <lstm_print.h>
@@ -15,6 +17,8 @@ int main(int argc, char* argv[])
 
 	double* input = NULL;
 	double* output = NULL;
+
+	srand(time(NULL));
 
 	// Checking
 	if(argc <= 1)
@@ -47,21 +51,15 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	while(1)
+	while(!kbhit())
 	{
 		for(i = 0; i < inputs; i++)
 		{
-			printf("Assign %d of %d input: ", i + 1, inputs);
-			iResult = scanf(" %lf", &input[i]);
-			if(iResult <= 0)
-			{
-				i--;
-				continue;
-			}
+			input[i] = (double)(rand()% 2001 - 1000) / 1000.0;
+			printf("%d of %d input: %lf\n", i + 1, inputs, input[i]);
 		}
 
 		lstm_forward_computation(lstm, input, output);
-		lstm_forward_computation_erase(lstm);
 
 		for(i = 0; i < outputs; i++)
 		{
