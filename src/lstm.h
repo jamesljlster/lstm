@@ -137,8 +137,11 @@ void lstm_forward_computation(lstm_t lstm, double* input, double* output);
 void lstm_forward_computation_erase(lstm_t lstm);
 
 int lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
-void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit);
+void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit);
 void lstm_bptt_erase(lstm_t lstm);
+
+int lstm_training_gradient(lstm_t lstm, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
+int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
 
 #ifdef __cplusplus
 }

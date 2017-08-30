@@ -317,7 +317,7 @@ RET:
 	return ret;
 }
 
-void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumCoef, double gradLimit)
+void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit)
 {
 	int i, j, k;
 	int indexTmp;
@@ -343,8 +343,8 @@ void lstm_bptt_adjust_netwrok(lstm_t lstm, double learningRate, double momentumC
 		layerRef[i].nodeList[j].gradLink = -gradLimit; \
 	} \
 	calcTmp = layerRef[i].nodeList[j].link + \
-		learningRate * layerRef[i].nodeList[j].gradLink + \
-		momentumCoef * layerRef[i].nodeList[j].deltaLink; \
+		lRate * layerRef[i].nodeList[j].gradLink + \
+		mCoef * layerRef[i].nodeList[j].deltaLink; \
 	layerRef[i].nodeList[j].deltaLink = calcTmp - \
 		layerRef[i].nodeList[j].link; \
 	layerRef[i].nodeList[j].link = calcTmp;
