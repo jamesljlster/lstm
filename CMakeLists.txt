@@ -9,7 +9,7 @@ set(VERSION_MINOR 1)
 set(VERSION_PATCH 0)
 
 # Set project
-project(lstm)
+project(lstm C)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
