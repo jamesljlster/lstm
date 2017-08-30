@@ -387,7 +387,8 @@ void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gr
 
 	// Adjust recurrent weight
 	indexTmp = cfgRef->layers - 2;
-	for(j = 0; j < layerRef[1].nodeCount; j++)
+	i = 1;
+	for(j = 0; j < layerRef[i].nodeCount; j++)
 	{
 		for(k = 0; k < layerRef[indexTmp].nodeCount; k++)
 		{
