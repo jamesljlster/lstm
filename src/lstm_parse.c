@@ -11,6 +11,7 @@
 
 #include "debug.h"
 
+#ifdef DEBUG
 #define __lstm_strtol(num, src, retVal, errLabel) \
 	num = strtol(src, &tmpPtr, 10); \
 	if(src == tmpPtr) \
@@ -28,6 +29,23 @@
 		retVal = LSTM_PARSE_FAILED; \
 		goto errLabel; \
 	}
+#else
+#define __lstm_strtol(num, src, retVal, errLabel) \
+	num = strtol(src, &tmpPtr, 10); \
+	if(src == tmpPtr) \
+	{ \
+		retVal = LSTM_PARSE_FAILED; \
+		goto errLabel; \
+	}
+
+#define __lstm_strtod(num, src, retVal, errLabel) \
+	num = strtod(src, &tmpPtr); \
+	if(src == tmpPtr) \
+	{ \
+		retVal = LSTM_PARSE_FAILED; \
+		goto errLabel; \
+	}
+#endif
 
 int lstm_import(lstm_t* lstmPtr, const char* filePath)
 {

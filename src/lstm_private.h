@@ -30,6 +30,7 @@ enum LSTM_NODE_TYPE
 		goto errLabel; \
 	}
 
+#ifdef DEBUG
 #define lstm_run(func, retVal, errLabel) \
 	retVal = func; \
 	if(retVal != LSTM_NO_ERROR) \
@@ -37,6 +38,14 @@ enum LSTM_NODE_TYPE
 		fprintf(stderr, "%s(): %s failed with error: %d\n", __FUNCTION__, #func, retVal); \
 		goto errLabel; \
 	}
+#else
+#define lstm_run(func, retVal, errLabel) \
+	retVal = func; \
+	if(retVal != LSTM_NO_ERROR) \
+	{ \
+		goto errLabel; \
+	}
+#endif
 
 #ifdef __cplusplus
 extern "C" {
