@@ -101,7 +101,7 @@ void lstm_fprint_vector(FILE* fptr, double* vector, int vectorLen, int indent)
 
 	for(i = 0; i < vectorLen; i++)
 	{
-		__lstm_fprint_indent(indent, "<%s %s=\"%d\"> %.32lf </%s>\n",
+		__lstm_fprint_indent(indent, "<%s %s=\"%d\"> %.32g </%s>\n",
 				lstm_str_list[LSTM_STR_VALUE],
 				lstm_str_list[LSTM_STR_INDEX], i,
 				vector[i],
@@ -125,7 +125,7 @@ void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int lay
 	}
 
 	// Print threshold
-	__lstm_fprint_indent(indent, "<%s> %.32lf </%s>\n",
+	__lstm_fprint_indent(indent, "<%s> %.32g </%s>\n",
 			lstm_str_list[LSTM_STR_THRESHOLD],
 			basePtr->th,
 			lstm_str_list[LSTM_STR_THRESHOLD]);
