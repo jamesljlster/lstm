@@ -11,6 +11,7 @@
 
 #include "debug.h"
 
+#ifdef DEBUG
 #define __lstm_strtol(num, src, retVal, errLabel) \
 	num = strtol(src, &tmpPtr, 10); \
 	if(src == tmpPtr) \
@@ -28,6 +29,23 @@
 		retVal = LSTM_PARSE_FAILED; \
 		goto errLabel; \
 	}
+#else
+#define __lstm_strtol(num, src, retVal, errLabel) \
+	num = strtol(src, &tmpPtr, 10); \
+	if(src == tmpPtr) \
+	{ \
+		retVal = LSTM_PARSE_FAILED; \
+		goto errLabel; \
+	}
+
+#define __lstm_strtod(num, src, retVal, errLabel) \
+	num = strtod(src, &tmpPtr); \
+	if(src == tmpPtr) \
+	{ \
+		retVal = LSTM_PARSE_FAILED; \
+		goto errLabel; \
+	}
+#endif
 
 int lstm_import(lstm_t* lstmPtr, const char* filePath)
 {
@@ -156,7 +174,7 @@ RET:
 	return ret;
 }
 
-int lstm_parse_net_base_xml(struct LSTM_BASE* basePtr, int netLen, int layerIndex, struct LSTM_XML_ELEM* elemPtr)
+int lstm_parse_net_base_xml(struct LSTM_BASE* basePtr, int netLen, int reNetLen, struct LSTM_XML_ELEM* elemPtr)
 {
 	int i;
 	int strId;
@@ -185,10 +203,10 @@ int lstm_parse_net_base_xml(struct LSTM_BASE* basePtr, int netLen, int layerInde
 				break;
 
 			case LSTM_STR_RECURRENT:
-				if(layerIndex == 1)
+				if(reNetLen > 0)
 				{
 					assert(basePtr->rWeight != NULL);
-					lstm_run(lstm_parse_net_vector_xml(basePtr->rWeight, netLen, &childElemPtr[i]), ret, RET);
+					lstm_run(lstm_parse_net_vector_xml(basePtr->rWeight, reNetLen, &childElemPtr[i]), ret, RET);
 				}
 				break;
 
@@ -208,6 +226,7 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 	int i;
 	int strId;
 	int ret = LSTM_NO_ERROR;
+	int netLen, reNetLen;
 
 	int nodeIndex = 0;
 
@@ -248,6 +267,17 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 
 	assert(layerRef[layerIndex].nodeList != NULL);
 
+	// Find network length
+	netLen = layerRef[layerIndex - 1].nodeCount;
+	if(layerIndex == 1)
+	{
+		reNetLen = layerRef[lstm->config.layers - 2].nodeCount;
+	}
+	else
+	{
+		reNetLen = 0;
+	}
+
 	// Parse network base
 	if(layerIndex < lstm->config.layers - 1)
 	{
@@ -260,32 +290,32 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 				case LSTM_STR_INPUT:
 					lstm_run(lstm_parse_net_base_xml(
 								&layerRef[layerIndex].nodeList[nodeIndex].inputNet,
-								layerRef[layerIndex - 1].nodeCount,
-								layerIndex, &childElemPtr[i]),
+								netLen, reNetLen,
+								&childElemPtr[i]),
 							ret, RET);
 					break;
 
 				case LSTM_STR_INPUT_GATE:
 					lstm_run(lstm_parse_net_base_xml(
 								&layerRef[layerIndex].nodeList[nodeIndex].igNet,
-								layerRef[layerIndex - 1].nodeCount,
-								layerIndex, &childElemPtr[i]),
+								netLen, reNetLen,
+								&childElemPtr[i]),
 							ret, RET);
 					break;
 
 				case LSTM_STR_FORGET_GATE:
 					lstm_run(lstm_parse_net_base_xml(
 								&layerRef[layerIndex].nodeList[nodeIndex].fgNet,
-								layerRef[layerIndex - 1].nodeCount,
-								layerIndex, &childElemPtr[i]),
+								netLen, reNetLen,
+								&childElemPtr[i]),
 							ret, RET);
 					break;
 
 				case LSTM_STR_OUTPUT_GATE:
 					lstm_run(lstm_parse_net_base_xml(
 								&layerRef[layerIndex].nodeList[nodeIndex].ogNet,
-								layerRef[layerIndex - 1].nodeCount,
-								layerIndex, &childElemPtr[i]),
+								netLen, reNetLen,
+								&childElemPtr[i]),
 							ret, RET);
 					break;
 			}
@@ -295,8 +325,8 @@ int lstm_parse_net_node_xml(struct LSTM_STRUCT* lstm, int layerIndex, struct LST
 	{
 		lstm_run(lstm_parse_net_base_xml(
 					&layerRef[layerIndex].nodeList[nodeIndex].inputNet,
-					layerRef[layerIndex - 1].nodeCount,
-					layerIndex, elemPtr),
+					netLen, reNetLen,
+					elemPtr),
 				ret, RET);
 	}
 
