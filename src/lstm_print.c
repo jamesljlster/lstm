@@ -109,7 +109,7 @@ void lstm_fprint_vector(FILE* fptr, double* vector, int vectorLen, int indent)
 	}
 }
 
-void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int layerIndex, int indent)
+void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int reNetSize, int indent)
 {
 	// Print weight
 	__lstm_fprint_indent(indent, "<%s>\n", lstm_str_list[LSTM_STR_WEIGHT]);
@@ -117,10 +117,10 @@ void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int lay
 	__lstm_fprint_indent(indent, "</%s>\n", lstm_str_list[LSTM_STR_WEIGHT]);
 
 	// Print recurrent weight
-	if(layerIndex == 1)
+	if(reNetSize > 0)
 	{
 		__lstm_fprint_indent(indent, "<%s>\n", lstm_str_list[LSTM_STR_RECURRENT]);
-		lstm_fprint_vector(fptr, basePtr->rWeight, netLen, indent + 1);
+		lstm_fprint_vector(fptr, basePtr->rWeight, reNetSize, indent + 1);
 		__lstm_fprint_indent(indent, "</%s>\n", lstm_str_list[LSTM_STR_RECURRENT]);
 	}
 
@@ -133,39 +133,47 @@ void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int lay
 
 void lstm_fprint_node(FILE* fptr, struct LSTM_STRUCT* lstm, int layerIndex, int nodeIndex, int indent)
 {
-	int netLen;
+	int netLen, reNetLen;
 	struct LSTM_NODE* nodeRef;
 
 	// Get reference
 	nodeRef = &lstm->layerList[layerIndex].nodeList[nodeIndex];
 	netLen = lstm->layerList[layerIndex - 1].nodeCount;
+	if(layerIndex == 1)
+	{
+		reNetLen = lstm->layerList[lstm->config.layers - 2].nodeCount;
+	}
+	else
+	{
+		reNetLen = 0;
+	}
 
 	// Print base networks
 	if(layerIndex < lstm->config.layers - 1)
 	{
 		// Input network
 		__lstm_fprint_indent(indent, "<%s>\n", lstm_str_list[LSTM_STR_INPUT]);
-		lstm_fprint_base(fptr, &nodeRef->inputNet, netLen, layerIndex, indent + 1);
+		lstm_fprint_base(fptr, &nodeRef->inputNet, netLen, reNetLen, indent + 1);
 		__lstm_fprint_indent(indent, "</%s>\n", lstm_str_list[LSTM_STR_INPUT]);
 
 		// Input gate
 		__lstm_fprint_indent(indent, "<%s>\n", lstm_str_list[LSTM_STR_INPUT_GATE]);
-		lstm_fprint_base(fptr, &nodeRef->igNet, netLen, layerIndex, indent + 1);
+		lstm_fprint_base(fptr, &nodeRef->igNet, netLen, reNetLen, indent + 1);
 		__lstm_fprint_indent(indent, "</%s>\n", lstm_str_list[LSTM_STR_INPUT_GATE]);
 
 		// Forget gate
 		__lstm_fprint_indent(indent, "<%s>\n", lstm_str_list[LSTM_STR_FORGET_GATE]);
-		lstm_fprint_base(fptr, &nodeRef->fgNet, netLen, layerIndex, indent + 1);
+		lstm_fprint_base(fptr, &nodeRef->fgNet, netLen, reNetLen, indent + 1);
 		__lstm_fprint_indent(indent, "</%s>\n", lstm_str_list[LSTM_STR_FORGET_GATE]);
 
 		// Output gate
 		__lstm_fprint_indent(indent, "<%s>\n", lstm_str_list[LSTM_STR_OUTPUT_GATE]);
-		lstm_fprint_base(fptr, &nodeRef->ogNet, netLen, layerIndex, indent + 1);
+		lstm_fprint_base(fptr, &nodeRef->ogNet, netLen, reNetLen, indent + 1);
 		__lstm_fprint_indent(indent, "</%s>\n", lstm_str_list[LSTM_STR_OUTPUT_GATE]);
 	}
 	else
 	{
-		lstm_fprint_base(fptr, &nodeRef->inputNet, netLen, layerIndex, indent);
+		lstm_fprint_base(fptr, &nodeRef->inputNet, netLen, reNetLen, indent);
 	}
 }
 
