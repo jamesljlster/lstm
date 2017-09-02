@@ -9,21 +9,25 @@
 /**
  *	\~English @defgroup Enum Enumeration
  *	@brief Enumeration of the Library.
+ *	@since 0.1.0
  *
  *@{
  *
  *	\~Chinese-Traditional @defgroup Enum 列舉
  *	@brief 函式庫列舉
+ *	@since 0.1.0
  *
  *@{
  */
 
 /**
  *	\~English
- *		Return value definitions of LSTM library.
+ *	@brief Return value definitions of LSTM library.
+ *	@since 0.1.0
  *
  *	\~Chinese-Traditional
- *		LSTM 函式庫回傳值定義
+ *	@brief LSTM 函式庫回傳值定義
+ *	@since 0.1.0
  */
 enum LSTM_RETUEN_VALUE
 {
@@ -35,7 +39,15 @@ enum LSTM_RETUEN_VALUE
 	LSTM_OUT_OF_RANGE	= -5	/*!< Operation out of range. @since 0.1.0 */
 };
 
-/** Transfer (activation) function index definitions. */
+/**
+ *	\~English
+ *	@brief Transfer (activation) function index definitions.
+ *	@since 0.1.0
+ *
+ *	\~Chinese-Traditional
+ *	@brief 活化函數定義
+ *	@since 0.1.0
+ */
 enum LSTM_TRANSFER_FUNC
 {
 	LSTM_SIGMOID			= 0,	/*!< Sigmoid function. @since 0.1.0 */
