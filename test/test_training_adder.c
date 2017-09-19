@@ -23,6 +23,7 @@
 #define DATA_COLS	8
 #define RAND_SWAP	32768
 
+#define USING_MANUAL_TRAINING
 //#define DEBUG
 
 double* adder_dataprep(int rows, int cols);
@@ -41,6 +42,9 @@ int main(int argc, char* argv[])
 	double* inputList[DATA_COLS];
 	double* desireList[DATA_COLS];
 	double* errList[DATA_COLS];
+#ifdef USING_MANUAL_TRAINING
+	double* outList[DATA_COLS];
+#endif
 
 	clock_t timeHold;
 
@@ -152,7 +156,25 @@ int main(int argc, char* argv[])
 			printf("Memory allocaton failed!\n");
 			return -1;
 		}
+
+#ifdef USING_MANUAL_TRAINING
+		outList[i] = calloc(OUTPUTS, sizeof(double));
+		if(outList[i] == NULL)
+		{
+			printf("Memory allocation failed!\n");
+			return -1;
+		}
+#endif
 	}
+
+#ifdef USING_MANUAL_TRAINING
+	iResult = lstm_bptt_set_max_timestep(lstm, DATA_COLS);
+	if(iResult < 0)
+	{
+		printf("lstm_bptt_set_max_timestep() failed with error: %d\n", iResult);
+		return -1;
+	}
+#endif
 
 	// Training
 	timeHold = 0;
@@ -201,6 +223,24 @@ int main(int argc, char* argv[])
 					getchar();
 #endif
 
+#ifdef USING_MANUAL_TRAINING
+					for(j = 0; j < DATA_COLS; j++)
+					{
+						lstm_forward_computation(lstm, inputList[j], outList[j]);
+
+						for(k = 0; k < OUTPUTS; k++)
+						{
+							errList[j][k] = desireList[j][k] - outList[j][k];
+						}
+
+						lstm_bptt_sum_gradient(lstm, errList[j]);
+					}
+
+					lstm_bptt_adjust_network(lstm, lRate, mCoef, DELTA_LIMIT);
+
+					lstm_bptt_erase(lstm);
+					lstm_forward_computation_erase(lstm);
+#else
 					// Training
 					iResult = lstm_training_gradient_custom(lstm, lRate, mCoef, inputList, desireList, NULL, errList, DATA_COLS, DELTA_LIMIT);
 					if(iResult != LSTM_NO_ERROR)
@@ -209,6 +249,7 @@ int main(int argc, char* argv[])
 						printf("lstm_training_gradient() failed with error: %d\n", iResult);
 						return -1;
 					}
+#endif
 
 					// Find error
 					for(j = 0; j < DATA_COLS; j++)
