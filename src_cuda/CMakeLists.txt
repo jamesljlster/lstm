@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 set(CMAKE_C_FLAGS_RELEASE "-O3")
-set(CMAKE_NVCC_FLAGS "${CMAKE_NVCC_FLAGS} -Wall")
+set(CMAKE_NVCC_FLAGS "${CMAKE_NVCC_FLAGS} -Wall -dc")
 set(CMAKE_NVCC_FLAGS_RELEASE "${CMAKE_NVCC_FLAGS} -O3")
 
 # Variables
