@@ -25,11 +25,11 @@ if(${WITH_CUDA})
 	find_package(CUDA QUIET REQUIRED)
 
 	# Add cuda subdirectory
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cuda_src)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cuda_src)
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src_cuda)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src_cuda)
 
 	if(${BUILD_TEST})
-		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cuda_test)
+		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test_cuda)
 	endif()
 endif()
 
