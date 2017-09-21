@@ -1,7 +1,7 @@
-#ifndef __LSTM_CUDA_TYPES_H__
-#define __LSTM_CUDA_TYPES_H__
+#ifndef __LSTM_TYPES_CUDA_H__
+#define __LSTM_TYPES_CUDA_H__
 
-struct LSTM_CUDA_MAT
+struct LSTM_CUMAT
 {
 	double* weight;
 	double* wGrad;
@@ -20,11 +20,11 @@ struct LSTM_CUDA_MAT
 	double* calcQue;
 };
 
-struct LSTM_CUDA_LAYER
+struct LSTM_CULAYER
 {
 	int nodeCount;
 
-	struct LSTM_CUDA_MAT nodeMat;
+	struct LSTM_CUMAT nodeMat;
 };
 
 #endif
