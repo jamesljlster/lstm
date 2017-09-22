@@ -44,7 +44,7 @@ struct LSTM_CULAYER
 	struct LSTM_CUMAT nodeMat;
 };
 
-struct LSTM_CUSTRUCT
+struct LSTM_CUDA
 {
 	int queueLen;
 	struct LSTM_CULAYER* layerList;
