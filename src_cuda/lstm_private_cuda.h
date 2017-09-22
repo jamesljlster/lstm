@@ -8,10 +8,17 @@
 // Macros
 #ifdef DEBUG
 #include <stdio.h>
-#define lstm_free_cuda(ptr)	fprintf(stderr, "%s(): free(%s), %p\n", __FUNCTION__, #ptr, ptr); cudaFree(ptr)
+#define lstm_free_cuda(ptr)	fprintf(stderr, "%s(): cudaFree(%s), %p\n", __FUNCTION__, #ptr, ptr); cudaFree(ptr)
 #else
 #define lstm_free_cuda(ptr)	cudaFree(ptr)
 #endif
+
+#define lstm_alloc_cuda(var, len, type, retVar, errLabel) \
+	if(cudaMalloc(&var, len * sizeof(type)) != cudaSuccess) \
+	{ \
+		retVar = LSTM_MEM_FAILED; \
+		goto errLabel; \
+	}
 
 #ifdef __cplusplus
 extern "C" {
