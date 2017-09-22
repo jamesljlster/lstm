@@ -1,6 +1,8 @@
 #ifndef __LSTM_TYPES_CUDA_H__
 #define __LSTM_TYPES_CUDA_H__
 
+#include <lstm_types.h>
+
 enum LSTM_CUMAT_LIST
 {
 	LSTM_CUMAT_OG,
@@ -32,10 +34,22 @@ struct LSTM_CUMAT
 
 struct LSTM_CULAYER
 {
+	int inputTFuncIndex;
+	int outputTFuncIndex;
+	int gateTFuncIndex;
+
 	int nodeCount;
 	int vecLen;
 
 	struct LSTM_CUMAT nodeMat;
+};
+
+struct LSTM_CUSTRUCT
+{
+	int queueLen;
+	struct LSTM_CULAYER* layerList;
+
+	struct LSTM_CONFIG_STRUCT config;
 };
 
 #endif
