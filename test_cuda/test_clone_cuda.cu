@@ -8,6 +8,8 @@ int main(int argc, char* argv[])
 	int i, j;
 	int iResult, ret = 0;
 
+	cudaError_t cuErr;
+
 	lstm_t srcLstm = NULL;
 	lstm_t cmpLstm = NULL;
 	lstm_cuda_t cuLstm = NULL;
@@ -37,16 +39,20 @@ int main(int argc, char* argv[])
 		goto RET;
 	}
 
+/*
 	// Clone lstm from cuda
-	iResult = lstm_clone_form_cuda(&cmpLstm, cuLstm);
+	iResult = lstm_clone_from_cuda(&cmpLstm, cuLstm);
 	if(iResult < 0)
 	{
-		printf("lstm_clone_to_cuda() failed with error: %d\n", iResult);
+		printf("lstm_clone_from_cuda() failed with error: %d\n", iResult);
 		ret = -1;
 		goto RET;
 	}
+	*/
 
 RET:
+	cuErr = cudaGetLastError();
+	printf("Last cuda error: %s, %s\n", cudaGetErrorName(cuErr), cudaGetErrorString(cuErr));
 	/*
 	lstm_delete(srcLstm);
 	lstm_delete(cmpLstm);
