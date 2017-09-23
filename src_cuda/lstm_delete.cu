@@ -52,6 +52,8 @@ void lstm_layer_delete_cuda(struct LSTM_CULAYER* cuLayerPtr)
 	lstm_free_cuda(cuLayerPtr->nodeMat.wGrad);
 	lstm_free_cuda(cuLayerPtr->nodeMat.wDelta);
 
+	lstm_free_cuda(cuLayerPtr->nodeMat.calcBuf);
+
 	lstm_free_cuda(cuLayerPtr->nodeMat.th);
 	lstm_free_cuda(cuLayerPtr->nodeMat.thGrad);
 	lstm_free_cuda(cuLayerPtr->nodeMat.thDelta);
