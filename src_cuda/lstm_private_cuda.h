@@ -13,12 +13,25 @@
 #define lstm_free_cuda(ptr)	cudaFree(ptr)
 #endif
 
+#ifdef DEBUG
+#define lstm_alloc_cuda(var, len, type, retVar, errLabel) \
+{ \
+	cudaError_t cuErr = cudaMalloc(&var, len * sizeof(type)); \
+	if(cuErr != cudaSuccess) \
+	{ \
+		fprintf(stderr, "%s(): cudaMalloc(&%s, %d) failed with error: %d\n", __FUNCTION__, #var, len * sizeof(type), cuErr); \
+		retVar = LSTM_MEM_FAILED; \
+		goto errLabel; \
+	} \
+}
+#else
 #define lstm_alloc_cuda(var, len, type, retVar, errLabel) \
 	if(cudaMalloc(&var, len * sizeof(type)) != cudaSuccess) \
 	{ \
 		retVar = LSTM_MEM_FAILED; \
 		goto errLabel; \
 	}
+#endif
 
 #ifdef __cplusplus
 extern "C" {
