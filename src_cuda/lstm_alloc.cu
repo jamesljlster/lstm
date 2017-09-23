@@ -106,6 +106,13 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 
 	LOG("enter");
 
+	// Checking
+	if(nodeCount <= 0)
+	{
+		ret = LSTM_INVALID_ARG;
+		goto RET;
+	}
+
 	// Zero memory
 	memset(&tmpLayer, 0, sizeof(struct LSTM_CULAYER));
 
@@ -131,11 +138,14 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	vecLen = netSize + reNetSize;
 
 	// Allocate device memory
-	lstm_alloc_cuda(tmpLayer.nodeMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.wGrad, matDim * nodeCount * vecLen, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.wDelta, matDim * nodeCount * vecLen, double, ret, ERR);
+	if(vecLen > 0)
+	{
+		lstm_alloc_cuda(tmpLayer.nodeMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.nodeMat.wGrad, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.nodeMat.wDelta, matDim * nodeCount * vecLen, double, ret, ERR);
 
-	lstm_alloc_cuda(tmpLayer.nodeMat.calcBuf, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.nodeMat.calcBuf, matDim * nodeCount * vecLen, double, ret, ERR);
+	}
 
 	lstm_alloc_cuda(tmpLayer.nodeMat.th, matDim * nodeCount, double, ret, ERR);
 	lstm_alloc_cuda(tmpLayer.nodeMat.thGrad, matDim * nodeCount, double, ret, ERR);
