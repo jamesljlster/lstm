@@ -18,6 +18,7 @@ int lstm_create_cuda(lstm_cuda_t* lstmCudaPtr, lstm_config_t lstmCfg)
 
 	// Memory allocation
 	lstm_alloc(allocTmp, 1, struct LSTM_CUDA, ret, RET);
+	tmpLstmPtr = (struct LSTM_CUDA*)allocTmp;
 
 	// Clone config
 	lstm_run(lstm_config_struct_clone(&tmpLstmPtr->config, lstmCfg), ret, ERR);
