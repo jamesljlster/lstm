@@ -36,9 +36,9 @@ struct LSTM_CUMAT
 
 struct LSTM_CULAYER
 {
-	int inputTFuncIndex;
-	int outputTFuncIndex;
-	int gateTFuncIndex;
+	int inputTFunc;
+	int outputTFunc;
+	int gateTFunc;
 
 	int nodeCount;
 	int vecLen;
