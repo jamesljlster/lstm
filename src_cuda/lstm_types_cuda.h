@@ -21,10 +21,6 @@ struct LSTM_CUMAT
 
 	double* calcBuf;
 
-	double* th;
-	double* thGrad;
-	double* thDelta;
-
 	double* calc;
 	double* out;
 	double* grad;
