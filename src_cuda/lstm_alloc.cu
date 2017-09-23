@@ -152,6 +152,10 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	lstm_alloc_cuda(tmpLayer.nodeMat.grad, matDim * nodeCount, double, ret, ERR);
 	lstm_alloc_cuda(tmpLayer.nodeMat.gradHold, matDim * nodeCount, double, ret, ERR);
 
+	// Set value
+	tmpLayer.vecLen = vecLen;
+	tmpLayer.nodeCount = nodeCount;
+
 	// Assign value
 	*cuLayerPtr = tmpLayer;
 	goto RET;
