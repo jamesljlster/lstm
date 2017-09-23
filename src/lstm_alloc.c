@@ -109,9 +109,13 @@ int lstm_network_alloc(struct LSTM_STRUCT* lstm, const struct LSTM_CONFIG_STRUCT
 	goto RET;
 
 ERR:
-	for(i = 0; i < layers; i++)
+	if(layerRef != NULL)
 	{
-		lstm_layer_delete(&layerRef[i]);
+		for(i = 0; i < layers; i++)
+		{
+			lstm_layer_delete(&layerRef[i]);
+		}
+		lstm_free(layerRef);
 	}
 
 RET:
