@@ -135,10 +135,10 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	}
 
 	// Find vector length
-	vecLen = netSize + reNetSize;
+	vecLen = netSize + reNetSize + 1;
 
 	// Allocate device memory
-	if(vecLen > 0)
+	if(vecLen > 1)
 	{
 		lstm_alloc_cuda(tmpLayer.nodeMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
 		lstm_alloc_cuda(tmpLayer.nodeMat.wGrad, matDim * nodeCount * vecLen, double, ret, ERR);
@@ -146,10 +146,6 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 
 		lstm_alloc_cuda(tmpLayer.nodeMat.calcBuf, matDim * nodeCount * vecLen, double, ret, ERR);
 	}
-
-	lstm_alloc_cuda(tmpLayer.nodeMat.th, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.thGrad, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.thDelta, matDim * nodeCount, double, ret, ERR);
 
 	lstm_alloc_cuda(tmpLayer.nodeMat.calc, matDim * nodeCount, double, ret, ERR);
 	lstm_alloc_cuda(tmpLayer.nodeMat.out, matDim * nodeCount, double, ret, ERR);
