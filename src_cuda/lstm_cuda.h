@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 int lstm_clone_to_cuda(lstm_cuda_t* lstmCudaPtr, lstm_t lstm);
-int lstm_clone_form_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda);
+int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda);
 
 void lstm_delete_cuda(lstm_cuda_t lstmCuda);
 

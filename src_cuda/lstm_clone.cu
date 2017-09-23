@@ -108,7 +108,7 @@ RET:
 	return ret;
 }
 
-int lstm_clone_form_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
+int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
 {
 	int i, j;
 	int vecLen, nodeCount;
