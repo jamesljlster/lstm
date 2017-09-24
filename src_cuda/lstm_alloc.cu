@@ -140,17 +140,17 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	// Allocate device memory
 	if(vecLen > 1)
 	{
-		lstm_alloc_cuda(tmpLayer.nodeMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
-		lstm_alloc_cuda(tmpLayer.nodeMat.wGrad, matDim * nodeCount * vecLen, double, ret, ERR);
-		lstm_alloc_cuda(tmpLayer.nodeMat.wDelta, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.wGrad, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.wDelta, matDim * nodeCount * vecLen, double, ret, ERR);
 
-		lstm_alloc_cuda(tmpLayer.nodeMat.calcBuf, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.calcBuf, matDim * nodeCount * vecLen, double, ret, ERR);
 	}
 
-	lstm_alloc_cuda(tmpLayer.nodeMat.calc, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.out, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.grad, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.nodeMat.gradHold, matDim * nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.calc, matDim * nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.out, matDim * nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.grad, matDim * nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.gradHold, matDim * nodeCount, double, ret, ERR);
 
 	// Set value
 	tmpLayer.vecLen = vecLen;

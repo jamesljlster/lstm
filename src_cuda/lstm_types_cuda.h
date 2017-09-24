@@ -39,7 +39,7 @@ struct LSTM_CULAYER
 	int nodeCount;
 	int vecLen;
 
-	struct LSTM_CUMAT nodeMat;
+	struct LSTM_CUMAT baseMat;
 };
 
 struct LSTM_CUDA

@@ -55,13 +55,13 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 	layerRef = lstmCuda->layerList;
 
 	// Copy inputs
-	cudaMemcpy(layerRef[0].nodeMat.out, input,
+	cudaMemcpy(layerRef[0].baseMat.out, input,
 			cfgRef->inputs * sizeof(double),
 			cudaMemcpyHostToDevice);
 
 	// Copy recurrent output
 	indexTmp = cfgRef->layers - 2;
-	cudaMemcpy(&layerRef[0].nodeMat.out[cfgRef->inputs], layerRef[indexTmp].nodeMat.out,
+	cudaMemcpy(&layerRef[0].baseMat.out[cfgRef->inputs], layerRef[indexTmp].baseMat.out,
 			layerRef[indexTmp].nodeCount * sizeof(double),
 			cudaMemcpyDeviceToDevice);
 
@@ -70,17 +70,17 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 	{
 		// Matrix element multiplication
 		lstm_matmul<<<LSTM_CUMAT_AMOUNT * layerRef[i].nodeCount, layerRef[i].vecLen - 1>>>(
-				layerRef[i].nodeMat.calcBuf,
-				layerRef[i - 1].nodeMat.out,
-				layerRef[i].nodeMat.weight,
+				layerRef[i].baseMat.calcBuf,
+				layerRef[i - 1].baseMat.out,
+				layerRef[i].baseMat.weight,
 				layerRef[i].vecLen);
 
 		// Network base calculation
 		lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[i].nodeCount>>>(
-				layerRef[i].nodeMat.calc,
-				layerRef[i].nodeMat.out,
-				layerRef[i].nodeMat.calcBuf,
-				layerRef[i].nodeMat.weight,
+				layerRef[i].baseMat.calc,
+				layerRef[i].baseMat.out,
+				layerRef[i].baseMat.calcBuf,
+				layerRef[i].baseMat.weight,
 				layerRef[i].vecLen,
 				layerRef[i].inputTFunc,
 				layerRef[i].gateTFunc);
@@ -94,7 +94,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 	// Get output
 	if(output != NULL)
 	{
-		cudaMemcpy(output, layerRef[indexTmp].nodeMat.out, cfgRef->outputs * sizeof(double), cudaMemcpyDeviceToHost);
+		cudaMemcpy(output, layerRef[indexTmp].baseMat.out, cfgRef->outputs * sizeof(double), cudaMemcpyDeviceToHost);
 	}
 
 RET:
