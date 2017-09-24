@@ -21,6 +21,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc)
 
 # CUDA
 if(${WITH_CUDA})
+	set(CUDA_SEPARABLE_COMPILATION ON)
+
 	# Find cuda package
 	find_package(CUDA QUIET REQUIRED)
 

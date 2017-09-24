@@ -17,7 +17,7 @@ file(GLOB TEST_TXT
 list(REMOVE_ITEM TEST_TXT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
 
 # Set dependences
-set(PROJECT_DEPS lstm lstm_cuda)
+set(PROJECT_DEPS lstm_cuda lstm)
 if(UNIX)
 	find_library(CONIO_LIB conio
 		"/usr/lib"
