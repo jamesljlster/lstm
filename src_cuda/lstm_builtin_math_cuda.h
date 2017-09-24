@@ -3,6 +3,9 @@
 
 #include <lstm_builtin_math.h>
 
+extern __device__ void (*lstm_transfer_list_cu[])(double*, double);
+extern __device__ void (*lstm_transfer_derivative_list_cu[])(double*, double);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
