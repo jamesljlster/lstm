@@ -32,9 +32,14 @@ struct LSTM_CUMAT
 
 struct LSTM_CULAYER
 {
-	int inputTFunc;
-	int outputTFunc;
-	int gateTFunc;
+	void (*inputTFunc)(double*, double);
+	void (*inputDTFunc)(double*, double);
+
+	void (*outputTFunc)(double*, double);
+	void (*outputDTFunc)(double*, double);
+
+	void (*gateTFunc)(double*, double);
+	void (*gateDTFunc)(double*, double);
 
 	int nodeCount;
 	int vecLen;
