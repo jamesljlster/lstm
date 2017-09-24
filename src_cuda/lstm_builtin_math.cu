@@ -3,34 +3,6 @@
 
 #include "lstm_builtin_math_cuda.h"
 
-__device__ void (*lstm_transfer_list_cu[LSTM_TFUNC_AMOUNT])(double*, double) = {
-	lstm_sigmoid_cu,
-	lstm_modified_sigmoid_cu,
-	lstm_tanh_cu,
-	lstm_gaussian_cu,
-	lstm_bent_identity_cu,
-	lstm_softplus_cu,
-	lstm_softsign_cu,
-	lstm_sinc_cu,
-	lstm_sinusoid_cu,
-	lstm_identity_cu,
-	lstm_relu_cu
-};
-
-__device__ void (*lstm_transfer_derivative_list_cu[LSTM_TFUNC_AMOUNT])(double*, double) = {
-	lstm_sigmoid_derivative_cu,
-	lstm_modified_sigmoid_derivative_cu,
-	lstm_tanh_derivative_cu,
-	lstm_gaussian_derivative_cu,
-	lstm_bent_identity_derivative_cu,
-	lstm_softplus_derivative_cu,
-	lstm_softsign_derivative_cu,
-	lstm_sinc_derivative_cu,
-	lstm_sinusoid_derivative_cu,
-	lstm_identity_derivative_cu,
-	lstm_relu_derivative_cu
-};
-
 __device__ void lstm_sigmoid_cu(double* dstPtr, double x)
 {
 	*dstPtr = 1.0 / (1.0 + exp(-x));

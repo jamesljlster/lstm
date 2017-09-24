@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-extern __device__ void (*lstm_transfer_list_cu[LSTM_TFUNC_AMOUNT])(double*, double);
-extern __device__ void (*lstm_transfer_derivative_list_cu[LSTM_TFUNC_AMOUNT])(double*, double);
-
 __device__ void lstm_sigmoid_cu(double* dstPtr, double x);
 __device__ void lstm_sigmoid_derivative_cu(double* dstPtr, double x);
 __device__ void lstm_modified_sigmoid_cu(double* dstPtr, double x);
