@@ -7,9 +7,12 @@
 int main()
 {
 	int i;
+	double* cuPtr;
 	double in, out, cuOut, err;
 
 	cudaError_t cuErr;
+
+	cudaMalloc(&cuPtr, sizeof(double));
 
 	for(i = 0; i < LSTM_TFUNC_AMOUNT; i++)
 	{
@@ -17,8 +20,9 @@ int main()
 		for(in = -1; in <= 1; in += 0.1)
 		{
 			out = lstm_transfer_list[i](in);
-			run_tfunc<<<1, 1>>>(&cuOut, in, i);
+			run_tfunc<<<1, 1>>>(cuPtr, in, i);
 			cudaDeviceSynchronize();
+			cudaMemcpy(&cuOut, cuPtr, sizeof(double), cudaMemcpyDeviceToHost);
 
 			err += fabs(out - cuOut);
 		}
