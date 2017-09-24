@@ -9,12 +9,19 @@ void lstm_forward_computation_erase_cuda(lstm_cuda_t lstmCuda)
 {
 }
 
+// lstm_matmul<<<LSTM_CUMAT_AMOUNT * layerRef[i].nodeCount, layerRef[i].vecLen - 1>>>
 __global__ void lstm_matmul(double* calcBuf, double* input, double* weight, int vecLen)
 {
 	calcBuf[blockIdx.x * vecLen + threadIdx.x] =
 		weight[blockIdx.x * vecLen + threadIdx.x] * input[threadIdx.x];
 }
 
+__device__ void linear(double* ptr, double x)
+{
+	*ptr = x;
+}
+
+// lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[i].nodeCount>>>
 __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, double* weight, int vecLen, int inputTFunc, int gateTFunc)
 {
 	int i;
@@ -34,8 +41,12 @@ __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, doubl
 
 	// Find network base output
 	tFuncIndex = (blockIdx.x == LSTM_CUMAT_INPUT) ? inputTFunc : gateTFunc;
+	linear(&out[blockIdx.x * blockDim.x + threadIdx.x],
+			calc[blockIdx.x * blockDim.x + threadIdx.x]);
+	/*
 	lstm_transfer_list_cu[tFuncIndex](&out[blockIdx.x * blockDim.x + threadIdx.x],
 			calc[blockIdx.x * blockDim.x + threadIdx.x]);
+			*/
 }
 
 __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, int outputTFunc)
@@ -48,7 +59,8 @@ __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, in
 		baseOut[LSTM_CUMAT_INPUT * blockDim.x + blockIdx.x];
 
 	// Find output value
-	lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[blockIdx.x]);
+	linear(&calcTmp, cell[blockIdx.x]);
+	//lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[blockIdx.x]);
 	output[blockIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + blockIdx.x] * calcTmp;
 }
 
@@ -58,6 +70,8 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 	int ret = LSTM_NO_ERROR;
 	int indexTmp;
 	int vecCalcLen;
+
+	cudaError_t cuErr;
 
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 	struct LSTM_CULAYER* layerRef;
@@ -88,8 +102,8 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 				layerRef[i - 1].output,
 				layerRef[i].baseMat.weight,
 				layerRef[i].vecLen);
+		cudaDeviceSynchronize();
 
-		// Network base calculation
 		lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[i].nodeCount>>>(
 				layerRef[i].baseMat.calc,
 				layerRef[i].baseMat.out,
@@ -98,6 +112,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 				layerRef[i].vecLen,
 				layerRef[i].inputTFunc,
 				layerRef[i].gateTFunc);
+		cudaDeviceSynchronize();
 
 		// LSTM cell calculation
 		lstm_cell_calc<<<layerRef[i].nodeCount, 1>>>(
@@ -105,6 +120,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 				layerRef[i].cell,
 				layerRef[i].baseMat.out,
 				layerRef[i].outputTFunc);
+		cudaDeviceSynchronize();
 	}
 
 	// Output layer calculation
@@ -114,7 +130,9 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 			layerRef[indexTmp - 1].output,
 			layerRef[indexTmp].baseMat.weight,
 			layerRef[indexTmp].vecLen);
-	lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[indexTmp].nodeCount>>>(
+	cudaDeviceSynchronize();
+
+	lstm_base_calc<<<1, layerRef[indexTmp].nodeCount>>>(
 			layerRef[indexTmp].baseMat.calc,
 			layerRef[indexTmp].baseMat.out,
 			layerRef[indexTmp].baseMat.calcBuf,
@@ -122,6 +140,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 			layerRef[indexTmp].vecLen,
 			layerRef[indexTmp].inputTFunc,
 			layerRef[indexTmp].gateTFunc);
+	cudaDeviceSynchronize();
 
 	// Get output
 	if(output != NULL)
