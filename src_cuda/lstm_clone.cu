@@ -28,7 +28,7 @@ int lstm_clone_to_cuda(lstm_cuda_t* lstmCudaPtr, lstm_t lstm)
 #define __lstm_clone_base_to_cuda(cuMat, base) \
 	{ \
 		int procIndex = cuMat * (nodeCount * vecLen) + j * vecLen; \
-		if(cudaMemcpy(&dstLayerRef[i].nodeMat.weight[procIndex], \
+		if(cudaMemcpy(&dstLayerRef[i].baseMat.weight[procIndex], \
 					srcLayerRef[i].nodeList[j].base.weight, \
 					srcLayerRef[i - 1].nodeCount * sizeof(double), \
 					cudaMemcpyHostToDevice) \
@@ -44,7 +44,7 @@ int lstm_clone_to_cuda(lstm_cuda_t* lstmCudaPtr, lstm_t lstm)
  \
 		if(i == 1) \
 		{ \
-			if(cudaMemcpy(&dstLayerRef[i].nodeMat.weight[procIndex], \
+			if(cudaMemcpy(&dstLayerRef[i].baseMat.weight[procIndex], \
 						srcLayerRef[i].nodeList[j].base.rWeight, \
 						srcLayerRef[cfgRef->layers - 2].nodeCount * sizeof(double), \
 						cudaMemcpyHostToDevice) \
@@ -59,7 +59,7 @@ int lstm_clone_to_cuda(lstm_cuda_t* lstmCudaPtr, lstm_t lstm)
 			} \
 		} \
  \
-		if(cudaMemcpy(&dstLayerRef[i].nodeMat.weight[procIndex], \
+		if(cudaMemcpy(&dstLayerRef[i].baseMat.weight[procIndex], \
 					&srcLayerRef[i].nodeList[j].base.th, \
 					sizeof(double), \
 					cudaMemcpyHostToDevice) \
@@ -131,7 +131,7 @@ int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
 	{ \
 		int procIndex = cuMat * (nodeCount * vecLen) + j * vecLen; \
 		if(cudaMemcpy(dstLayerRef[i].nodeList[j].base.weight, \
-					&srcLayerRef[i].nodeMat.weight[procIndex], \
+					&srcLayerRef[i].baseMat.weight[procIndex], \
 					dstLayerRef[i - 1].nodeCount * sizeof(double), \
 					cudaMemcpyDeviceToHost) \
 				!= cudaSuccess) \
@@ -147,7 +147,7 @@ int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
 		if(i == 1) \
 		{ \
 			if(cudaMemcpy(dstLayerRef[i].nodeList[j].base.rWeight, \
-						&srcLayerRef[i].nodeMat.weight[procIndex], \
+						&srcLayerRef[i].baseMat.weight[procIndex], \
 						dstLayerRef[cfgRef->layers - 2].nodeCount * sizeof(double), \
 						cudaMemcpyDeviceToHost) \
 					!= cudaSuccess) \
@@ -162,7 +162,7 @@ int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
 		} \
  \
 		if(cudaMemcpy(&dstLayerRef[i].nodeList[j].base.th, \
-					&srcLayerRef[i].nodeMat.weight[procIndex], \
+					&srcLayerRef[i].baseMat.weight[procIndex], \
 					sizeof(double), \
 					cudaMemcpyDeviceToHost) \
 				!= cudaSuccess) \

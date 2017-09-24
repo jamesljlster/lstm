@@ -48,19 +48,23 @@ void lstm_layer_delete_cuda(struct LSTM_CULAYER* cuLayerPtr)
 	LOG("enter");
 
 	// Free device memory
-	lstm_free_cuda(cuLayerPtr->nodeMat.weight);
-	lstm_free_cuda(cuLayerPtr->nodeMat.wGrad);
-	lstm_free_cuda(cuLayerPtr->nodeMat.wDelta);
+	lstm_free_cuda(cuLayerPtr->baseMat.weight);
+	lstm_free_cuda(cuLayerPtr->baseMat.wGrad);
+	lstm_free_cuda(cuLayerPtr->baseMat.wDelta);
 
-	lstm_free_cuda(cuLayerPtr->nodeMat.calcBuf);
+	lstm_free_cuda(cuLayerPtr->baseMat.calcBuf);
 
-	lstm_free_cuda(cuLayerPtr->nodeMat.calc);
-	lstm_free_cuda(cuLayerPtr->nodeMat.out);
-	lstm_free_cuda(cuLayerPtr->nodeMat.grad);
-	lstm_free_cuda(cuLayerPtr->nodeMat.gradHold);
+	lstm_free_cuda(cuLayerPtr->baseMat.calc);
+	lstm_free_cuda(cuLayerPtr->baseMat.out);
+	lstm_free_cuda(cuLayerPtr->baseMat.grad);
+	lstm_free_cuda(cuLayerPtr->baseMat.gradHold);
 
-	lstm_free_cuda(cuLayerPtr->nodeMat.outQue);
-	lstm_free_cuda(cuLayerPtr->nodeMat.calcQue);
+	lstm_free_cuda(cuLayerPtr->baseMat.outQue);
+	lstm_free_cuda(cuLayerPtr->baseMat.calcQue);
+
+	lstm_free_cuda(cuLayerPtr->output);
+	lstm_free_cuda(cuLayerPtr->cell);
+	lstm_free_cuda(cuLayerPtr->grad);
 
 	// Zero memory
 	memset(cuLayerPtr, 0, sizeof(struct LSTM_CULAYER));
