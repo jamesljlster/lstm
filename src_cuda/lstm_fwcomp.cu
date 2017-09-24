@@ -16,11 +16,6 @@ __global__ void lstm_matmul(double* calcBuf, double* input, double* weight, int 
 		weight[blockIdx.x * vecLen + threadIdx.x] * input[threadIdx.x];
 }
 
-__device__ void linear(double* ptr, double x)
-{
-	*ptr = x;
-}
-
 // lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[i].nodeCount>>>
 __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, double* weight, int vecLen, int inputTFunc, int gateTFunc)
 {
@@ -41,12 +36,8 @@ __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, doubl
 
 	// Find network base output
 	tFuncIndex = (blockIdx.x == LSTM_CUMAT_INPUT) ? inputTFunc : gateTFunc;
-	linear(&out[blockIdx.x * blockDim.x + threadIdx.x],
-			calc[blockIdx.x * blockDim.x + threadIdx.x]);
-	/*
 	lstm_transfer_list_cu[tFuncIndex](&out[blockIdx.x * blockDim.x + threadIdx.x],
 			calc[blockIdx.x * blockDim.x + threadIdx.x]);
-			*/
 }
 
 __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, int outputTFunc)
@@ -59,8 +50,7 @@ __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, in
 		baseOut[LSTM_CUMAT_INPUT * blockDim.x + blockIdx.x];
 
 	// Find output value
-	linear(&calcTmp, cell[blockIdx.x]);
-	//lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[blockIdx.x]);
+	lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[blockIdx.x]);
 	output[blockIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + blockIdx.x] * calcTmp;
 }
 

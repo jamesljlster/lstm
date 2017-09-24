@@ -3,6 +3,16 @@
 
 #include "lstm_builtin_math_cuda.h"
 
+__global__ void run_tfunc(double* out, double in, int tFuncIndex)
+{
+	lstm_transfer_list_cu[tFuncIndex](out, in);
+}
+
+__global__ void run_tfunc_de(double* out, double in, int tFuncIndex)
+{
+	lstm_transfer_derivative_list_cu[tFuncIndex](out, in);
+}
+
 __device__ void (*lstm_transfer_list_cu[])(double*, double) = {
 	lstm_sigmoid_cu,
 	lstm_modified_sigmoid_cu,

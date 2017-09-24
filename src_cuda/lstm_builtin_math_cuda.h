@@ -10,6 +10,9 @@ extern __device__ void (*lstm_transfer_derivative_list_cu[])(double*, double);
 extern "C" {
 #endif
 
+__global__ void run_tfunc(double* out, double in, int tFuncIndex);
+__global__ void run_tfunc_de(double* out, double in, int tFuncIndex);
+
 __device__ void lstm_sigmoid_cu(double* dstPtr, double x);
 __device__ void lstm_sigmoid_derivative_cu(double* dstPtr, double x);
 __device__ void lstm_modified_sigmoid_cu(double* dstPtr, double x);
