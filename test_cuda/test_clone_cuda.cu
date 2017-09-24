@@ -39,7 +39,6 @@ int main(int argc, char* argv[])
 		goto RET;
 	}
 
-/*
 	// Clone lstm from cuda
 	iResult = lstm_clone_from_cuda(&cmpLstm, cuLstm);
 	if(iResult < 0)
@@ -48,7 +47,6 @@ int main(int argc, char* argv[])
 		ret = -1;
 		goto RET;
 	}
-	*/
 
 RET:
 	cuErr = cudaGetLastError();

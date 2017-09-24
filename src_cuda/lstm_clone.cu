@@ -141,7 +141,7 @@ int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
 		} \
 		else \
 		{ \
-			procIndex += srcLayerRef[i - 1].nodeCount; \
+			procIndex += dstLayerRef[i - 1].nodeCount; \
 		} \
  \
 		if(i == 1) \
@@ -157,7 +157,7 @@ int lstm_clone_from_cuda(lstm_t* lstmPtr, lstm_cuda_t lstmCuda)
 			} \
 			else \
 			{ \
-				procIndex += srcLayerRef[cfgRef->layers - 2].nodeCount; \
+				procIndex += dstLayerRef[cfgRef->layers - 2].nodeCount; \
 			} \
 		} \
  \
