@@ -38,6 +38,20 @@ __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, doubl
 			calc[blockIdx.x * blockDim.x + threadIdx.x]);
 }
 
+__global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, int outputTFunc)
+{
+	double calcTmp;
+
+	// Find cell value
+	cell[blockIdx.x] = baseOut[LSTM_CUMAT_FG * blockDim.x + blockIdx.x] * cell[blockIdx.x] +
+		baseOut[LSTM_CUMAT_IG * blockDim.x + blockIdx.x] *
+		baseOut[LSTM_CUMAT_INPUT * blockDim.x + blockIdx.x];
+
+	// Find output value
+	lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[blockIdx.x]);
+	output[blockIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + blockIdx.x] * calcTmp;
+}
+
 int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* output)
 {
 	int i;
@@ -61,7 +75,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 
 	// Copy recurrent output
 	indexTmp = cfgRef->layers - 2;
-	cudaMemcpy(&layerRef[0].baseMat.out[cfgRef->inputs], layerRef[indexTmp].baseMat.out,
+	cudaMemcpy(&layerRef[0].baseMat.out[cfgRef->inputs], layerRef[indexTmp].output,
 			layerRef[indexTmp].nodeCount * sizeof(double),
 			cudaMemcpyDeviceToDevice);
 
@@ -71,7 +85,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 		// Matrix element multiplication
 		lstm_matmul<<<LSTM_CUMAT_AMOUNT * layerRef[i].nodeCount, layerRef[i].vecLen - 1>>>(
 				layerRef[i].baseMat.calcBuf,
-				layerRef[i - 1].baseMat.out,
+				layerRef[i - 1].output,
 				layerRef[i].baseMat.weight,
 				layerRef[i].vecLen);
 
@@ -86,10 +100,28 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 				layerRef[i].gateTFunc);
 
 		// LSTM cell calculation
+		lstm_cell_calc<<<layerRef[i].nodeCount, 1>>>(
+				layerRef[i].output,
+				layerRef[i].cell,
+				layerRef[i].baseMat.out,
+				layerRef[i].outputTFunc);
 	}
 
 	// Output layer calculation
 	indexTmp = cfgRef->layers - 1;
+	lstm_matmul<<<layerRef[indexTmp].nodeCount, layerRef[indexTmp].vecLen - 1>>>(
+			layerRef[indexTmp].baseMat.calcBuf,
+			layerRef[indexTmp - 1].output,
+			layerRef[indexTmp].baseMat.weight,
+			layerRef[indexTmp].vecLen);
+	lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[indexTmp].nodeCount>>>(
+			layerRef[indexTmp].baseMat.calc,
+			layerRef[indexTmp].baseMat.out,
+			layerRef[indexTmp].baseMat.calcBuf,
+			layerRef[indexTmp].baseMat.weight,
+			layerRef[indexTmp].vecLen,
+			layerRef[indexTmp].inputTFunc,
+			layerRef[indexTmp].gateTFunc);
 
 	// Get output
 	if(output != NULL)
