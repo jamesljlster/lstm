@@ -35,23 +35,25 @@ __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, doubl
 	}
 
 	// Find network base output
+	out[blockIdx.x * blockDim.x + threadIdx.x] = 0;
 	tFuncIndex = (blockIdx.x == LSTM_CUMAT_INPUT) ? inputTFunc : gateTFunc;
 	lstm_transfer_list_cu[tFuncIndex](&out[blockIdx.x * blockDim.x + threadIdx.x],
 			calc[blockIdx.x * blockDim.x + threadIdx.x]);
 }
 
+// lstm_cell_calc<<<1, layerRef[i].nodeCount>>>
 __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, int outputTFunc)
 {
 	double calcTmp;
 
 	// Find cell value
-	cell[blockIdx.x] = baseOut[LSTM_CUMAT_FG * blockDim.x + blockIdx.x] * cell[blockIdx.x] +
-		baseOut[LSTM_CUMAT_IG * blockDim.x + blockIdx.x] *
-		baseOut[LSTM_CUMAT_INPUT * blockDim.x + blockIdx.x];
+	cell[threadIdx.x] = baseOut[LSTM_CUMAT_FG * blockDim.x + threadIdx.x] * cell[threadIdx.x] +
+		baseOut[LSTM_CUMAT_IG * blockDim.x + threadIdx.x] *
+		baseOut[LSTM_CUMAT_INPUT * blockDim.x + threadIdx.x];
 
 	// Find output value
-	lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[blockIdx.x]);
-	output[blockIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + blockIdx.x] * calcTmp;
+	lstm_transfer_list_cu[outputTFunc](&calcTmp, cell[threadIdx.x]);
+	output[threadIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + threadIdx.x] * calcTmp;
 }
 
 int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* output)
@@ -105,7 +107,7 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 		cudaDeviceSynchronize();
 
 		// LSTM cell calculation
-		lstm_cell_calc<<<layerRef[i].nodeCount, 1>>>(
+		lstm_cell_calc<<<1, layerRef[i].nodeCount>>>(
 				layerRef[i].output,
 				layerRef[i].cell,
 				layerRef[i].baseMat.out,
