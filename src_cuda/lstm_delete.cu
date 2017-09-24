@@ -62,6 +62,10 @@ void lstm_layer_delete_cuda(struct LSTM_CULAYER* cuLayerPtr)
 	lstm_free_cuda(cuLayerPtr->baseMat.outQue);
 	lstm_free_cuda(cuLayerPtr->baseMat.calcQue);
 
+	lstm_free_cuda(cuLayerPtr->output);
+	lstm_free_cuda(cuLayerPtr->cell);
+	lstm_free_cuda(cuLayerPtr->grad);
+
 	// Zero memory
 	memset(cuLayerPtr, 0, sizeof(struct LSTM_CULAYER));
 

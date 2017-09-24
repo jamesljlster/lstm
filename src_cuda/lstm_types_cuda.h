@@ -39,6 +39,14 @@ struct LSTM_CULAYER
 	int nodeCount;
 	int vecLen;
 
+	double* output;
+	double* cell;
+
+	double* grad;
+
+	double* outputQue;
+	double* cellQue;
+
 	struct LSTM_CUMAT baseMat;
 };
 

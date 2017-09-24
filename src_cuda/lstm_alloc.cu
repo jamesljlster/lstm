@@ -137,7 +137,7 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	// Find vector length
 	vecLen = netSize + reNetSize + 1;
 
-	// Allocate device memory
+	// Allocate device memory for network base
 	if(vecLen > 1)
 	{
 		lstm_alloc_cuda(tmpLayer.baseMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
@@ -151,6 +151,11 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	lstm_alloc_cuda(tmpLayer.baseMat.out, matDim * nodeCount, double, ret, ERR);
 	lstm_alloc_cuda(tmpLayer.baseMat.grad, matDim * nodeCount, double, ret, ERR);
 	lstm_alloc_cuda(tmpLayer.baseMat.gradHold, matDim * nodeCount, double, ret, ERR);
+
+	// Allocate device memory for lstm block
+	lstm_alloc_cuda(tmpLayer.output, nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.cell, nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.grad, nodeCount, double, ret, ERR);
 
 	// Set value
 	tmpLayer.vecLen = vecLen;
