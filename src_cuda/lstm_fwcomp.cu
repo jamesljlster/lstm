@@ -5,6 +5,9 @@
 #include "lstm_private_cuda.h"
 #include "lstm_builtin_math_cuda.h"
 
+//#define DUMP_CUDA
+#include "lstm_dump_cuda.h"
+
 void lstm_forward_computation_erase_cuda(lstm_cuda_t lstmCuda)
 {
 }
@@ -75,15 +78,17 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 	layerRef = lstmCuda->layerList;
 
 	// Copy inputs
-	cudaMemcpy(layerRef[0].baseMat.out, input,
+	cudaMemcpy(layerRef[0].output, input,
 			cfgRef->inputs * sizeof(double),
 			cudaMemcpyHostToDevice);
 
 	// Copy recurrent output
 	indexTmp = cfgRef->layers - 2;
-	cudaMemcpy(&layerRef[0].baseMat.out[cfgRef->inputs], layerRef[indexTmp].output,
+	cudaMemcpy(&layerRef[0].output[cfgRef->inputs], layerRef[indexTmp].output,
 			layerRef[indexTmp].nodeCount * sizeof(double),
 			cudaMemcpyDeviceToDevice);
+
+	DUMP("layerRef[0].output: ", layerRef[0].output, layerRef[0].nodeCount);
 
 	// Hidden layer calculation
 	for(i = 1; i < cfgRef->layers - 1; i++)
