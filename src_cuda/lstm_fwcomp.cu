@@ -10,6 +10,27 @@
 
 void lstm_forward_computation_erase_cuda(lstm_cuda_t lstmCuda)
 {
+	int i, indexTmp;
+	struct LSTM_CULAYER* layerRef;
+
+	LOG("enter");
+
+	// Set referenct
+	layerRef = lstmCuda->layerList;
+
+	// Set indexTmp to last hidden layer index
+	indexTmp = lstmCuda->config.layers - 2;
+
+	// Clear hidden layer outputs
+	cudaMemset(layerRef[indexTmp].output, 0, layerRef[indexTmp].nodeCount * sizeof(double));
+
+	// Clear cell value
+	for(i = 1; i <= indexTmp; i++)
+	{
+		cudaMemset(layerRef[i].cell, 0, layerRef[i].nodeCount * sizeof(double));
+	}
+
+	LOG("exit");
 }
 
 // lstm_matmul<<<LSTM_CUMAT_AMOUNT * layerRef[i].nodeCount, layerRef[i].vecLen - 1>>>
@@ -59,14 +80,10 @@ __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, in
 	output[threadIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + threadIdx.x] * calcTmp;
 }
 
-int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* output)
+void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* output)
 {
 	int i;
-	int ret = LSTM_NO_ERROR;
 	int indexTmp;
-	int vecCalcLen;
-
-	cudaError_t cuErr;
 
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 	struct LSTM_CULAYER* layerRef;
@@ -145,8 +162,6 @@ int lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* o
 		cudaMemcpy(output, layerRef[indexTmp].baseMat.out, cfgRef->outputs * sizeof(double), cudaMemcpyDeviceToHost);
 	}
 
-RET:
 	LOG("exit");
-	return ret;
 }
 
