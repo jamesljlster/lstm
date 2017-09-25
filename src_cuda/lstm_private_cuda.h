@@ -19,7 +19,14 @@
 	cudaError_t cuErr = cudaMalloc(&var, len * sizeof(type)); \
 	if(cuErr != cudaSuccess) \
 	{ \
-		fprintf(stderr, "%s(): cudaMalloc(&%s, %d) failed with error: %d\n", __FUNCTION__, #var, len * sizeof(type), cuErr); \
+		fprintf(stderr, "%s(): cudaMalloc(&%s, %lu) failed with error: %d\n", __FUNCTION__, #var, len * sizeof(type), cuErr); \
+		retVar = LSTM_MEM_FAILED; \
+		goto errLabel; \
+	} \
+	cuErr = cudaMemset(var, 0, len * sizeof(type)); \
+	if(cuErr != cudaSuccess) \
+	{ \
+		fprintf(stderr, "%s(): cudaMemset(%s, 0, %lu) failed with error: %d\n", __FUNCTION__, #var, len * sizeof(type), cuErr); \
 		retVar = LSTM_MEM_FAILED; \
 		goto errLabel; \
 	} \
@@ -27,6 +34,11 @@
 #else
 #define lstm_alloc_cuda(var, len, type, retVar, errLabel) \
 	if(cudaMalloc(&var, len * sizeof(type)) != cudaSuccess) \
+	{ \
+		retVar = LSTM_MEM_FAILED; \
+		goto errLabel; \
+	} \
+	if(cudaMemset(var, 0, len * sizeof(type)) != cudaSuccess) \
 	{ \
 		retVar = LSTM_MEM_FAILED; \
 		goto errLabel; \
