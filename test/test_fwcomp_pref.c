@@ -4,55 +4,83 @@
 #include <time.h>
 
 #include <lstm.h>
-#include <lstm_cuda.h>
 #include <lstm_print.h>
 
 #define FW_ITER	100000
 
 int main(int argc, char* argv[])
 {
-	int i, iter;
+	int i, iter, hSize;
 	int iResult;
 	int inputs, outputs;
 
 	lstm_t lstm;
-	lstm_cuda_t lstmCuda;
 	lstm_config_t cfg;
 
 	double* input = NULL;
 	double* output = NULL;
+	char* tmpPtr;
 
 	clock_t timeHold;
 
 	srand(time(NULL));
 
 	// Checking
-	if(argc <= 1)
+	if(argc < 3)
 	{
-		printf("Assign a lstm model file to run the program\n");
+		printf("Usage: test_fwcomp_performance <hidden_nodes> <iteration>\n");
 		return -1;
 	}
 
-	iResult = lstm_import(&lstm, argv[1]);
-	if(iResult != LSTM_NO_ERROR)
+	// Parsing argument
+	hSize = strtol(argv[1], &tmpPtr, 10);
+	if(tmpPtr == argv[1])
 	{
-		printf("lstm_import() failed with error: %d\n", iResult);
+		printf("Failed to parse %s as hidden nodes!\n", tmpPtr);
 		return -1;
 	}
 
-	iResult = lstm_clone_to_cuda(&lstmCuda, lstm);
+	iter = strtol(argv[2], &tmpPtr, 10);
+	if(tmpPtr == argv[2])
+	{
+		printf("Failed to parse %s as iteration!\n", tmpPtr);
+		return -1;
+	}
+
+	printf("Using hidden nodes: %d\n", hSize);
+	printf("Using iteration: %d\n", iter);
+
+	// Create lstm config
+	iResult = lstm_config_create(&cfg);
 	if(iResult < 0)
 	{
-		printf("lstm_clone_to_cuda() failed with error: %d\n", iResult);
+		printf("lstm_config_create() failed with error: %d\n", iResult);
+		return -1;
+	}
+
+	// Set hidden size
+	iResult = lstm_config_set_hidden_nodes(cfg, 0, hSize);
+	if(iResult < 0)
+	{
+		printf("lstm_config_set_hidden_nodes() failed with error: %d\n", iResult);
+		return -1;
+	}
+
+	// Create lstm
+	iResult = lstm_create(&lstm, cfg);
+	if(iResult < 0)
+	{
+		printf("lstm_create() failed with error: %d\n", iResult);
 		return -1;
 	}
 
 	// Get neural network configuration
-	cfg = lstm_get_config(lstm);
+	inputs = lstm_config_get_inputs(cfg);
+	outputs = lstm_config_get_outputs(cfg);
 
 	// Memory allocation
-	input = (double*)calloc(inputs, sizeof(double));
-	output = (double*)calloc(outputs, sizeof(double));
+	input = calloc(inputs, sizeof(double));
+	output = calloc(outputs, sizeof(double));
 	if(input == NULL || output == NULL)
 	{
 		printf("Memory allocation failed\n");
@@ -62,7 +90,7 @@ int main(int argc, char* argv[])
 	timeHold = clock();
 	for(iter = 0; iter < FW_ITER; iter++)
 	{
-		lstm_forward_computation_cuda(lstmCuda, input, output);
+		lstm_forward_computation(lstm, input, output);
 	}
 	timeHold = clock() - timeHold;
 
@@ -80,6 +108,7 @@ int main(int argc, char* argv[])
 	printf("Time cost of %d iteration forward computation: %lf sec\n", FW_ITER, (double)timeHold / (double)CLOCKS_PER_SEC);
 
 	lstm_delete(lstm);
+	lstm_config_delete(cfg);
 
 	return 0;
 }
