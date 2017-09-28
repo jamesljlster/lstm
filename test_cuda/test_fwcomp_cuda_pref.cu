@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 	}
 
 	timeHold = clock();
-	for(iter = 0; iter < FW_ITER; iter++)
+	for(i = 0; i < iter; i++)
 	{
 		lstm_forward_computation_cuda(lstmCuda, input, output);
 	}
