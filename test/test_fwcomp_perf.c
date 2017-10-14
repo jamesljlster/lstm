@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 	// Checking
 	if(argc < 3)
 	{
-		printf("Usage: test_fwcomp_performance <hidden_nodes> <iteration>\n");
+		printf("Usage: test_fwcomp_perf <hidden_nodes> <iteration>\n");
 		return -1;
 	}
 
