@@ -80,7 +80,11 @@ struct LSTM_CONFIG_STRUCT
 
 struct LSTM_STRUCT
 {
-	int queueLen;
+	//int queueLen;
+	int queueSize;
+	int queueHead;
+	int queueTail;
+
 	struct LSTM_LAYER* layerList;
 
 	struct LSTM_CONFIG_STRUCT config;
