@@ -138,28 +138,27 @@ void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* 
 	}
 
 	// Output layer calculation
-	indexTmp = cfgRef->layers - 1;
-	lstm_matmul<<<layerRef[indexTmp].nodeCount, layerRef[indexTmp].vecLen - 1>>>(
-			layerRef[indexTmp].baseMat.calcBuf,
-			layerRef[indexTmp - 1].output,
-			layerRef[indexTmp].baseMat.weight,
-			layerRef[indexTmp].vecLen);
+	lstm_matmul<<<layerRef[i].nodeCount, layerRef[i].vecLen - 1>>>(
+			layerRef[i].baseMat.calcBuf,
+			layerRef[i - 1].output,
+			layerRef[i].baseMat.weight,
+			layerRef[i].vecLen);
 	//cudaDeviceSynchronize();
 
-	lstm_base_calc<<<1, layerRef[indexTmp].nodeCount>>>(
-			layerRef[indexTmp].baseMat.calc,
-			layerRef[indexTmp].baseMat.out,
-			layerRef[indexTmp].baseMat.calcBuf,
-			layerRef[indexTmp].baseMat.weight,
-			layerRef[indexTmp].vecLen,
-			layerRef[indexTmp].inputTFunc,
-			layerRef[indexTmp].gateTFunc);
+	lstm_base_calc<<<1, layerRef[i].nodeCount>>>(
+			layerRef[i].baseMat.calc,
+			layerRef[i].baseMat.out,
+			layerRef[i].baseMat.calcBuf,
+			layerRef[i].baseMat.weight,
+			layerRef[i].vecLen,
+			layerRef[i].inputTFunc,
+			layerRef[i].gateTFunc);
 	//cudaDeviceSynchronize();
 
 	// Get output
 	if(output != NULL)
 	{
-		cudaMemcpy(output, layerRef[indexTmp].baseMat.out, cfgRef->outputs * sizeof(double), cudaMemcpyDeviceToHost);
+		cudaMemcpy(output, layerRef[i].baseMat.out, cfgRef->outputs * sizeof(double), cudaMemcpyDeviceToHost);
 	}
 	else
 	{
