@@ -24,11 +24,22 @@ int lstm_bptt_set_max_timestep(lstm_t lstm, int timeStep)
 {
 	int i, j;
 	int ret = LSTM_NO_ERROR;
+	int memLen;
 
 	struct LSTM_LAYER* layerRef;
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 
 	double* tmpPtr;
+
+	// Checking argument
+	if(timeStep <= 0)
+	{
+		ret = LSTM_INVALID_ARG;
+		goto RET;
+	}
+
+	// Set memory length
+	memLen = timeStep + 1;
 
 	// Get reference
 	layerRef = lstm->layerList;
@@ -40,18 +51,21 @@ int lstm_bptt_set_max_timestep(lstm_t lstm, int timeStep)
 		for(j = 0; j < layerRef[i].nodeCount; j++)
 		{
 			// Re-Allocate queue space
-			__lstm_buf_realloc(layerRef[i].nodeList[j].outputQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].cellQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].ogNet.outQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].ogNet.calcQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].fgNet.outQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].fgNet.calcQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].igNet.outQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].igNet.calcQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].inputNet.outQue, timeStep, ret, RET);
-			__lstm_buf_realloc(layerRef[i].nodeList[j].inputNet.calcQue, timeStep, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].outputQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].cellQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].ogNet.outQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].ogNet.calcQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].fgNet.outQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].fgNet.calcQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].igNet.outQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].igNet.calcQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].inputNet.outQue, memLen, ret, RET);
+			__lstm_buf_realloc(layerRef[i].nodeList[j].inputNet.calcQue, memLen, ret, RET);
 		}
 	}
+
+	// Set queue size
+	lstm->queueSize = memLen;
 
 RET:
 	return ret;
@@ -67,6 +81,7 @@ void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 
 	int queLen;
+	int queIndex, quePreIndex;
 
 	LOG("enter");
 
@@ -74,40 +89,52 @@ void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 	layerRef = lstm->layerList;
 	cfgRef = &lstm->config;
 
+	// Update bptt queue
+	lstm->queueHead = (lstm->queueHead + 1) % lstm->queueSize;
+	if(lstm->queueHead == lstm->queueTail)
+	{
+		lstm->queueTail = (lstm->queueTail + 1) % lstm->queueSize;
+	}
+
+	// Find queue length
+	queLen = lstm->queueHead - lstm->queueTail;
+	if(queLen < 0)
+	{
+		queLen += lstm->queueSize;
+	}
+
 	// Set queue value
-	queLen = lstm->queueLen + 1;
 	for(i = 0; i < cfgRef->layers; i++)
 	{
 		for(j = 0; j < layerRef[i].nodeCount; j++)
 		{
 			// Store value to queue
-			layerRef[i].nodeList[j].outputQue.list[queLen - 1] = layerRef[i].nodeList[j].output;
-			layerRef[i].nodeList[j].cellQue.list[queLen - 1] = layerRef[i].nodeList[j].cell;
+			layerRef[i].nodeList[j].outputQue.list[lstm->queueHead] =
+				layerRef[i].nodeList[j].output;
+			layerRef[i].nodeList[j].cellQue.list[lstm->queueHead] =
+				layerRef[i].nodeList[j].cell;
 
-			layerRef[i].nodeList[j].ogNet.outQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].ogNet.outQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].ogNet.out;
-			layerRef[i].nodeList[j].ogNet.calcQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].ogNet.calcQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].ogNet.calc;
 
-			layerRef[i].nodeList[j].fgNet.outQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].fgNet.outQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].fgNet.out;
-			layerRef[i].nodeList[j].fgNet.calcQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].fgNet.calcQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].fgNet.calc;
 
-			layerRef[i].nodeList[j].igNet.outQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].igNet.outQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].igNet.out;
-			layerRef[i].nodeList[j].igNet.calcQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].igNet.calcQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].igNet.calc;
 
-			layerRef[i].nodeList[j].inputNet.outQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].inputNet.outQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].inputNet.out;
-			layerRef[i].nodeList[j].inputNet.calcQue.list[queLen - 1] =
+			layerRef[i].nodeList[j].inputNet.calcQue.list[lstm->queueHead] =
 				layerRef[i].nodeList[j].inputNet.calc;
 		}
 	}
-
-	// Update queue length
-	lstm->queueLen = queLen;
 
 	// Find network adjust gradient: Output layer
 	indexTmp = cfgRef->layers - 1;
@@ -134,33 +161,37 @@ void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 
 #define __lstm_bptt_find_og_grad() \
 	layerRef[i].nodeList[j].ogNet.grad = layerRef[i].nodeList[j].grad * \
-		layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
-		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[re])
+		layerRef[i].outputTFunc(layerRef[i].nodeList[j].cellQue.list[queIndex]) * \
+		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].ogNet.calcQue.list[queIndex])
 
 #define __lstm_bptt_find_fg_grad() \
 	layerRef[i].nodeList[j].fgNet.grad = layerRef[i].nodeList[j].grad * \
-		layerRef[i].nodeList[j].ogNet.outQue.list[re] * \
-		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
-		layerRef[i].nodeList[j].cellQue.list[re - 1] * \
-		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[re])
+		layerRef[i].nodeList[j].ogNet.outQue.list[queIndex] * \
+		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[queIndex]) * \
+		layerRef[i].nodeList[j].cellQue.list[quePreIndex] * \
+		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].fgNet.calcQue.list[queIndex])
 
 #define __lstm_bptt_find_ig_grad() \
 	layerRef[i].nodeList[j].igNet.grad = layerRef[i].nodeList[j].grad * \
-		layerRef[i].nodeList[j].ogNet.outQue.list[re] * \
-		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
-		layerRef[i].nodeList[j].inputNet.outQue.list[re] * \
-		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[re])
+		layerRef[i].nodeList[j].ogNet.outQue.list[queIndex] * \
+		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[queIndex]) * \
+		layerRef[i].nodeList[j].inputNet.outQue.list[queIndex] * \
+		layerRef[i].gateDTFunc(layerRef[i].nodeList[j].igNet.calcQue.list[queIndex])
 
 #define __lstm_bptt_find_input_grad() \
 	layerRef[i].nodeList[j].inputNet.grad = layerRef[i].nodeList[j].grad * \
-		layerRef[i].nodeList[j].ogNet.outQue.list[re] * \
-		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[re]) * \
-		layerRef[i].nodeList[j].igNet.outQue.list[re] * \
-		layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[re])
+		layerRef[i].nodeList[j].ogNet.outQue.list[queIndex] * \
+		layerRef[i].outputDTFunc(layerRef[i].nodeList[j].cellQue.list[queIndex]) * \
+		layerRef[i].nodeList[j].igNet.outQue.list[queIndex] * \
+		layerRef[i].inputDTFunc(layerRef[i].nodeList[j].inputNet.calcQue.list[queIndex])
 
 	// Find gradient: Hidden layers
 	for(re = queLen - 1; re >= 0; re--)
 	{
+		// Set queue index
+		queIndex = (re + lstm->queueTail + 1) % lstm->queueSize;
+		quePreIndex = (re + lstm->queueTail) % lstm->queueSize;
+
 		if(re == queLen - 1)
 		{
 			// Backpropagation from output layer
@@ -273,25 +304,25 @@ void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 					// Output gate network
 					layerRef[i].nodeList[j].ogNet.wGrad[k] +=
 						layerRef[i].nodeList[j].ogNet.grad *
-						layerRef[i - 1].nodeList[k].outputQue.list[re];
+						layerRef[i - 1].nodeList[k].outputQue.list[queIndex];
 
 					// Forget gate network
 					if(re > 0)
 					{
 						layerRef[i].nodeList[j].fgNet.wGrad[k] +=
 							layerRef[i].nodeList[j].fgNet.grad *
-							layerRef[i - 1].nodeList[k].outputQue.list[re];
+							layerRef[i - 1].nodeList[k].outputQue.list[queIndex];
 					}
 
 					// Input gate network
 					layerRef[i].nodeList[j].igNet.wGrad[k] +=
 						layerRef[i].nodeList[j].igNet.grad *
-						layerRef[i - 1].nodeList[k].outputQue.list[re];
+						layerRef[i - 1].nodeList[k].outputQue.list[queIndex];
 
 					// Input netwrok
 					layerRef[i].nodeList[j].inputNet.wGrad[k] +=
 						layerRef[i].nodeList[j].inputNet.grad *
-						layerRef[i - 1].nodeList[k].outputQue.list[re];
+						layerRef[i - 1].nodeList[k].outputQue.list[queIndex];
 				}
 
 				// Sum recurrent weight gradient
@@ -303,22 +334,22 @@ void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 						// Output gate network
 						layerRef[i].nodeList[j].ogNet.rGrad[k] +=
 							layerRef[i].nodeList[j].ogNet.grad *
-							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+							layerRef[indexTmp].nodeList[k].outputQue.list[quePreIndex];
 
 						// Forget gate network
 						layerRef[i].nodeList[j].fgNet.rGrad[k] +=
 							layerRef[i].nodeList[j].fgNet.grad *
-							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+							layerRef[indexTmp].nodeList[k].outputQue.list[quePreIndex];
 
 						// Input gate network
 						layerRef[i].nodeList[j].igNet.rGrad[k] +=
 							layerRef[i].nodeList[j].igNet.grad *
-							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+							layerRef[indexTmp].nodeList[k].outputQue.list[quePreIndex];
 
 						// Input network
 						layerRef[i].nodeList[j].inputNet.rGrad[k] +=
 							layerRef[i].nodeList[j].inputNet.grad *
-							layerRef[indexTmp].nodeList[k].outputQue.list[re - 1];
+							layerRef[indexTmp].nodeList[k].outputQue.list[quePreIndex];
 					}
 				}
 
@@ -436,7 +467,8 @@ void lstm_bptt_erase(lstm_t lstm)
 	cfgRef = &lstm->config;
 
 	// Reset queue length
-	lstm->queueLen = 0;
+	lstm->queueHead = 0;
+	lstm->queueTail = 0;
 
 	// Clear output layer gradient
 	i = cfgRef->layers - 1;
