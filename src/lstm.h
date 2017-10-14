@@ -160,7 +160,8 @@ void lstm_zero_network(lstm_t lstm);
 void lstm_forward_computation(lstm_t lstm, double* input, double* output);
 void lstm_forward_computation_erase(lstm_t lstm);
 
-int lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
+int lstm_bptt_set_max_timestep(lstm_t lstm, int timeStep);
+void lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
 void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit);
 void lstm_bptt_erase(lstm_t lstm);
 
