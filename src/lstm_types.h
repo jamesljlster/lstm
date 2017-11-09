@@ -80,8 +80,8 @@ struct LSTM_CONFIG_STRUCT
 
 struct LSTM_STATE_STRUCT
 {
-	double* cell;	// Cell matrix of lstm blocks
-	double* hidden;	// Hidden state matrix of lstm blocks
+	double** cell;		// Cell vector list
+	double** hidden;	// Hidden state vector list
 
 	struct LSTM_CONFIG_STRUCT config;	// Store network configure for verifying.
 };
