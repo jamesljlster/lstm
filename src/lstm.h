@@ -85,6 +85,9 @@ typedef struct LSTM_STRUCT* lstm_t;
 /** Type definition of lstm configuration. @since 0.1.0 */
 typedef struct LSTM_CONFIG_STRUCT* lstm_config_t;
 
+/** Type definition of lstm state. @since 0.1.0 */
+typedef struct LSTM_STATE_STRUCT* lstm_state_t;
+
 /**
  * @}
  */
@@ -167,6 +170,25 @@ void lstm_bptt_erase(lstm_t lstm);
 
 int lstm_training_gradient(lstm_t lstm, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
 int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
+
+/**
+ * @}
+ */
+
+/**
+ *	\~English @defgroup State LSTM State Processing
+ *	@brief Functions for LSTM state processing.
+ *
+ * @{
+ *
+ *	\~Chinese-Traditional @defgroup State LSTM 狀態處理
+ *	@brief LSTM 狀態處理
+ *
+ * @{
+ */
+
+int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg);
+void lstm_state_delete(lstm_state_t lstmState);
 
 /**
  * @}
