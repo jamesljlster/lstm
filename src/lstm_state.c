@@ -6,6 +6,74 @@
 
 #include "debug.h"
 
+void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
+{
+	int i, j;
+	int indexTmp;
+
+	struct LSTM_LAYER* layerRef;
+
+	LOG("enter");
+
+	// Get reference
+	layerRef = lstm->layerList;
+	assert(layerRef != NULL);
+
+	// Set indexTmp to last hidden layer index
+	indexTmp = lstm->config.layers - 2;
+
+	// Save hidden state
+	for(i = 0; i < layerRef[indexTmp].nodeCount; i++)
+	{
+		layerRef[indexTmp].nodeList[i].output = lstmState->hidden[i];
+	}
+
+	// Save cell value
+	for(i = 0; i < indexTmp; i++)
+	{
+		for(j = 0; j < layerRef[i + 1].nodeCount; j++)
+		{
+			layerRef[i + 1].nodeList[j].cell = lstmState->cell[i][j];
+		}
+	}
+
+	LOG("exit");
+}
+
+void lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
+{
+	int i, j;
+	int indexTmp;
+
+	struct LSTM_LAYER* layerRef;
+
+	LOG("enter");
+
+	// Get reference
+	layerRef = lstm->layerList;
+	assert(layerRef != NULL);
+
+	// Set indexTmp to last hidden layer index
+	indexTmp = lstm->config.layers - 2;
+
+	// Save hidden state
+	for(i = 0; i < layerRef[indexTmp].nodeCount; i++)
+	{
+		lstmState->hidden[i] = layerRef[indexTmp].nodeList[i].output;
+	}
+
+	// Save cell value
+	for(i = 0; i < indexTmp; i++)
+	{
+		for(j = 0; j < layerRef[i + 1].nodeCount; j++)
+		{
+			lstmState->cell[i][j] = layerRef[i + 1].nodeList[j].cell;
+		}
+	}
+
+	LOG("exit");
+}
+
 int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg)
 {
 	int i, hLayers;
@@ -23,13 +91,14 @@ int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg)
 	// Allocate vector list
 	assert(lstmCfg->layers >= 3);
 	hLayers = lstmCfg->layers - 2;
-	lstm_alloc(tmpStatePtr->cell, hLayers, double, ret, ERR);
-	lstm_alloc(tmpStatePtr->hidden, hLayers, double, ret, ERR);
+
+	lstm_alloc(tmpStatePtr->cell, hLayers, double*, ret, ERR);
 	for(i = 0; i < hLayers; i++)
 	{
 		lstm_alloc(tmpStatePtr->cell[i], lstmCfg->nodeList[i + 1], double, ret, ERR);
-		lstm_alloc(tmpStatePtr->hidden[i], lstmCfg->nodeList[i + 1], double, ret, ERR);
 	}
+
+	lstm_alloc(tmpStatePtr->hidden, lstmCfg->nodeList[hLayers], double, ret, ERR);
 
 	// Assign value
 	*lstmStatePtr = tmpStatePtr;
@@ -62,14 +131,7 @@ void lstm_state_struct_delete(struct LSTM_STATE_STRUCT* statePtr)
 		lstm_free(statePtr->cell);
 	}
 
-	if(statePtr->hidden != NULL)
-	{
-		for(i = 0; i < hLayers; i++)
-		{
-			lstm_free(statePtr->hidden[i]);
-		}
-		lstm_free(statePtr->hidden);
-	}
+	lstm_free(statePtr->hidden);
 
 	// Delete config
 	lstm_config_struct_delete(&statePtr->config);
