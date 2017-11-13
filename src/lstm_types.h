@@ -78,6 +78,14 @@ struct LSTM_CONFIG_STRUCT
 	int* nodeList;
 };
 
+struct LSTM_STATE_STRUCT
+{
+	double** cell;		// Cell vector list
+	double* hidden;		// Hidden state vector list
+
+	struct LSTM_CONFIG_STRUCT config;	// Store network configure for verifying.
+};
+
 struct LSTM_STRUCT
 {
 	//int queueLen;
