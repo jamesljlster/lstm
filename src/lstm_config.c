@@ -19,6 +19,38 @@ lstm_config_t lstm_get_config(lstm_t lstm)
 	return &lstm->config;
 }
 
+int lstm_config_arch_compare(lstm_config_t src1, lstm_config_t src2)
+{
+	int i;
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+#define __lstm_cmp(elem) \
+	if(src1->elem != src2->elem) \
+	{ \
+		ret = LSTM_NOT_MATCH; \
+		goto RET; \
+	}
+
+	__lstm_cmp(inputs);
+	__lstm_cmp(outputs);
+	__lstm_cmp(layers);
+
+	__lstm_cmp(inputTFunc);
+	__lstm_cmp(outputTFunc);
+	__lstm_cmp(gateTFunc);
+
+	for(i = 0; i < src1->layers; i++)
+	{
+		__lstm_cmp(nodeList[i]);
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
 int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc)
 {
 	int ret = LSTM_NO_ERROR;

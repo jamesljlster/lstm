@@ -36,7 +36,8 @@ enum LSTM_RETUEN_VALUE
 	LSTM_INVALID_ARG	= -2,	/*!< Invalid argument(s) or setting(s). @since 0.1.0 */
 	LSTM_FILE_OP_FAILED	= -3,	/*!< File operation failed. @since 0.1.0 */
 	LSTM_PARSE_FAILED	= -4,	/*!< Error occurred while parsing file. @since 0.1.0 */
-	LSTM_OUT_OF_RANGE	= -5	/*!< Operation out of range. @since 0.1.0 */
+	LSTM_OUT_OF_RANGE	= -5,	/*!< Operation out of range. @since 0.1.0 */
+	LSTM_NOT_MATCH		= -6	/*!< Comparison not match. @since 0.1.0 */
 };
 
 /**
@@ -110,6 +111,7 @@ extern "C" {
 
 int lstm_config_create(lstm_config_t* lstmCfgPtr);
 int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc);
+int lstm_config_arch_compare(lstm_config_t src1, lstm_config_t src2);
 void lstm_config_delete(lstm_config_t lstmCfg);
 int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs);
 int lstm_config_get_inputs(lstm_config_t lstmCfg);
