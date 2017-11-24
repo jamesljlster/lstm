@@ -6,14 +6,18 @@
 
 #include "debug.h"
 
-void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
+int lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
 {
+	int ret = LSTM_NO_ERROR;
 	int i, j;
 	int indexTmp;
 
 	struct LSTM_LAYER* layerRef;
 
 	LOG("enter");
+
+	// Check config
+	lstm_run(lstm_config_arch_compare(&lstmState->config, &lstm->config), ret, RET);
 
 	// Get reference
 	layerRef = lstm->layerList;
@@ -37,17 +41,23 @@ void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
 		}
 	}
 
+RET:
 	LOG("exit");
+	return ret;
 }
 
-void lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
+int lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
 {
+	int ret = LSTM_NO_ERROR;
 	int i, j;
 	int indexTmp;
 
 	struct LSTM_LAYER* layerRef;
 
 	LOG("enter");
+
+	// Check config
+	lstm_run(lstm_config_arch_compare(&lstmState->config, &lstm->config), ret, RET);
 
 	// Get reference
 	layerRef = lstm->layerList;
@@ -71,7 +81,9 @@ void lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
 		}
 	}
 
+RET:
 	LOG("exit");
+	return ret;
 }
 
 int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg)
