@@ -30,6 +30,9 @@ int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, doubl
 	lstm_alloc(outputStore, outputs * timeStep, double, ret, RET);
 	lstm_alloc(errorStore, outputs * timeStep, double, ret, RET);
 
+	// Set time step
+	lstm_run(lstm_bptt_set_max_timestep(lstm, timeStep), ret, RET);
+
 	// Recurrent training
 	for(i = 0; i < timeStep; i++)
 	{
@@ -43,7 +46,7 @@ int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, doubl
 		}
 
 		// Backpropagation
-		lstm_run(lstm_bptt_sum_gradient(lstm, &errorStore[i * outputs]), ret, RET);
+		lstm_bptt_sum_gradient(lstm, &errorStore[i * outputs]);
 	}
 
 	// Adjust network

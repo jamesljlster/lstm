@@ -48,7 +48,7 @@ int main()
 	printf("Output tfunc index: %d\n", cfg->outputTFunc);
 	printf("Gate tfunc index: %d\n", cfg->gateTFunc);
 	printf("\n");
-	
+
 	for(i = 0; i < cfg->layers; i++)
 	{
 		printf("Nodes of %d layer: %d\n", i, cfg->nodeList[i]);
@@ -115,6 +115,14 @@ int main()
 	lstm->layerList[2].nodeList[0].inputNet.weight[0] = 0.5;
 	lstm->layerList[2].nodeList[0].inputNet.weight[1] = 0.6;
 	lstm->layerList[2].nodeList[0].inputNet.th = 0.9;
+
+	// Set time step
+	iResult = lstm_bptt_set_max_timestep(lstm, TIME_STEP);
+	if(iResult < 0)
+	{
+		printf("lstm_bptt_set_max_timestep() failed with error: %d\n", iResult);
+		return -1;
+	}
 
 	// Sum gradient
 	for(row = 0; row < TIME_STEP; row++)

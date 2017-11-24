@@ -9,21 +9,25 @@
 /**
  *	\~English @defgroup Enum Enumeration
  *	@brief Enumeration of the Library.
+ *	@since 0.1.0
  *
- *@{
+ * @{
  *
  *	\~Chinese-Traditional @defgroup Enum 列舉
  *	@brief 函式庫列舉
+ *	@since 0.1.0
  *
- *@{
+ * @{
  */
 
 /**
  *	\~English
- *		Return value definitions of LSTM library.
+ *	@brief Return value definitions of LSTM library.
+ *	@since 0.1.0
  *
  *	\~Chinese-Traditional
- *		LSTM 函式庫回傳值定義
+ *	@brief LSTM 函式庫回傳值定義
+ *	@since 0.1.0
  */
 enum LSTM_RETUEN_VALUE
 {
@@ -35,7 +39,15 @@ enum LSTM_RETUEN_VALUE
 	LSTM_OUT_OF_RANGE	= -5	/*!< Operation out of range. @since 0.1.0 */
 };
 
-/** Transfer (activation) function index definitions. */
+/**
+ *	\~English
+ *	@brief Transfer (activation) function index definitions.
+ *	@since 0.1.0
+ *
+ *	\~Chinese-Traditional
+ *	@brief 活化函數定義
+ *	@since 0.1.0
+ */
 enum LSTM_TRANSFER_FUNC
 {
 	LSTM_SIGMOID			= 0,	/*!< Sigmoid function. @since 0.1.0 */
@@ -52,19 +64,19 @@ enum LSTM_TRANSFER_FUNC
 };
 
 /**
- *@}
+ * @}
  */
 
 /**
  *	\~English @defgroup Types Data Types
  *	@brief Data Types of the Library.
  *
- *@{
+ * @{
  *
  *	\~Chinese-Traditional @defgroup Types 資料型別
  *	@brief 函式庫資料型別
  *
- *@{
+ * @{
  */
 
 /** Type definition of lstm. @since 0.1.0 */
@@ -73,8 +85,11 @@ typedef struct LSTM_STRUCT* lstm_t;
 /** Type definition of lstm configuration. @since 0.1.0 */
 typedef struct LSTM_CONFIG_STRUCT* lstm_config_t;
 
+/** Type definition of lstm state. @since 0.1.0 */
+typedef struct LSTM_STATE_STRUCT* lstm_state_t;
+
 /**
- *@}
+ * @}
  */
 
 #ifdef __cplusplus
@@ -85,12 +100,12 @@ extern "C" {
  *	\~English @defgroup Config Configuration
  *	@brief Configuration of LSTM networks.
  *
- *@{
+ * @{
  *
  *	\~Chinese-Traditional @defgroup Config 配置
  *	@brief LSTM 網路配置
  *
- *@{
+ * @{
  */
 
 int lstm_config_create(lstm_config_t* lstmCfgPtr);
@@ -121,7 +136,19 @@ int lstm_get_transfer_func_id(const char* tFuncName);
 lstm_config_t lstm_get_config(lstm_t lstm);
 
 /**
- *@}
+ * @}
+ */
+
+/**
+ *	\~English @defgroup LSTM LSTM Functions
+ *	@brief Functions of LSTM networks.
+ *
+ * @{
+ *
+ *	\~Chinese-Traditional @defgroup LSTM LSTM 函式
+ *	@brief LSTM 網路函式
+ *
+ * @{
  */
 
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
@@ -136,12 +163,39 @@ void lstm_zero_network(lstm_t lstm);
 void lstm_forward_computation(lstm_t lstm, double* input, double* output);
 void lstm_forward_computation_erase(lstm_t lstm);
 
-int lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
+int lstm_bptt_set_max_timestep(lstm_t lstm, int timeStep);
+void lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
 void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit);
 void lstm_bptt_erase(lstm_t lstm);
 
 int lstm_training_gradient(lstm_t lstm, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
 int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
+
+/**
+ * @}
+ */
+
+/**
+ *	\~English @defgroup State LSTM State Processing
+ *	@brief Functions for LSTM state processing.
+ *
+ * @{
+ *
+ *	\~Chinese-Traditional @defgroup State LSTM 狀態處理
+ *	@brief LSTM 狀態處理
+ *
+ * @{
+ */
+
+int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg);
+void lstm_state_delete(lstm_state_t lstmState);
+
+void lstm_state_save(lstm_state_t lstmState, lstm_t lstm);
+void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

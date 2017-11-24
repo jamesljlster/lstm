@@ -7,6 +7,8 @@
 
 #include "debug.h"
 
+#define DEFAULT_MAX_TIMESTEP	5
+
 void lstm_zeromem(struct LSTM_STRUCT* lstm)
 {
 	memset(lstm, 0, sizeof(struct LSTM_STRUCT));
@@ -43,6 +45,9 @@ int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg)
 	{
 		goto ERR;
 	}
+
+	// Set default max time step
+	lstm_run(lstm_bptt_set_max_timestep(tmpLstmPtr, DEFAULT_MAX_TIMESTEP), ret, ERR);
 
 	// Assign value
 	*lstmPtr = tmpLstmPtr;
