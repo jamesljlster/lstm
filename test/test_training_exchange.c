@@ -23,7 +23,7 @@
 
 //#define DEBUG
 
-extern double dataset[];
+extern float dataset[];
 
 int main(int argc, char* argv[])
 {
@@ -31,10 +31,10 @@ int main(int argc, char* argv[])
 	int iResult;
 	int iterCount;
 
-	double outputList[OUTPUTS];
-	double err[OUTPUTS];
-	//double iterErr[OUTPUTS];
-	double mse;
+	float outputList[OUTPUTS];
+	float err[OUTPUTS];
+	//float iterErr[OUTPUTS];
+	float mse;
 
 	clock_t timeHold;
 
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Find mse
-		mse /= (double)((DATA_AMOUNT - 1) * OUTPUTS);
+		mse /= (float)((DATA_AMOUNT - 1) * OUTPUTS);
 		if(mse < ERR_TH)
 		{
 			break;
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 
 		/*
 		for(i = 0; i < OUTPUTS; i++)
-			iterErr[i] /= (double)DATA_AMOUNT;
+			iterErr[i] /= (float)DATA_AMOUNT;
 		*/
 
 		/*
@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
 
 	//lstm_print(lstm);
 
-	printf("\nTime cost: %lf secs\n\n", (double)timeHold / (double)CLOCKS_PER_SEC);
+	printf("\nTime cost: %lf secs\n\n", (float)timeHold / (float)CLOCKS_PER_SEC);
 
 	iResult = lstm_export(lstm, "./exchange.lstm");
 	if(iResult != LSTM_NO_ERROR)
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-double dataset[] = {
+float dataset[] = {
 	0.712162162,
 	0.706756757,
 	0.704054054,

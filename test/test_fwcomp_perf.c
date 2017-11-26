@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
 	lstm_t lstm;
 	lstm_config_t cfg;
 
-	double* input = NULL;
-	double* output = NULL;
+	float* input = NULL;
+	float* output = NULL;
 	char* tmpPtr;
 
 	clock_t timeHold;
@@ -79,8 +79,8 @@ int main(int argc, char* argv[])
 	outputs = lstm_config_get_outputs(cfg);
 
 	// Memory allocation
-	input = calloc(inputs, sizeof(double));
-	output = calloc(outputs, sizeof(double));
+	input = calloc(inputs, sizeof(float));
+	output = calloc(outputs, sizeof(float));
 	if(input == NULL || output == NULL)
 	{
 		printf("Memory allocation failed\n");
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 	}
 	printf("\n");
 
-	printf("Time cost of %d iteration forward computation: %lf sec\n", FW_ITER, (double)timeHold / (double)CLOCKS_PER_SEC);
+	printf("Time cost of %d iteration forward computation: %lf sec\n", FW_ITER, (float)timeHold / (float)CLOCKS_PER_SEC);
 
 	lstm_delete(lstm);
 	lstm_config_delete(cfg);

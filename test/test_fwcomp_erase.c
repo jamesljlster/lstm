@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
 	lstm_t lstm;
 	lstm_config_t cfg;
 
-	double* input = NULL;
-	double* output = NULL;
+	float* input = NULL;
+	float* output = NULL;
 
 	// Checking
 	if(argc <= 1)
@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
 	lstm_fprint_net(stdout, lstm, 0);
 
 	// Memory allocation
-	input = calloc(inputs, sizeof(double));
-	output = calloc(outputs, sizeof(double));
+	input = calloc(inputs, sizeof(float));
+	output = calloc(outputs, sizeof(float));
 	if(input == NULL || output == NULL)
 	{
 		printf("Memory allocation failed\n");
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 		for(i = 0; i < inputs; i++)
 		{
 			printf("Assign %d of %d input: ", i + 1, inputs);
-			iResult = scanf(" %lf", &input[i]);
+			iResult = scanf(" %f", &input[i]);
 			if(iResult <= 0)
 			{
 				i--;
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 
 		for(i = 0; i < outputs; i++)
 		{
-			printf("%d of %d output: %lf\n", i + 1, outputs, output[i]);
+			printf("%d of %d output: %f\n", i + 1, outputs, output[i]);
 		}
 		printf("\n");
 	}
