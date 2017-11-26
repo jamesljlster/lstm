@@ -146,7 +146,8 @@ float lstm_bent_identity_derivative(float x)
 
 float lstm_softplus(float x)
 {
-	return log(1.0 + exp(x));
+	//return log(1.0 + exp(x));
+	return log1p(exp(x));
 }
 
 float lstm_softplus_derivative(float x)
