@@ -76,9 +76,9 @@ int lstm_base_alloc(struct LSTM_BASE* basePtr, int netSize, int reNetSize);
 int lstm_network_alloc(struct LSTM_STRUCT* lstm, const struct LSTM_CONFIG_STRUCT* lstmCfg);
 
 // Private init functions
-double lstm_rand(void);
-double lstm_zero(void);
-void lstm_init_network(lstm_t lstm, double (*initMethod)(void));
+float lstm_rand(void);
+float lstm_zero(void);
+void lstm_init_network(lstm_t lstm, float (*initMethod)(void));
 
 #ifdef __cplusplus
 }

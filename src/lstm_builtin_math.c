@@ -6,7 +6,7 @@
 
 #include "debug.h"
 
-double (*lstm_transfer_list[])(double) = {
+float (*lstm_transfer_list[])(float) = {
 	lstm_sigmoid,
 	lstm_modified_sigmoid,
 	lstm_tanh,
@@ -20,7 +20,7 @@ double (*lstm_transfer_list[])(double) = {
 	lstm_relu
 };
 
-double (*lstm_transfer_derivative_list[])(double) = {
+float (*lstm_transfer_derivative_list[])(float) = {
 	lstm_sigmoid_derivative,
 	lstm_modified_sigmoid_derivative,
 	lstm_tanh_derivative,
@@ -70,47 +70,47 @@ RET:
 	return ret;
 }
 
-double lstm_sigmoid(double x)
+float lstm_sigmoid(float x)
 {
 	return 1.0 / (1.0 + exp(-x));
 }
 
-double lstm_sigmoid_derivative(double x)
+float lstm_sigmoid_derivative(float x)
 {
     return lstm_sigmoid(x) * (1.0 - lstm_sigmoid(x));
 }
 
-double lstm_modified_sigmoid(double x)
+float lstm_modified_sigmoid(float x)
 {
 	return 2.0 * lstm_sigmoid(x) - 1.0;
 }
 
-double lstm_modified_sigmoid_derivative(double x)
+float lstm_modified_sigmoid_derivative(float x)
 {
 	return 2.0 * lstm_sigmoid_derivative(x);
 }
 
-double lstm_tanh(double x)
+float lstm_tanh(float x)
 {
     return 2.0 / (1.0 + exp(-2.0 * x)) - 1.0;
 }
 
-double lstm_tanh_derivative(double x)
+float lstm_tanh_derivative(float x)
 {
     return 1.0 - lstm_tanh(x) * lstm_tanh(x);
 }
 
-double lstm_gaussian(double x)
+float lstm_gaussian(float x)
 {
     return exp(-pow(x, 2) * 0.5);
 }
 
-double lstm_gaussian_derivative(double x)
+float lstm_gaussian_derivative(float x)
 {
     return -x * exp(-pow(x, 2) * 0.5);
 }
 
-double lstm_modified_gaussian(double x)
+float lstm_modified_gaussian(float x)
 {
 	if(x == 0)
 	{
@@ -122,7 +122,7 @@ double lstm_modified_gaussian(double x)
 	}
 }
 
-double lstm_modified_gaussian_derivative(double x)
+float lstm_modified_gaussian_derivative(float x)
 {
 	if(x == 0)
 	{
@@ -134,37 +134,37 @@ double lstm_modified_gaussian_derivative(double x)
 	}
 }
 
-double lstm_bent_identity(double x)
+float lstm_bent_identity(float x)
 {
 	return (sqrt(pow(x, 2) + 1.0) - 1) / 2.0 + x;
 }
 
-double lstm_bent_identity_derivative(double x)
+float lstm_bent_identity_derivative(float x)
 {
 	return x / (2.0 * sqrt(pow(x, 2) + 1)) + 1;
 }
 
-double lstm_softplus(double x)
+float lstm_softplus(float x)
 {
 	return log(1.0 + exp(x));
 }
 
-double lstm_softplus_derivative(double x)
+float lstm_softplus_derivative(float x)
 {
 	return 1.0 / (1.0 + exp(-x));
 }
 
-double lstm_softsign(double x)
+float lstm_softsign(float x)
 {
 	return x / (1 + fabs(x));
 }
 
-double lstm_softsign_derivative(double x)
+float lstm_softsign_derivative(float x)
 {
 	return 1.0 / pow(1.0 + fabs(x), 2);
 }
 
-double lstm_sinc(double x)
+float lstm_sinc(float x)
 {
 	if(x == 0.0)
 	{
@@ -176,7 +176,7 @@ double lstm_sinc(double x)
 	}
 }
 
-double lstm_sinc_derivative(double x)
+float lstm_sinc_derivative(float x)
 {
 	if(x == 0.0)
 	{
@@ -188,27 +188,27 @@ double lstm_sinc_derivative(double x)
 	}
 }
 
-double lstm_sinusoid(double x)
+float lstm_sinusoid(float x)
 {
 	return sin(x);
 }
 
-double lstm_sinusoid_derivative(double x)
+float lstm_sinusoid_derivative(float x)
 {
 	return cos(x);
 }
 
-double lstm_identity(double x)
+float lstm_identity(float x)
 {
 	return x;
 }
 
-double lstm_identity_derivative(double x)
+float lstm_identity_derivative(float x)
 {
 	return 1;
 }
 
-double lstm_relu(double x)
+float lstm_relu(float x)
 {
 	if(x < 0.0)
 	{
@@ -220,7 +220,7 @@ double lstm_relu(double x)
 	}
 }
 
-double lstm_relu_derivative(double x)
+float lstm_relu_derivative(float x)
 {
 	if(x < 0.0)
 	{

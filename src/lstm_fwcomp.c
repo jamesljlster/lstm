@@ -36,11 +36,11 @@ void lstm_forward_computation_erase(lstm_t lstm)
 	LOG("exit");
 }
 
-void lstm_forward_computation(lstm_t lstm, double* input, double* output)
+void lstm_forward_computation(lstm_t lstm, float* input, float* output)
 {
 	int i, j, k;
 	int indexTmp;
-	double calcTmp, ig, fg, og;
+	float calcTmp, ig, fg, og;
 
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 	struct LSTM_LAYER* layerRef;

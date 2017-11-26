@@ -95,7 +95,7 @@ RET:
 	return ret;
 }
 
-void lstm_fprint_vector(FILE* fptr, double* vector, int vectorLen, int indent)
+void lstm_fprint_vector(FILE* fptr, float* vector, int vectorLen, int indent)
 {
 	int i;
 

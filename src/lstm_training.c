@@ -7,19 +7,19 @@
 
 #include "debug.h"
 
-int lstm_training_gradient(lstm_t lstm, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit)
+int lstm_training_gradient(lstm_t lstm, float** inputList, float** desireList, float** outputList, float** errList, int timeStep, float gradLimit)
 {
 	return lstm_training_gradient_custom(lstm, lstm->config.lRate, lstm->config.mCoef, inputList, desireList, outputList, errList, timeStep, gradLimit);
 }
 
-int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit)
+int lstm_training_gradient_custom(lstm_t lstm, float lRate, float mCoef, float** inputList, float** desireList, float** outputList, float** errList, int timeStep, float gradLimit)
 {
 	int i, j;
 	int ret = LSTM_NO_ERROR;
 	int outputs;
 
-	double* outputStore = NULL;
-	double* errorStore = NULL;
+	float* outputStore = NULL;
+	float* errorStore = NULL;
 
 	LOG("enter");
 
@@ -27,8 +27,8 @@ int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, doubl
 	outputs = lstm->config.outputs;
 
 	// Memory allocation
-	lstm_alloc(outputStore, outputs * timeStep, double, ret, RET);
-	lstm_alloc(errorStore, outputs * timeStep, double, ret, RET);
+	lstm_alloc(outputStore, outputs * timeStep, float, ret, RET);
+	lstm_alloc(errorStore, outputs * timeStep, float, ret, RET);
 
 	// Set time step
 	lstm_run(lstm_bptt_set_max_timestep(lstm, timeStep), ret, RET);

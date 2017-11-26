@@ -4,46 +4,46 @@
 // LSTM transfer function private definition
 #define LSTM_TFUNC_AMOUNT	11
 
-extern double (*lstm_transfer_list[])(double);
-extern double (*lstm_transfer_derivative_list[])(double);
+extern float (*lstm_transfer_list[])(float);
+extern float (*lstm_transfer_derivative_list[])(float);
 extern char* lstm_transfer_func_name[];
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-double lstm_sigmoid(double x);
-double lstm_sigmoid_derivative(double x);
+float lstm_sigmoid(float x);
+float lstm_sigmoid_derivative(float x);
 
-double lstm_modified_sigmoid(double x);
-double lstm_modified_sigmoid_derivative(double x);
+float lstm_modified_sigmoid(float x);
+float lstm_modified_sigmoid_derivative(float x);
 
-double lstm_tanh(double x);
-double lstm_tanh_derivative(double x);
+float lstm_tanh(float x);
+float lstm_tanh_derivative(float x);
 
-double lstm_gaussian(double x);
-double lstm_gaussian_derivative(double x);
+float lstm_gaussian(float x);
+float lstm_gaussian_derivative(float x);
 
-double lstm_bent_identity(double x);
-double lstm_bent_identity_derivative(double x);
+float lstm_bent_identity(float x);
+float lstm_bent_identity_derivative(float x);
 
-double lstm_softplus(double x);
-double lstm_softplus_derivative(double x);
+float lstm_softplus(float x);
+float lstm_softplus_derivative(float x);
 
-double lstm_softsign(double x);
-double lstm_softsign_derivative(double x);
+float lstm_softsign(float x);
+float lstm_softsign_derivative(float x);
 
-double lstm_sinc(double x);
-double lstm_sinc_derivative(double x);
+float lstm_sinc(float x);
+float lstm_sinc_derivative(float x);
 
-double lstm_sinusoid(double x);
-double lstm_sinusoid_derivative(double x);
+float lstm_sinusoid(float x);
+float lstm_sinusoid_derivative(float x);
 
-double lstm_identity(double x);
-double lstm_identity_derivative(double x);
+float lstm_identity(float x);
+float lstm_identity_derivative(float x);
 
-double lstm_relu(double x);
-double lstm_relu_derivative(double x);
+float lstm_relu(float x);
+float lstm_relu_derivative(float x);
 
 #ifdef __cplusplus
 }

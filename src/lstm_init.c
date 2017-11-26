@@ -10,21 +10,21 @@
 #define NUM_MAX			1
 #define	NUM_MIN			-1
 
-double lstm_rand(void)
+float lstm_rand(void)
 {
 	int randRange;
 
 	randRange = (NUM_MAX - NUM_MIN) * NUM_PRECISION + 1;
 
-	return (double)(rand() % randRange) / (double)(NUM_PRECISION) + (double)NUM_MIN;
+	return (float)(rand() % randRange) / (float)(NUM_PRECISION) + (float)NUM_MIN;
 }
 
-double lstm_zero(void)
+float lstm_zero(void)
 {
 	return 0;
 }
 
-void lstm_init_network(lstm_t lstm, double (*initMethod)(void))
+void lstm_init_network(lstm_t lstm, float (*initMethod)(void))
 {
 	int i, j, k;
 	struct LSTM_LAYER* layerRef;
