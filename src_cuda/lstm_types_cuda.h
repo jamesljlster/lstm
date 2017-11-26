@@ -15,19 +15,19 @@ enum LSTM_CUMAT_LIST
 
 struct LSTM_CUMAT
 {
-	double* weight;
-	double* wGrad;
-	double* wDelta;
+	float* weight;
+	float* wGrad;
+	float* wDelta;
 
-	double* calcBuf;
+	float* calcBuf;
 
-	double* calc;
-	double* out;
-	double* grad;
-	double* gradHold;
+	float* calc;
+	float* out;
+	float* grad;
+	float* gradHold;
 
-	double* outQue;
-	double* calcQue;
+	float* outQue;
+	float* calcQue;
 };
 
 struct LSTM_CULAYER
@@ -39,13 +39,13 @@ struct LSTM_CULAYER
 	int nodeCount;
 	int vecLen;
 
-	double* output;
-	double* cell;
+	float* output;
+	float* cell;
 
-	double* grad;
+	float* grad;
 
-	double* outputQue;
-	double* cellQue;
+	float* outputQue;
+	float* cellQue;
 
 	struct LSTM_CUMAT baseMat;
 };

@@ -99,7 +99,6 @@ RET:
 
 int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int nodeType, int netSize, int reNetSize)
 {
-	int i;
 	int matDim, vecLen;
 	int ret = LSTM_NO_ERROR;
 	struct LSTM_CULAYER tmpLayer;
@@ -140,22 +139,22 @@ int lstm_layer_alloc_cuda(struct LSTM_CULAYER* cuLayerPtr, int nodeCount, int no
 	// Allocate device memory for network base
 	if(vecLen > 1)
 	{
-		lstm_alloc_cuda(tmpLayer.baseMat.weight, matDim * nodeCount * vecLen, double, ret, ERR);
-		lstm_alloc_cuda(tmpLayer.baseMat.wGrad, matDim * nodeCount * vecLen, double, ret, ERR);
-		lstm_alloc_cuda(tmpLayer.baseMat.wDelta, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.weight, matDim * nodeCount * vecLen, float, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.wGrad, matDim * nodeCount * vecLen, float, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.wDelta, matDim * nodeCount * vecLen, float, ret, ERR);
 
-		lstm_alloc_cuda(tmpLayer.baseMat.calcBuf, matDim * nodeCount * vecLen, double, ret, ERR);
+		lstm_alloc_cuda(tmpLayer.baseMat.calcBuf, matDim * nodeCount * vecLen, float, ret, ERR);
 	}
 
-	lstm_alloc_cuda(tmpLayer.baseMat.calc, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.baseMat.out, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.baseMat.grad, matDim * nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.baseMat.gradHold, matDim * nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.calc, matDim * nodeCount, float, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.out, matDim * nodeCount, float, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.grad, matDim * nodeCount, float, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.baseMat.gradHold, matDim * nodeCount, float, ret, ERR);
 
 	// Allocate device memory for lstm block
-	lstm_alloc_cuda(tmpLayer.output, nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.cell, nodeCount, double, ret, ERR);
-	lstm_alloc_cuda(tmpLayer.grad, nodeCount, double, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.output, nodeCount, float, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.cell, nodeCount, float, ret, ERR);
+	lstm_alloc_cuda(tmpLayer.grad, nodeCount, float, ret, ERR);
 
 	// Set value
 	tmpLayer.vecLen = vecLen;

@@ -22,26 +22,26 @@ void lstm_forward_computation_erase_cuda(lstm_cuda_t lstmCuda)
 	indexTmp = lstmCuda->config.layers - 2;
 
 	// Clear hidden layer outputs
-	cudaMemset(layerRef[indexTmp].output, 0, layerRef[indexTmp].nodeCount * sizeof(double));
+	cudaMemset(layerRef[indexTmp].output, 0, layerRef[indexTmp].nodeCount * sizeof(float));
 
 	// Clear cell value
 	for(i = 1; i <= indexTmp; i++)
 	{
-		cudaMemset(layerRef[i].cell, 0, layerRef[i].nodeCount * sizeof(double));
+		cudaMemset(layerRef[i].cell, 0, layerRef[i].nodeCount * sizeof(float));
 	}
 
 	LOG("exit");
 }
 
 // lstm_matmul<<<LSTM_CUMAT_AMOUNT * layerRef[i].nodeCount, layerRef[i].vecLen - 1>>>
-__global__ void lstm_matmul(double* calcBuf, double* input, double* weight, int vecLen)
+__global__ void lstm_matmul(float* calcBuf, float* input, float* weight, int vecLen)
 {
 	calcBuf[blockIdx.x * vecLen + threadIdx.x] =
 		weight[blockIdx.x * vecLen + threadIdx.x] * input[threadIdx.x];
 }
 
 // lstm_base_calc<<<LSTM_CUMAT_AMOUNT, layerRef[i].nodeCount>>>
-__global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, double* weight, int vecLen, int inputTFunc, int gateTFunc)
+__global__ void lstm_base_calc(float* calc, float* out, float* calcBuf, float* weight, int vecLen, int inputTFunc, int gateTFunc)
 {
 	int i;
 	int tFuncIndex;
@@ -66,9 +66,9 @@ __global__ void lstm_base_calc(double* calc, double* out, double* calcBuf, doubl
 }
 
 // lstm_cell_calc<<<1, layerRef[i].nodeCount>>>
-__global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, int outputTFunc)
+__global__ void lstm_cell_calc(float* output, float* cell, float* baseOut, int outputTFunc)
 {
-	double calcTmp;
+	float calcTmp;
 
 	// Find cell value
 	cell[threadIdx.x] = baseOut[LSTM_CUMAT_FG * blockDim.x + threadIdx.x] * cell[threadIdx.x] +
@@ -80,7 +80,7 @@ __global__ void lstm_cell_calc(double* output, double* cell, double* baseOut, in
 	output[threadIdx.x] = baseOut[LSTM_CUMAT_OG * blockDim.x + threadIdx.x] * calcTmp;
 }
 
-void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* output)
+void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, float* input, float* output)
 {
 	int i;
 	int indexTmp;
@@ -96,13 +96,13 @@ void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* 
 
 	// Copy inputs
 	cudaMemcpy(layerRef[0].output, input,
-			cfgRef->inputs * sizeof(double),
+			cfgRef->inputs * sizeof(float),
 			cudaMemcpyHostToDevice);
 
 	// Copy recurrent output
 	indexTmp = cfgRef->layers - 2;
 	cudaMemcpy(&layerRef[0].output[cfgRef->inputs], layerRef[indexTmp].output,
-			layerRef[indexTmp].nodeCount * sizeof(double),
+			layerRef[indexTmp].nodeCount * sizeof(float),
 			cudaMemcpyDeviceToDevice);
 
 	DUMP("layerRef[0].output: ", layerRef[0].output, layerRef[0].nodeCount);
@@ -158,7 +158,7 @@ void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* 
 	// Get output
 	if(output != NULL)
 	{
-		cudaMemcpy(output, layerRef[i].baseMat.out, cfgRef->outputs * sizeof(double), cudaMemcpyDeviceToHost);
+		cudaMemcpy(output, layerRef[i].baseMat.out, cfgRef->outputs * sizeof(float), cudaMemcpyDeviceToHost);
 	}
 	else
 	{
