@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
 	lstm_t lstm;
 	lstm_config_t cfg;
 
-	double* input = NULL;
-	double* output = NULL;
+	float* input = NULL;
+	float* output = NULL;
 
 	// Checking
 	if(argc <= 1)

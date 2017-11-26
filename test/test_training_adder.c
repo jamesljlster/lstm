@@ -26,7 +26,7 @@
 #define USING_MANUAL_TRAINING
 //#define DEBUG
 
-double* adder_dataprep(int rows, int cols);
+float* adder_dataprep(int rows, int cols);
 
 int main(int argc, char* argv[])
 {
@@ -36,19 +36,19 @@ int main(int argc, char* argv[])
 	int iResult;
 	int iterCount;
 
-	double lRate, mCoef;
-	double mse;
+	float lRate, mCoef;
+	float mse;
 
-	double* inputList[DATA_COLS];
-	double* desireList[DATA_COLS];
-	double* errList[DATA_COLS];
+	float* inputList[DATA_COLS];
+	float* desireList[DATA_COLS];
+	float* errList[DATA_COLS];
 #ifdef USING_MANUAL_TRAINING
-	double* outList[DATA_COLS];
+	float* outList[DATA_COLS];
 #endif
 
 	clock_t timeHold;
 
-	double* dataset;
+	float* dataset;
 	int dataRows, dataCols;
 
 	lstm_t lstm = NULL;
@@ -136,21 +136,21 @@ int main(int argc, char* argv[])
 	// Memory allocation
 	for(i = 0; i < DATA_COLS; i++)
 	{
-		inputList[i] = calloc(INPUTS, sizeof(double));
+		inputList[i] = calloc(INPUTS, sizeof(float));
 		if(inputList[i] == NULL)
 		{
 			printf("Memory allocation failed!\n");
 			return -1;
 		}
 
-		desireList[i] = calloc(OUTPUTS, sizeof(double));
+		desireList[i] = calloc(OUTPUTS, sizeof(float));
 		if(desireList[i] == NULL)
 		{
 			printf("Memory allocation failed!\n");
 			return -1;
 		}
 
-		errList[i] = calloc(OUTPUTS, sizeof(double));
+		errList[i] = calloc(OUTPUTS, sizeof(float));
 		if(errList[i] == NULL)
 		{
 			printf("Memory allocaton failed!\n");
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 		}
 
 #ifdef USING_MANUAL_TRAINING
-		outList[i] = calloc(OUTPUTS, sizeof(double));
+		outList[i] = calloc(OUTPUTS, sizeof(float));
 		if(outList[i] == NULL)
 		{
 			printf("Memory allocation failed!\n");
@@ -265,7 +265,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		mse /= (double)(DATA_COLS) * (double)(dataCounter) * (double)OUTPUTS;
+		mse /= (float)(DATA_COLS) * (float)(dataCounter) * (float)OUTPUTS;
 		printf("Iter. %5d mse: %lf\n", iterCount, mse);
 
 		if(mse <= STOP_MSE)
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
 
 	timeHold = clock() - timeHold;
 
-	printf("\nTime cost: %lf secs\n\n", (double)timeHold / (double)CLOCKS_PER_SEC);
+	printf("\nTime cost: %lf secs\n\n", (float)timeHold / (float)CLOCKS_PER_SEC);
 
 	iResult = lstm_export(lstm, "./test.lstm");
 	if(iResult != LSTM_NO_ERROR)
@@ -292,14 +292,14 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-double* adder_dataprep(int rows, int cols)
+float* adder_dataprep(int rows, int cols)
 {
 	int i, j;
 
-	double* tmpPtr = NULL;
+	float* tmpPtr = NULL;
 
 	// Memory allocation
-	tmpPtr = calloc(rows * cols, sizeof(double));
+	tmpPtr = calloc(rows * cols, sizeof(float));
 	if(tmpPtr == NULL)
 	{
 		goto RET;

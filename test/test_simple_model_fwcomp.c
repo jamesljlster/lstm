@@ -16,8 +16,8 @@ int main()
 	lstm_t lstm;
 	lstm_config_t cfg;
 
-	double input[INPUTS];
-	double output[OUTPUTS];
+	float input[INPUTS];
+	float output[OUTPUTS];
 
 	// Create config
 	iResult = lstm_config_create(&cfg);
@@ -116,7 +116,7 @@ int main()
 		for(i = 0; i < INPUTS; i++)
 		{
 			printf("Assign %d of %d input: ", i + 1, INPUTS);
-			iResult = scanf(" %lf", &input[i]);
+			iResult = scanf(" %f", &input[i]);
 			if(iResult <= 0)
 			{
 				i--;
@@ -134,30 +134,30 @@ int main()
 			{
 				printf("Hidden node %d:\n", j);
 				printf("    [Input net]\n");
-				printf("        calc: %lf\n", lstm->layerList[i + 1].nodeList[j].inputNet.calc);
-				printf("        out:  %lf\n", lstm->layerList[i + 1].nodeList[j].inputNet.out);
+				printf("        calc: %f\n", lstm->layerList[i + 1].nodeList[j].inputNet.calc);
+				printf("        out:  %f\n", lstm->layerList[i + 1].nodeList[j].inputNet.out);
 				printf("\n");
 				printf("    [Input gate]\n");
-				printf("        calc: %lf\n", lstm->layerList[i + 1].nodeList[j].igNet.calc);
-				printf("        out:  %lf\n", lstm->layerList[i + 1].nodeList[j].igNet.out);
+				printf("        calc: %f\n", lstm->layerList[i + 1].nodeList[j].igNet.calc);
+				printf("        out:  %f\n", lstm->layerList[i + 1].nodeList[j].igNet.out);
 				printf("\n");
 				printf("    [Forget gate]\n");
-				printf("        calc: %lf\n", lstm->layerList[i + 1].nodeList[j].fgNet.calc);
-				printf("        out:  %lf\n", lstm->layerList[i + 1].nodeList[j].fgNet.out);
+				printf("        calc: %f\n", lstm->layerList[i + 1].nodeList[j].fgNet.calc);
+				printf("        out:  %f\n", lstm->layerList[i + 1].nodeList[j].fgNet.out);
 				printf("\n");
 				printf("    [Output gate]\n");
-				printf("        calc: %lf\n", lstm->layerList[i + 1].nodeList[j].ogNet.calc);
-				printf("        out:  %lf\n", lstm->layerList[i + 1].nodeList[j].ogNet.out);
+				printf("        calc: %f\n", lstm->layerList[i + 1].nodeList[j].ogNet.calc);
+				printf("        out:  %f\n", lstm->layerList[i + 1].nodeList[j].ogNet.out);
 				printf("\n");
-				printf("    cell:   %lf\n", lstm->layerList[i + 1].nodeList[j].cell);
-				printf("    output: %lf\n", lstm->layerList[i + 1].nodeList[j].output);
+				printf("    cell:   %f\n", lstm->layerList[i + 1].nodeList[j].cell);
+				printf("    output: %f\n", lstm->layerList[i + 1].nodeList[j].output);
 				printf("\n");
 			}
 		}
 
 		for(i = 0; i < OUTPUTS; i++)
 		{
-			printf("%d of %d output: %lf\n", i + 1, OUTPUTS, output[i]);
+			printf("%d of %d output: %f\n", i + 1, OUTPUTS, output[i]);
 		}
 		printf("\n");
 	}

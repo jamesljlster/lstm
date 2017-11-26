@@ -347,22 +347,22 @@ int lstm_config_get_output_transfer_func(lstm_config_t lstmCfg)
 	return lstmCfg->outputTFunc;
 }
 
-void lstm_config_set_learning_rate(lstm_config_t lstmCfg, double lRate)
+void lstm_config_set_learning_rate(lstm_config_t lstmCfg, float lRate)
 {
 	lstmCfg->lRate = lRate;
 }
 
-double lstm_config_get_learning_rate(lstm_config_t lstmCfg)
+float lstm_config_get_learning_rate(lstm_config_t lstmCfg)
 {
 	return lstmCfg->lRate;
 }
 
-void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef)
+void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, float mCoef)
 {
 	lstmCfg->mCoef = mCoef;
 }
 
-double lstm_config_get_momentum_coef(lstm_config_t lstmCfg)
+float lstm_config_get_momentum_coef(lstm_config_t lstmCfg)
 {
 	return lstmCfg->mCoef;
 }

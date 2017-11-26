@@ -3,28 +3,28 @@
 
 struct LSTM_BUF
 {
-	double* list;
+	float* list;
 	int listLen;
 };
 
 struct LSTM_BASE
 {
-	double* weight;		// Weight connection
-	double* wGrad;		// Gradient summation of weight
-	double* wDelta;		// Momentum of weight
+	float* weight;		// Weight connection
+	float* wGrad;		// Gradient summation of weight
+	float* wDelta;		// Momentum of weight
 
-	double* rWeight;	// Recurrent weight connection
-	double* rGrad;		// Gradient summation of recurrent weight
-	double* rDelta;		// Momentum of recurrent weight
+	float* rWeight;	// Recurrent weight connection
+	float* rGrad;		// Gradient summation of recurrent weight
+	float* rDelta;		// Momentum of recurrent weight
 
-	double th;			// Threshold of the node
-	double thGrad;		// Gradient summation of threshold
-	double thDelta;		// Momentum of threshold
+	float th;			// Threshold of the node
+	float thGrad;		// Gradient summation of threshold
+	float thDelta;		// Momentum of threshold
 
-	double calc;		// Calcalution temp: value before activation function
-	double out;			// Network output value
-	double grad;		// Gradient value
-	double gradHold;	// Gradient value backup
+	float calc;		// Calcalution temp: value before activation function
+	float out;			// Network output value
+	float grad;		// Gradient value
+	float gradHold;	// Gradient value backup
 
 	struct LSTM_BUF outQue;		// out queue
 	struct LSTM_BUF calcQue;	// calc queue
@@ -37,26 +37,26 @@ struct LSTM_NODE
 	struct LSTM_BASE igNet;		// Input gate network
 	struct LSTM_BASE inputNet;	// Input network
 
-	double output;				// Output of node
-	double cell;				// Cell value of node
+	float output;				// Output of node
+	float cell;				// Cell value of node
 
 	struct LSTM_BUF outputQue;	// Output queue
 	struct LSTM_BUF cellQue;	// Cell value queue
 
-	double grad;	// Node gradient, for bp calculation
-	double rHold;	// For recurrent forward computation
+	float grad;	// Node gradient, for bp calculation
+	float rHold;	// For recurrent forward computation
 };
 
 struct LSTM_LAYER
 {
-	double (*inputTFunc)(double);	// Input transfer function
-	double (*inputDTFunc)(double);	// Input derivative transfer function
+	float (*inputTFunc)(float);	// Input transfer function
+	float (*inputDTFunc)(float);	// Input derivative transfer function
 
-	double (*outputTFunc)(double);	// Output transfer function
-	double (*outputDTFunc)(double);	// Output derivative transfer function
+	float (*outputTFunc)(float);	// Output transfer function
+	float (*outputDTFunc)(float);	// Output derivative transfer function
 
-	double (*gateTFunc)(double);	// Gate transfer function
-	double (*gateDTFunc)(double);	// Gate derivative transfer function
+	float (*gateTFunc)(float);	// Gate transfer function
+	float (*gateDTFunc)(float);	// Gate derivative transfer function
 
 	struct LSTM_NODE* nodeList;
 	int nodeCount;
@@ -72,16 +72,16 @@ struct LSTM_CONFIG_STRUCT
 	int outputTFunc;
 	int gateTFunc;
 
-	double lRate;
-	double mCoef;
+	float lRate;
+	float mCoef;
 
 	int* nodeList;
 };
 
 struct LSTM_STATE_STRUCT
 {
-	double** cell;		// Cell vector list
-	double* hidden;		// Hidden state vector list
+	float** cell;		// Cell vector list
+	float* hidden;		// Hidden state vector list
 
 	struct LSTM_CONFIG_STRUCT config;	// Store network configure for verifying.
 };

@@ -9,7 +9,7 @@ typedef struct LSTM_CUDA* lstm_cuda_t;
 extern "C" {
 #endif
 
-void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, double* input, double* output);
+void lstm_forward_computation_cuda(lstm_cuda_t lstmCuda, float* input, float* output);
 void lstm_forward_computation_erase_cuda(lstm_cuda_t lstmCuda);
 
 int lstm_clone_to_cuda(lstm_cuda_t* lstmCudaPtr, lstm_t lstm);

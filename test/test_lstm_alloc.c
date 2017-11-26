@@ -13,10 +13,10 @@ int main()
 	unsigned int smallSize = 100;
 
 	// Test allocate
-	lstm_alloc(ptr, smallSize, double, ret, ERR);
+	lstm_alloc(ptr, smallSize, float, ret, ERR);
 	printf("Memory allocated\n");
 
-	lstm_alloc(ptr, bigSize, double, ret, ERR);
+	lstm_alloc(ptr, bigSize, float, ret, ERR);
 	printf("Memory allocated\n");
 
 	goto RET;

@@ -15,7 +15,7 @@ void lstm_fprint_net(FILE* fptr, struct LSTM_STRUCT* lstm, int indent);
 void lstm_fprint_layer(FILE* fptr, struct LSTM_STRUCT* lstm, int layerIndex, int indent);
 void lstm_fprint_node(FILE* fptr, struct LSTM_STRUCT* lstm, int layerIndex, int nodeIndex, int indent);
 void lstm_fprint_base(FILE* fptr, struct LSTM_BASE* basePtr, int netLen, int reNetSize, int indent);
-void lstm_fprint_vector(FILE* fptr, double* vector, int vectorLen, int indent);
+void lstm_fprint_vector(FILE* fptr, float* vector, int vectorLen, int indent);
 
 #ifdef __cplusplus
 }

@@ -117,14 +117,14 @@ RET:
 	return ret;
 }
 
-int lstm_parse_net_vector_xml(double* vector, int vectorLen, struct LSTM_XML_ELEM* elemPtr)
+int lstm_parse_net_vector_xml(float* vector, int vectorLen, struct LSTM_XML_ELEM* elemPtr)
 {
 	int i, j;
 	int strId;
 	int ret = LSTM_NO_ERROR;
 
 	int index;
-	double value;
+	float value;
 	char* tmpPtr;
 
 	int childElemLen;
@@ -624,7 +624,7 @@ int lstm_parse_config_xml(struct LSTM_CONFIG_STRUCT* lstmCfg, struct LSTM_XML_EL
 	int strId;
 	int ret = LSTM_NO_ERROR;
 
-	double tmpdVal;
+	float tmpdVal;
 	int tmpVal;
 	char* tmpPtr;
 

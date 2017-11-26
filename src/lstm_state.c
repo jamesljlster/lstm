@@ -104,13 +104,13 @@ int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg)
 	assert(lstmCfg->layers >= 3);
 	hLayers = lstmCfg->layers - 2;
 
-	lstm_alloc(tmpStatePtr->cell, hLayers, double*, ret, ERR);
+	lstm_alloc(tmpStatePtr->cell, hLayers, float*, ret, ERR);
 	for(i = 0; i < hLayers; i++)
 	{
-		lstm_alloc(tmpStatePtr->cell[i], lstmCfg->nodeList[i + 1], double, ret, ERR);
+		lstm_alloc(tmpStatePtr->cell[i], lstmCfg->nodeList[i + 1], float, ret, ERR);
 	}
 
-	lstm_alloc(tmpStatePtr->hidden, lstmCfg->nodeList[hLayers], double, ret, ERR);
+	lstm_alloc(tmpStatePtr->hidden, lstmCfg->nodeList[hLayers], float, ret, ERR);
 
 	// Assign value
 	*lstmStatePtr = tmpStatePtr;

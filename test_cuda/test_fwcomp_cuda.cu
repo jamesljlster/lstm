@@ -18,8 +18,8 @@ int main(int argc, char* argv[])
 	lstm_cuda_t lstmCuda;
 	lstm_config_t cfg;
 
-	double* input = NULL;
-	double* output = NULL;
+	float* input = NULL;
+	float* output = NULL;
 
 	// Checking
 	if(argc <= 1)
@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
 	lstm_fprint_net(stdout, lstm, 0);
 
 	// Memory allocation
-	input = (double*)calloc(inputs, sizeof(double));
-	output = (double*)calloc(outputs, sizeof(double));
+	input = (float*)calloc(inputs, sizeof(float));
+	output = (float*)calloc(outputs, sizeof(float));
 	if(input == NULL || output == NULL)
 	{
 		printf("Memory allocation failed\n");
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 			printf("%d of %d output: %lf\n", i + 1, outputs, output[i]);
 		}
 
-		memset(output, 0, outputs * sizeof(double));
+		memset(output, 0, outputs * sizeof(float));
 
 		lstm_forward_computation_cuda(lstmCuda, input, output);
 		for(i = 0; i < outputs; i++)

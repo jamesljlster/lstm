@@ -8,7 +8,7 @@
 #define __lstm_buf_realloc(buf, len, ret, errLabel) \
 	if(buf.listLen < len) \
 	{ \
-		tmpPtr = realloc(buf.list, len * sizeof(double)); \
+		tmpPtr = realloc(buf.list, len * sizeof(float)); \
 		if(tmpPtr == NULL) \
 		{ \
 			ret = LSTM_MEM_FAILED; \
@@ -29,7 +29,7 @@ int lstm_bptt_set_max_timestep(lstm_t lstm, int timeStep)
 	struct LSTM_LAYER* layerRef;
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 
-	double* tmpPtr;
+	float* tmpPtr;
 
 	// Checking argument
 	if(timeStep <= 0)
@@ -71,11 +71,11 @@ RET:
 	return ret;
 }
 
-void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
+void lstm_bptt_sum_gradient(lstm_t lstm, float* dError)
 {
 	int i, j, k, re;
 	int indexTmp;
-	double calcTmp;
+	float calcTmp;
 
 	struct LSTM_LAYER* layerRef;
 	struct LSTM_CONFIG_STRUCT* cfgRef;
@@ -368,7 +368,7 @@ void lstm_bptt_sum_gradient(lstm_t lstm, double* dError)
 	LOG("exit");
 }
 
-void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit)
+void lstm_bptt_adjust_network(lstm_t lstm, float lRate, float mCoef, float gradLimit)
 {
 	int i, j, k;
 	int indexTmp;
@@ -376,7 +376,7 @@ void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gr
 	struct LSTM_LAYER* layerRef;
 	struct LSTM_CONFIG_STRUCT* cfgRef;
 
-	double calcTmp;
+	float calcTmp;
 
 	LOG("enter");
 

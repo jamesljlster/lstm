@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 #define __lstm_clone_validation(base) \
 	iResult = memcmp(srcLayerRef[i].nodeList[j].base.weight, \
 			cmpLayerRef[i].nodeList[j].base.weight, \
-			srcLayerRef[i - 1].nodeCount * sizeof(double)); \
+			srcLayerRef[i - 1].nodeCount * sizeof(float)); \
 	if(iResult != 0) \
 	{ \
 		printf("Clone validation failed!\n"); \
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 	{ \
 		iResult = memcmp(srcLayerRef[i].nodeList[j].base.rWeight, \
 				cmpLayerRef[i].nodeList[j].base.rWeight, \
-				srcLayerRef[cfgRef->layers - 2].nodeCount * sizeof(double)); \
+				srcLayerRef[cfgRef->layers - 2].nodeCount * sizeof(float)); \
 		if(iResult != 0) \
 		{ \
 			printf("Clone validation failed!\n"); \

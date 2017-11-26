@@ -11,7 +11,7 @@
 #define TIME_STEP 2
 #define DATA_COLS 3
 
-extern double dataset[];
+extern float dataset[];
 
 int main()
 {
@@ -21,9 +21,9 @@ int main()
 	lstm_t lstm;
 	lstm_config_t cfg;
 
-	double input[INPUTS];
-	double output[OUTPUTS];
-	double err[OUTPUTS];
+	float input[INPUTS];
+	float output[OUTPUTS];
+	float err[OUTPUTS];
 
 	// Create config
 	iResult = lstm_config_create(&cfg);
@@ -300,7 +300,7 @@ int main()
 	return 0;
 }
 
-double dataset[] = {
+float dataset[] = {
 	0.4, 0.3, 0.5,
 	1.0, 0.1, 0.6,
 	0.2, 0.6, 0.4
