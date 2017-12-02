@@ -154,6 +154,7 @@ lstm_config_t lstm_get_config(lstm_t lstm);
  */
 
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
+int lstm_clone(lstm_t* lstmPtr, lstm_t lstmSrc);
 void lstm_delete(lstm_t lstm);
 
 int lstm_import(lstm_t* lstmPtr, const char* filePath);
