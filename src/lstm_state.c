@@ -6,6 +6,30 @@
 
 #include "debug.h"
 
+void lstm_state_erase(lstm_state_t lstmState)
+{
+	int i, hLayers;
+	lstm_config_t lstmCfg;
+
+	LOG("enter");
+
+	// Get config
+	lstmCfg = &lstmState->config;
+
+	// Get hidden layers
+	hLayers = lstmCfg->layers - 2;
+
+	// Zero state
+	for(i = 0; i < hLayers; i++)
+	{
+		memset(lstmState->cell[i], 0, lstmCfg->nodeList[i + 1] * sizeof(float));
+	}
+
+	memset(lstmState->hidden, 0, lstmCfg->nodeList[hLayers] * sizeof(float));
+
+	LOG("exit");
+}
+
 int lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
 {
 	int ret = LSTM_NO_ERROR;

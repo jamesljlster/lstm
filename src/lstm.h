@@ -192,6 +192,7 @@ int lstm_training_gradient_custom(lstm_t lstm, float lRate, float mCoef, float**
 
 int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg);
 void lstm_state_delete(lstm_state_t lstmState);
+void lstm_state_erase(lstm_state_t lstmState);
 
 int lstm_state_save(lstm_state_t lstmState, lstm_t lstm);
 int lstm_state_restore(lstm_state_t lstmState, lstm_t lstm);
