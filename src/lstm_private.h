@@ -26,7 +26,7 @@ enum LSTM_NODE_TYPE
 	ptr = calloc(len, sizeof(type)); \
 	if(ptr == NULL) \
 	{ \
-		ret = LSTM_MEM_FAILED; \
+		retVar = LSTM_MEM_FAILED; \
 		goto errLabel; \
 	}
 
