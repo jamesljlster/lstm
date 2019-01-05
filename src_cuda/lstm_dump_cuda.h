@@ -7,14 +7,14 @@
 #include <cuda_runtime.h>
 #define DUMP(msg, ptr, len) \
 { \
-	double* dumpTmp = (double*)calloc(len, sizeof(double)); \
+	float* dumpTmp = (float*)calloc(len, sizeof(float)); \
 	if(dumpTmp == NULL) \
 	{ \
 		fprintf(stderr, "%s(): Memory allocation failed while trying to dump %s with length %d\n", __FUNCTION__, #ptr, len); \
 	} \
 	else \
 	{ \
-		cudaError_t cuErr = cudaMemcpy(dumpTmp, ptr, len * sizeof(double), cudaMemcpyDeviceToHost); \
+		cudaError_t cuErr = cudaMemcpy(dumpTmp, ptr, len * sizeof(float), cudaMemcpyDeviceToHost); \
 		if(cuErr != cudaSuccess) \
 		{ \
 			fprintf(stderr, "%s(): cudaMemcpy() failed while trying to dump %s with length %d\n", __FUNCTION__, #ptr, len); \

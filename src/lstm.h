@@ -36,7 +36,8 @@ enum LSTM_RETUEN_VALUE
 	LSTM_INVALID_ARG	= -2,	/*!< Invalid argument(s) or setting(s). @since 0.1.0 */
 	LSTM_FILE_OP_FAILED	= -3,	/*!< File operation failed. @since 0.1.0 */
 	LSTM_PARSE_FAILED	= -4,	/*!< Error occurred while parsing file. @since 0.1.0 */
-	LSTM_OUT_OF_RANGE	= -5	/*!< Operation out of range. @since 0.1.0 */
+	LSTM_OUT_OF_RANGE	= -5,	/*!< Operation out of range. @since 0.1.0 */
+	LSTM_NOT_MATCH		= -6	/*!< Comparison not match. @since 0.1.0 */
 };
 
 /**
@@ -110,6 +111,7 @@ extern "C" {
 
 int lstm_config_create(lstm_config_t* lstmCfgPtr);
 int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc);
+int lstm_config_arch_compare(lstm_config_t src1, lstm_config_t src2);
 void lstm_config_delete(lstm_config_t lstmCfg);
 int lstm_config_set_inputs(lstm_config_t lstmCfg, int inputs);
 int lstm_config_get_inputs(lstm_config_t lstmCfg);
@@ -123,10 +125,10 @@ int lstm_config_set_input_transfer_func(lstm_config_t lstmCfg, int tFuncID);
 int lstm_config_get_input_transfer_func(lstm_config_t lstmCfg);
 int lstm_config_set_output_transfer_func(lstm_config_t lstmCfg, int tFuncID);
 int lstm_config_get_output_transfer_func(lstm_config_t lstmCfg);
-void lstm_config_set_learning_rate(lstm_config_t lstmCfg, double lRate);
-double lstm_config_get_learning_rate(lstm_config_t lstmCfg);
-void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef);
-double lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
+void lstm_config_set_learning_rate(lstm_config_t lstmCfg, float lRate);
+float lstm_config_get_learning_rate(lstm_config_t lstmCfg);
+void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, float mCoef);
+float lstm_config_get_momentum_coef(lstm_config_t lstmCfg);
 
 int lstm_config_import(lstm_config_t* lstmCfgPtr, const char* filePath);
 int lstm_config_export(lstm_config_t lstmCfg, const char* filePath);
@@ -152,6 +154,7 @@ lstm_config_t lstm_get_config(lstm_t lstm);
  */
 
 int lstm_create(lstm_t* lstmPtr, lstm_config_t lstmCfg);
+int lstm_clone(lstm_t* lstmPtr, lstm_t lstmSrc);
 void lstm_delete(lstm_t lstm);
 
 int lstm_import(lstm_t* lstmPtr, const char* filePath);
@@ -160,16 +163,16 @@ int lstm_export(lstm_t lstm, const char* filePath);
 void lstm_rand_network(lstm_t lstm);
 void lstm_zero_network(lstm_t lstm);
 
-void lstm_forward_computation(lstm_t lstm, double* input, double* output);
+void lstm_forward_computation(lstm_t lstm, float* input, float* output);
 void lstm_forward_computation_erase(lstm_t lstm);
 
 int lstm_bptt_set_max_timestep(lstm_t lstm, int timeStep);
-void lstm_bptt_sum_gradient(lstm_t lstm, double* dError);
-void lstm_bptt_adjust_network(lstm_t lstm, double lRate, double mCoef, double gradLimit);
+void lstm_bptt_sum_gradient(lstm_t lstm, float* dError);
+void lstm_bptt_adjust_network(lstm_t lstm, float lRate, float mCoef, float gradLimit);
 void lstm_bptt_erase(lstm_t lstm);
 
-int lstm_training_gradient(lstm_t lstm, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
-int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, double** inputList, double** desireList, double** outputList, double** errList, int timeStep, double gradLimit);
+int lstm_training_gradient(lstm_t lstm, float** inputList, float** desireList, float** outputList, float** errList, int timeStep, float gradLimit);
+int lstm_training_gradient_custom(lstm_t lstm, float lRate, float mCoef, float** inputList, float** desireList, float** outputList, float** errList, int timeStep, float gradLimit);
 
 /**
  * @}
@@ -189,9 +192,10 @@ int lstm_training_gradient_custom(lstm_t lstm, double lRate, double mCoef, doubl
 
 int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg);
 void lstm_state_delete(lstm_state_t lstmState);
+void lstm_state_erase(lstm_state_t lstmState);
 
-void lstm_state_save(lstm_state_t lstmState, lstm_t lstm);
-void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm);
+int lstm_state_save(lstm_state_t lstmState, lstm_t lstm);
+int lstm_state_restore(lstm_state_t lstmState, lstm_t lstm);
 
 /**
  * @}

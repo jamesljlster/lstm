@@ -136,16 +136,16 @@ int lstm_base_alloc(struct LSTM_BASE* basePtr, int netSize, int reNetSize)
 	// Allocate memory
 	if(netSize > 0)
 	{
-		lstm_alloc(tmpBase.weight, netSize, double, ret, ERR);
-		lstm_alloc(tmpBase.wGrad, netSize, double, ret, ERR);
-		lstm_alloc(tmpBase.wDelta, netSize, double, ret, ERR);
+		lstm_alloc(tmpBase.weight, netSize, float, ret, ERR);
+		lstm_alloc(tmpBase.wGrad, netSize, float, ret, ERR);
+		lstm_alloc(tmpBase.wDelta, netSize, float, ret, ERR);
 	}
 
 	if(reNetSize > 0)
 	{
-		lstm_alloc(tmpBase.rWeight, reNetSize, double, ret, ERR);
-		lstm_alloc(tmpBase.rGrad, reNetSize, double, ret, ERR);
-		lstm_alloc(tmpBase.rDelta, reNetSize, double, ret, ERR);
+		lstm_alloc(tmpBase.rWeight, reNetSize, float, ret, ERR);
+		lstm_alloc(tmpBase.rGrad, reNetSize, float, ret, ERR);
+		lstm_alloc(tmpBase.rDelta, reNetSize, float, ret, ERR);
 	}
 
 	// Assign value

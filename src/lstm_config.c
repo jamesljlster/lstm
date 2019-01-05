@@ -19,6 +19,38 @@ lstm_config_t lstm_get_config(lstm_t lstm)
 	return &lstm->config;
 }
 
+int lstm_config_arch_compare(lstm_config_t src1, lstm_config_t src2)
+{
+	int i;
+	int ret = LSTM_NO_ERROR;
+
+	LOG("enter");
+
+#define __lstm_cmp(elem) \
+	if(src1->elem != src2->elem) \
+	{ \
+		ret = LSTM_NOT_MATCH; \
+		goto RET; \
+	}
+
+	__lstm_cmp(inputs);
+	__lstm_cmp(outputs);
+	__lstm_cmp(layers);
+
+	__lstm_cmp(inputTFunc);
+	__lstm_cmp(outputTFunc);
+	__lstm_cmp(gateTFunc);
+
+	for(i = 0; i < src1->layers; i++)
+	{
+		__lstm_cmp(nodeList[i]);
+	}
+
+RET:
+	LOG("exit");
+	return ret;
+}
+
 int lstm_config_clone(lstm_config_t* lstmCfgPtr, const lstm_config_t lstmCfgSrc)
 {
 	int ret = LSTM_NO_ERROR;
@@ -315,22 +347,22 @@ int lstm_config_get_output_transfer_func(lstm_config_t lstmCfg)
 	return lstmCfg->outputTFunc;
 }
 
-void lstm_config_set_learning_rate(lstm_config_t lstmCfg, double lRate)
+void lstm_config_set_learning_rate(lstm_config_t lstmCfg, float lRate)
 {
 	lstmCfg->lRate = lRate;
 }
 
-double lstm_config_get_learning_rate(lstm_config_t lstmCfg)
+float lstm_config_get_learning_rate(lstm_config_t lstmCfg)
 {
 	return lstmCfg->lRate;
 }
 
-void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, double mCoef)
+void lstm_config_set_momentum_coef(lstm_config_t lstmCfg, float mCoef)
 {
 	lstmCfg->mCoef = mCoef;
 }
 
-double lstm_config_get_momentum_coef(lstm_config_t lstmCfg)
+float lstm_config_get_momentum_coef(lstm_config_t lstmCfg)
 {
 	return lstmCfg->mCoef;
 }

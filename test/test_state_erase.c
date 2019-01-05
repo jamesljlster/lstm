@@ -7,11 +7,13 @@
 int main(int argc, char* argv[])
 {
 	int i;
+	int counter;
 	int iResult;
 	int inputs, outputs;
 
 	lstm_t lstm;
 	lstm_config_t cfg;
+	lstm_state_t state;
 
 	float* input = NULL;
 	float* output = NULL;
@@ -38,6 +40,14 @@ int main(int argc, char* argv[])
 	lstm_fprint_config(stdout, cfg, 0);
 	lstm_fprint_net(stdout, lstm, 0);
 
+	// Create lstm state
+	iResult = lstm_state_create(&state, cfg);
+	if(iResult < 0)
+	{
+		printf("lstm_state_create() failed with error: %d\n", iResult);
+		return -1;
+	}
+
 	// Memory allocation
 	input = calloc(inputs, sizeof(float));
 	output = calloc(outputs, sizeof(float));
@@ -47,8 +57,18 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	counter = 0;
+	printf("Backup and restore lstm state after initialization\n");
 	while(1)
 	{
+		lstm_state_erase(state);
+
+		// Restore lstm state
+		if(counter > 0)
+		{
+			lstm_state_restore(state, lstm);
+		}
+
 		for(i = 0; i < inputs; i++)
 		{
 			printf("Assign %d of %d input: ", i + 1, inputs);
@@ -61,13 +81,20 @@ int main(int argc, char* argv[])
 		}
 
 		lstm_forward_computation(lstm, input, output);
-		lstm_forward_computation_erase(lstm);
 
 		for(i = 0; i < outputs; i++)
 		{
 			printf("%d of %d output: %f\n", i + 1, outputs, output[i]);
 		}
 		printf("\n");
+
+		// Save lstm state
+		if(counter == 0)
+		{
+			lstm_state_save(state, lstm);
+		}
+
+		counter++;
 	}
 
 	lstm_delete(lstm);

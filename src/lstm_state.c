@@ -6,14 +6,42 @@
 
 #include "debug.h"
 
-void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
+void lstm_state_erase(lstm_state_t lstmState)
 {
+	int i, hLayers;
+	lstm_config_t lstmCfg;
+
+	LOG("enter");
+
+	// Get config
+	lstmCfg = &lstmState->config;
+
+	// Get hidden layers
+	hLayers = lstmCfg->layers - 2;
+
+	// Zero state
+	for(i = 0; i < hLayers; i++)
+	{
+		memset(lstmState->cell[i], 0, lstmCfg->nodeList[i + 1] * sizeof(float));
+	}
+
+	memset(lstmState->hidden, 0, lstmCfg->nodeList[hLayers] * sizeof(float));
+
+	LOG("exit");
+}
+
+int lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
+{
+	int ret = LSTM_NO_ERROR;
 	int i, j;
 	int indexTmp;
 
 	struct LSTM_LAYER* layerRef;
 
 	LOG("enter");
+
+	// Check config
+	lstm_run(lstm_config_arch_compare(&lstmState->config, &lstm->config), ret, RET);
 
 	// Get reference
 	layerRef = lstm->layerList;
@@ -37,17 +65,23 @@ void lstm_state_restore(lstm_state_t lstmState, lstm_t lstm)
 		}
 	}
 
+RET:
 	LOG("exit");
+	return ret;
 }
 
-void lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
+int lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
 {
+	int ret = LSTM_NO_ERROR;
 	int i, j;
 	int indexTmp;
 
 	struct LSTM_LAYER* layerRef;
 
 	LOG("enter");
+
+	// Check config
+	lstm_run(lstm_config_arch_compare(&lstmState->config, &lstm->config), ret, RET);
 
 	// Get reference
 	layerRef = lstm->layerList;
@@ -71,7 +105,9 @@ void lstm_state_save(lstm_state_t lstmState, lstm_t lstm)
 		}
 	}
 
+RET:
 	LOG("exit");
+	return ret;
 }
 
 int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg)
@@ -92,13 +128,13 @@ int lstm_state_create(lstm_state_t* lstmStatePtr, lstm_config_t lstmCfg)
 	assert(lstmCfg->layers >= 3);
 	hLayers = lstmCfg->layers - 2;
 
-	lstm_alloc(tmpStatePtr->cell, hLayers, double*, ret, ERR);
+	lstm_alloc(tmpStatePtr->cell, hLayers, float*, ret, ERR);
 	for(i = 0; i < hLayers; i++)
 	{
-		lstm_alloc(tmpStatePtr->cell[i], lstmCfg->nodeList[i + 1], double, ret, ERR);
+		lstm_alloc(tmpStatePtr->cell[i], lstmCfg->nodeList[i + 1], float, ret, ERR);
 	}
 
-	lstm_alloc(tmpStatePtr->hidden, lstmCfg->nodeList[hLayers], double, ret, ERR);
+	lstm_alloc(tmpStatePtr->hidden, lstmCfg->nodeList[hLayers], float, ret, ERR);
 
 	// Assign value
 	*lstmStatePtr = tmpStatePtr;

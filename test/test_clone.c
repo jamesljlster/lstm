@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 	int inputs, outputs;
 
 	lstm_t lstm;
+	lstm_t clone;
 	lstm_config_t cfg;
 
 	float* input = NULL;
@@ -23,6 +24,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	// Import
 	iResult = lstm_import(&lstm, argv[1]);
 	if(iResult != LSTM_NO_ERROR)
 	{
@@ -30,13 +32,24 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	iResult = lstm_export(lstm, "test_export.lstm");
+	// Clone
+	iResult = lstm_clone(&clone, lstm);
+	if(iResult != LSTM_NO_ERROR)
+	{
+		printf("lstm_clone() failed with error: %d\n", iResult);
+		return -1;
+	}
+
+	// Export
+	iResult = lstm_export(clone, "lstm.clone");
 	if(iResult != LSTM_NO_ERROR)
 	{
 		printf("lstm_export() failed with error: %d\n", iResult);
+		return -1;
 	}
 
 	lstm_delete(lstm);
+	lstm_delete(clone);
 
 	return 0;
 }

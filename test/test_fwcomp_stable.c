@@ -15,8 +15,8 @@ int main(int argc, char* argv[])
 	lstm_t lstm;
 	lstm_config_t cfg;
 
-	double* input = NULL;
-	double* output = NULL;
+	float* input = NULL;
+	float* output = NULL;
 
 	srand(time(NULL));
 
@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
 	lstm_fprint_net(stdout, lstm, 0);
 
 	// Memory allocation
-	input = calloc(inputs, sizeof(double));
-	output = calloc(outputs, sizeof(double));
+	input = calloc(inputs, sizeof(float));
+	output = calloc(outputs, sizeof(float));
 	if(input == NULL || output == NULL)
 	{
 		printf("Memory allocation failed\n");
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 	{
 		for(i = 0; i < inputs; i++)
 		{
-			input[i] = (double)(rand()% 2001 - 1000) / 1000.0;
+			input[i] = (float)(rand()% 2001 - 1000) / 1000.0;
 			printf("%d of %d input: %lf\n", i + 1, inputs, input[i]);
 		}
 
